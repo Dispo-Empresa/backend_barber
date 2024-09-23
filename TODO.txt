@@ -1,0 +1,1 @@
+Mover regras de negócio do AppService para o Service.
