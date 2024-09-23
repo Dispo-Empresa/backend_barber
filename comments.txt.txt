@@ -1,0 +1,7 @@
+In Clean Architecture, Services and Repositories belong to different layers, as each serves a distinct purpose in the separation of concerns.
+
+    Repositories typically belong to the Infrastructure Layer (sometimes referred to as the Data or Persistence Layer). Repositories are responsible for interacting with external resources like databases, APIs, or file systems. In Clean Architecture, this layer is at the outer circle and implements the interface that the Application Core (inner layers) depends on.
+
+    Services can be divided into two categories:
+        Application Services: These belong to the Application Layer (or Use Case Layer). They are responsible for orchestrating business logic and coordinating work between entities, repositories, and external services.
+        Domain Services: These belong to the Domain Layer, which contains the core business logic and rules. Domain services represent operations that do not fit naturally into a single entity or aggregate but still reflect the domain logic.
