@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Persistence.Context;
+using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dispo.Barber.Persistence.Repository
+namespace Dispo.Barber.Infrastructure.Repository
 {
     public class RepositoryBase<T> : IRepositoryBase<T> where T : EntityBase
     {

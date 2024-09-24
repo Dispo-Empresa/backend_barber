@@ -16,5 +16,6 @@ namespace Dispo.Barber.Domain.Entities
         public BusinessUnity? BusinessUnity { get; set; }
 
         public IList<ServiceUser> ServicesUser { get; set; } = new List<ServiceUser>();
+        public IList<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

@@ -14,7 +14,7 @@
         public required BusinessUnity BusinessUnity { get; set; }
 
         public required long CustomerId { get; set; }
-        public required User Customer { get; set; }
+        public required Customer Customer { get; set; }
 
         public long? AcceptedUserId { get; set; }
         public User? AcceptedUser { get; set; }

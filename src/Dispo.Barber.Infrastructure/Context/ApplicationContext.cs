@@ -1,7 +1,7 @@
 ﻿using Dispo.Barber.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dispo.Barber.Persistence.Context
+namespace Dispo.Barber.Infrastructure.Context
 {
     public class ApplicationContext : DbContext
     {

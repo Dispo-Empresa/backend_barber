@@ -32,5 +32,22 @@ namespace Dispo.Barber.Application.AppService
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
             });
         }
+
+        public async Task<List<Appointment>> GetUserAppointmentsAsync(long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
+        {
+            var cancellationTokenSource = new CancellationTokenRegistration();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var userRepository = unitOfWork.GetRepository<IUserRepository>();
+                var user = await userRepository.GetAsync(id);
+                if (user is null)
+                {
+                    throw new VersionNotFoundException();
+                }
+
+                return user.Appointments.ToList();
+            });
+        }
+
     }
 }

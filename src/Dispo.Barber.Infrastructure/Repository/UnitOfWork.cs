@@ -1,10 +1,9 @@
 ﻿using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Persistence.Context;
+using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-public class UnitOfWork(IServiceProvider serviceProvider, ILogger logger) : IUnitOfWork
+public class UnitOfWork(IServiceProvider serviceProvider) : IUnitOfWork
 {
     private bool _disposed;
     private string _errorMessage = string.Empty;
@@ -16,7 +15,7 @@ public class UnitOfWork(IServiceProvider serviceProvider, ILogger logger) : IUni
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
         context = serviceProvider.GetRequiredService<ApplicationContext>();
-        transaction = await context.Database.BeginTransactionAsync();
+        transaction = await context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken)
@@ -34,6 +33,10 @@ public class UnitOfWork(IServiceProvider serviceProvider, ILogger logger) : IUni
         {
             await RollbackAsync(cancellationToken);
             throw;
+        }
+        finally 
+        {
+            await DisposeTransactionAsync();
         }
     }
 
@@ -55,6 +58,16 @@ public class UnitOfWork(IServiceProvider serviceProvider, ILogger logger) : IUni
         }
 
         return await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task DisposeTransactionAsync()
+    {
+        if (transaction is null)
+        {
+            return;
+        }
+
+        await transaction.DisposeAsync();
     }
 
     public T GetRepository<T>() where T : class
@@ -99,6 +112,24 @@ public class UnitOfWork(IServiceProvider serviceProvider, ILogger logger) : IUni
         catch
         {
             await RollbackAsync(cancellationToken);
+        }
+        finally
+        {
+            await DisposeTransactionAsync();
+        }
+    }
+
+    public async Task<T> QueryUnderTransactionAsync<T>(CancellationToken cancellationToken, Func<Task<T>> action)
+    {
+        try
+        {
+            await BeginTransactionAsync(cancellationToken);
+
+            return await action();
+        }
+        finally
+        {
+            await DisposeTransactionAsync();
         }
     }
 }

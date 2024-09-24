@@ -5,8 +5,8 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Persistence.Context;
-using Dispo.Barber.Persistence.Repository;
+using Dispo.Barber.Infrastructure.Context;
+using Dispo.Barber.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +28,7 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICompanyService, CompanyService>();
 builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
 builder.Services.AddTransient<IUserAppService, UserAppService>();
+builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
@@ -40,6 +41,8 @@ var config = new MapperConfiguration(cfg =>
     cfg.AddProfile<CompanyProfile>();
     cfg.AddProfile<BusinessUnityProfile>();
     cfg.AddProfile<UserProfile>();
+    cfg.AddProfile<AppointmentProfile>();
+    cfg.AddProfile<CustomerProfile>();
 });
 
 IMapper mapper = config.CreateMapper();

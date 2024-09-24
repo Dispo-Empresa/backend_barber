@@ -1,8 +1,8 @@
 ﻿using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Persistence.Context;
+using Dispo.Barber.Infrastructure.Context;
 
-namespace Dispo.Barber.Persistence.Repository
+namespace Dispo.Barber.Infrastructure.Repository
 {
     public class AppointmentRepository : RepositoryBase<Appointment>, IAppointmentRepository
     {

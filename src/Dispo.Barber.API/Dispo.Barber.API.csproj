@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -27,7 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Dispo.Barber.Application\Dispo.Barber.Application.csproj" />
     <ProjectReference Include="..\Dispo.Barber.Domain\Dispo.Barber.Domain.csproj" />
-    <ProjectReference Include="..\Dispo.Barber.Persistence\Dispo.Barber.Persistence.csproj" />
+    <ProjectReference Include="..\Dispo.Barber.Infrastructure\Dispo.Barber.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
