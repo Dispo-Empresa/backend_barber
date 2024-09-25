@@ -1,5 +1,4 @@
-﻿using Dispo.Barber.Domain.DTO.ServiceUser;
-using Dispo.Barber.Domain.Enum;
+﻿using Dispo.Barber.Domain.Enum;
 
 namespace Dispo.Barber.Domain.DTO.User
 {

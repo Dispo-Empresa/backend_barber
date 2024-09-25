@@ -30,6 +30,7 @@ builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
 builder.Services.AddTransient<IUserAppService, UserAppService>();
 builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();
 builder.Services.AddTransient<IDashboardAppService, DashboardAppService>();
+builder.Services.AddTransient<IServiceAppService, ServiceAppService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 

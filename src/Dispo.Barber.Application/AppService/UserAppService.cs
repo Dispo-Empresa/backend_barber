@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.User;
@@ -7,8 +8,20 @@ using Dispo.Barber.Domain.Extension;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class UserAppService(IUnitOfWork unitOfWork) : IUserAppService
+    public class UserAppService(IUnitOfWork unitOfWork, IMapper mapper) : IUserAppService
     {
+        public async Task CreateAsync(CreateUserDTO createUserDTO)
+        {
+            var cancellationTokenSource = new CancellationTokenRegistration();
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var userRepository = unitOfWork.GetRepository<IUserRepository>();
+                var user = mapper.Map<User>(createUserDTO);
+                await userRepository.AddAsync(user);
+                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+            });
+        }
+
         public async Task AddServiceToUserAsync(long id, AddServiceToUserDTO addServiceToUserDTO)
         {
             var cancellationTokenSource = new CancellationTokenRegistration();

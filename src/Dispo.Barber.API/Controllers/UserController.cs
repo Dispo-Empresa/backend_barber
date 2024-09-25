@@ -10,8 +10,16 @@ namespace Dispo.Barber.API.Controllers
     public class UserController(IUserAppService userAppService) : ControllerBase
     {
         [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateUserDTO createUserDTO)
+        {
+            await userAppService.CreateAsync(createUserDTO);
+            return Ok();
+        }
+
+        [AllowAnonymous]
         [HttpPost("{id}/services")]
-        public async Task<IActionResult> Create([FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
+        public async Task<IActionResult> AddServiceToUser([FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
         {
             await userAppService.AddServiceToUserAsync(id, addServiceToUserDTO);
             return Ok();
