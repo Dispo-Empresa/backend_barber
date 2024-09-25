@@ -1,14 +1,31 @@
 ﻿using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dispo.Barber.Infrastructure.Repository
 {
     public class UserRepository : RepositoryBase<User>, IUserRepository
     {
+        private readonly ApplicationContext context;
         public UserRepository(ApplicationContext context)
             : base(context)
         {
+            this.context = context;
+        }
+
+        public async Task<List<Appointment>> GetAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Include("Appointments.Service")
+                                .Where(w => w.Id == id)
+                                .SelectMany(s => s.Appointments)
+                                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Include("Appointments.Service")
+                                      .FirstOrDefaultAsync(w => w.Id == id);
         }
     }
 }

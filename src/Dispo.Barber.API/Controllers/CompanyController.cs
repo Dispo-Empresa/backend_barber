@@ -16,5 +16,13 @@ namespace Dispo.Barber.API.Controllers
             await companyAppService.CreateAsync(companyDTO);
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            await companyAppService.CreateAsync();
+            return Ok();
+        }
     }
 }

@@ -17,5 +17,43 @@ namespace Dispo.Barber.Domain.Entities
 
         public IList<ServiceUser> ServicesUser { get; set; } = new List<ServiceUser>();
         public IList<Appointment> Appointments { get; set; } = new List<Appointment>();
+
+        public string EstimatedGains()
+        {
+            if (Appointments.Count == 0)
+            {
+                return "N/A";
+            }
+
+            return $"R${Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Service.Price)}";
+        }
+
+        public string TodayAppointments()
+        {
+            if (Appointments.Count == 0)
+            {
+                return "N/A";
+            }
+
+            return $"{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Now)}/{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1))}";
+        }
+
+        public string ScheduledHours()
+        {
+            if (Appointments.Count == 0)
+            {
+                return "N/A";
+            }
+
+            return $"{FormatMinutesToHours(Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(w => w.Service.Duration))}";
+        }
+
+        private static string FormatMinutesToHours(int minutes)
+        {
+            int hours = minutes / 60;
+            int remainingMinutes = minutes % 60;
+
+            return $"{hours:D2}h{remainingMinutes:D2}m";
+        }
     }
 }

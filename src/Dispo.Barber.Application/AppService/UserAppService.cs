@@ -39,13 +39,7 @@ namespace Dispo.Barber.Application.AppService
             return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
-                if (user is null)
-                {
-                    throw new VersionNotFoundException();
-                }
-
-                return user.Appointments.ToList();
+                return await userRepository.GetAppointmentsAsync(cancellationTokenSource.Token, id);
             });
         }
 

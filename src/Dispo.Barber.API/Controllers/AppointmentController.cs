@@ -16,5 +16,13 @@ namespace Dispo.Barber.API.Controllers
             await appointmentAppService.CreateAsync(createAppointmentDTO);
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpPatch("{id}/inform-problem")]
+        public async Task<IActionResult> InformProblem([FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
+        {
+            await appointmentAppService.InformProblemAsync(id, informAppointmentProblemDTO);
+            return Ok();
+        }
     }
 }
