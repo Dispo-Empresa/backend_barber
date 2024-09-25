@@ -21,7 +21,7 @@ namespace Dispo.Barber.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            await companyAppService.CreateAsync();
+            await companyAppService.GetAllAsync();
             return Ok();
         }
     }
