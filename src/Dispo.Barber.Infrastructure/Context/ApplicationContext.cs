@@ -21,5 +21,6 @@ namespace Dispo.Barber.Infrastructure.Context
         public DbSet<User> Users { get; set; }
         public DbSet<ServiceUser> UserServices { get; set; }
         public DbSet<ServiceCompany> CompanyServices { get; set; }
+        public DbSet<UserSchedule> UserSchedules { get; set; }
     }
 }

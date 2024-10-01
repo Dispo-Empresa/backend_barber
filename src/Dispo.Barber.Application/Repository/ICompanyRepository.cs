@@ -4,5 +4,6 @@ namespace Dispo.Barber.Application.Repository
 {
     public interface ICompanyRepository : IRepositoryBase<Company>
     {
+        Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id);
     }
 }

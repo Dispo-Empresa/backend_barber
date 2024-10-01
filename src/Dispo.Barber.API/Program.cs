@@ -37,6 +37,8 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
                 .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddRequestTimeouts();
+
 var config = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<ServiceProfile>();

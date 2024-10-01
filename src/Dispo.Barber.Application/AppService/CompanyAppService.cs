@@ -29,5 +29,15 @@ namespace Dispo.Barber.Application.AppService
                 return await companyRepository.GetAllAsync();
             });
         }
+
+        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                return await companyRepository.GetBusinessUnitiesAsync(id);
+            });
+        }
     }
 }

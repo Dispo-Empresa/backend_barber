@@ -22,6 +22,14 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<UserSchedule>> GetSchedulesAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Include(i => i.Schedules)
+                                      .Where(w => w.Id == id)
+                                      .SelectMany(s => s.Schedules)
+                                      .ToListAsync();
+        }
+
         public async Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Users.Include("Appointments.Service")

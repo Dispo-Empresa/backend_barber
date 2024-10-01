@@ -8,5 +8,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task CreateAsync(CreateCompanyDTO companyDTO);
 
         Task<List<Company>> GetAllAsync();
+
+        Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id);
     }
 }
