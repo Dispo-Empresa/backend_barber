@@ -20,5 +20,11 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .SelectMany(s => s.BusinessUnities)
                                 .ToListAsync();
         }
+
+        public async Task<Company> GetWithBusinessUnitiesAsync(long id)
+        {
+            return await context.Companies.Include(i => i.BusinessUnities)
+                                .FirstOrDefaultAsync(w => w.Id == id);
+        }
     }
 }

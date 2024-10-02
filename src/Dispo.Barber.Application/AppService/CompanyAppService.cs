@@ -39,5 +39,36 @@ namespace Dispo.Barber.Application.AppService
                 return await companyRepository.GetBusinessUnitiesAsync(id);
             });
         }
+
+        public async Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                var company = await companyRepository.GetWithBusinessUnitiesAsync(id);
+                if (company is null)
+                {
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
+                {
+                    company.Name = updateCompanyDTO.Name;
+                }
+
+                if (company.BusinessUnities.Any())
+                {
+                    if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
+                    {
+                        var businessUnity = company.BusinessUnities.First();
+                        businessUnity.Phone = updateCompanyDTO.Phone;
+                    }
+                }
+
+                companyRepository.Update(company);
+                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+            });
+        }
     }
 }

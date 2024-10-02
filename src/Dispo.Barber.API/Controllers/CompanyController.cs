@@ -32,5 +32,13 @@ namespace Dispo.Barber.API.Controllers
             var result = await companyAppService.GetBusinessUnitiesAsync(id);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
+        {
+            await companyAppService.UpdateAsync(id, updateCompanyDTO);
+            return Ok();
+        }
     }
 }

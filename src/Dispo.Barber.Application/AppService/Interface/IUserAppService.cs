@@ -12,5 +12,9 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task<List<Appointment>> GetUserAppointmentsAsync(long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task<List<UserSchedule>> GetUserSchedulesAsync(long id);
+
+        Task DisableUserAsync(long id);
+
+        Task UpdateAsync(long id, UpdateUserDTO updateUserDTO);
     }
 }

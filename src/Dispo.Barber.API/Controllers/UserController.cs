@@ -18,10 +18,10 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] CreateUserDTO createUserDTO)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
-            await userAppService.CreateAsync(createUserDTO);
+            await userAppService.UpdateAsync(id, updateUserDTO);
             return Ok();
         }
 
@@ -48,6 +48,14 @@ namespace Dispo.Barber.API.Controllers
         {
             var result = await userAppService.GetUserSchedulesAsync(id);
             return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("{id}/disable")]
+        public async Task<IActionResult> Disable([FromRoute] long id)
+        {
+            await userAppService.DisableUserAsync(id);
+            return Ok();
         }
     }
 }
