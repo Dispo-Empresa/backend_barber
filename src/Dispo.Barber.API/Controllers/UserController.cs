@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
+using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace Dispo.Barber.API.Controllers
 {
     [Route("api/v1/users")]
     [ApiController]
-    public class UserController(IUserAppService userAppService) : ControllerBase
+    public class UserController(IUserAppService userAppService, IinformationChatService informationChatService) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost]
@@ -31,6 +32,21 @@ namespace Dispo.Barber.API.Controllers
         {
             var result = await userAppService.GetUserAppointmentsAsync(id, getUserAppointmentsDTO);
             return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("user-information/{id}")]
+        public async Task<IActionResult> GetInformationChatById(long id)
+        {
+            try
+            {
+                var informationChat = await informationChatService.GetInformationChatByIdUser(id);
+                return Ok(informationChat);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
+            }
         }
     }
 }

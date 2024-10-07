@@ -1,0 +1,24 @@
+﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
+
+namespace Dispo.Barber.Infrastructure.Repository
+{
+    public class CustomerRepository : RepositoryBase<Customer>, ICustomerRepository
+    {
+        private readonly ApplicationContext context;
+        public CustomerRepository(ApplicationContext context)
+            : base(context)
+        {
+            this.context = context;
+        }
+
+        public async Task<Customer> GetCustomerByPhoneAsync(string phone)
+        {
+            return await context.Customer
+                   .FirstOrDefaultAsync(w => w.Phone == phone);
+        }
+
+    }
+}
