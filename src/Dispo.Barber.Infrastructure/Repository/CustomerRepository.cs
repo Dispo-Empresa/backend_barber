@@ -15,7 +15,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<Customer> GetCustomerByPhoneAsync(string phone)
         {
-            return await context.Customer
+            return await context.Customers
                    .FirstOrDefaultAsync(w => w.Phone == phone);
         }
 
