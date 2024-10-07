@@ -17,6 +17,7 @@ namespace Dispo.Barber.Domain.Entities
 
         public IList<ServiceUser> ServicesUser { get; set; } = new List<ServiceUser>();
         public IList<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public IList<UserSchedule> Schedules { get; set; } = new List<UserSchedule>();
 
         public string EstimatedGains()
         {

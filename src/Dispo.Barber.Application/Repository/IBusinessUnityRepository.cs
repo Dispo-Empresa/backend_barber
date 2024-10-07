@@ -5,5 +5,6 @@ namespace Dispo.Barber.Application.Repository
     public interface IBusinessUnityRepository : IRepositoryBase<BusinessUnity>
     {
         Task<long> GetIdByCompanyAsync(long companyId);
+        Task<List<User>> GetUsersAsync(long id);
     }
 }

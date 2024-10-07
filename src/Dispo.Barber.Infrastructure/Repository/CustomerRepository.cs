@@ -8,8 +8,7 @@ namespace Dispo.Barber.Infrastructure.Repository
     public class CustomerRepository : RepositoryBase<Customer>, ICustomerRepository
     {
         private readonly ApplicationContext context;
-        public CustomerRepository(ApplicationContext context)
-            : base(context)
+        public CustomerRepository(ApplicationContext context) : base(context)
         {
             this.context = context;
         }
@@ -18,6 +17,18 @@ namespace Dispo.Barber.Infrastructure.Repository
         {
             return await context.Customer
                    .FirstOrDefaultAsync(w => w.Phone == phone);
+        }
+
+        public async Task<List<Customer>> GetCustomersForAppointment(string search)
+        {
+            if (search.Any(char.IsDigit))
+            {
+                return await context.Customers.Where(w => w.Phone.Contains(search))
+                                              .ToListAsync();
+            }
+         
+            return await context.Customers.Where(w => w.Name.Contains(search))
+                                          .ToListAsync();
         }
 
     }

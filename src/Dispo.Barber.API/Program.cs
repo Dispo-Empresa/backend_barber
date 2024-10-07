@@ -47,13 +47,17 @@ builder.Services.AddTransient<IDashboardAppService, DashboardAppService>();
 builder.Services.AddTransient<IServiceAppService, ServiceAppService>();
 builder.Services.AddTransient<ICustomerService, CustomerService>();
 builder.Services.AddTransient<IinformationChatService, InformationChatService>();
+builder.Services.AddTransient<ICustomerAppService, CustomerAppService>();
+builder.Services.AddTransient<IBusinessUnityAppService, BusinessUnityAppService>();
+
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
                 .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// AutoMapper configuration
+builder.Services.AddRequestTimeouts();
+
 var config = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<ServiceProfile>();

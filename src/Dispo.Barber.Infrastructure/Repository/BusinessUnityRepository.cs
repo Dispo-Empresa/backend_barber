@@ -14,14 +14,22 @@ namespace Dispo.Barber.Infrastructure.Repository
             this.context = context;
         }
 
+        public async Task<List<User>> GetUsersAsync(long id)
+        {
+            return await context.BusinessUnities.Where(w => w.Id == id)
+                                .Include(i => i.Users)
+                                .SelectMany(s => s.Users.Where(x => x.Active))
+                                .ToListAsync();
+        }
+
         public async Task<long> GetIdByCompanyAsync(long companyId)
         {
             var businessUnity = await context.BusinessUnities
                 .Where(w => w.CompanyId == companyId)
-                .Select(b => b.Id) 
+                .Select(b => b.Id)
                 .FirstOrDefaultAsync();
 
-            return businessUnity; 
+            return businessUnity;
         }
 
     }

@@ -16,7 +16,7 @@ namespace Dispo.Barber.Persistence.Migrations
                 table: "Appointments");
 
             migrationBuilder.CreateTable(
-                name: "Customer",
+                name: "Customers",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -26,14 +26,14 @@ namespace Dispo.Barber.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.PrimaryKey("PK_Customers", x => x.Id);
                 });
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Appointments_Customer_CustomerId",
+                name: "FK_Appointments_Customers_CustomerId",
                 table: "Appointments",
                 column: "CustomerId",
-                principalTable: "Customer",
+                principalTable: "Customers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -42,11 +42,11 @@ namespace Dispo.Barber.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Appointments_Customer_CustomerId",
+                name: "FK_Appointments_Customers_CustomerId",
                 table: "Appointments");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "Customers");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Appointments_Users_CustomerId",

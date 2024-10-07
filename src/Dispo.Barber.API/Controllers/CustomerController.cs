@@ -1,13 +1,15 @@
 ﻿using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO;
+using Dispo.Barber.Application.AppService;
+using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.API.Controllers
 {
-    [Route("api/v1/customer")]
+    [Route("api/v1/customers")]
     [ApiController]
-    public class CustomerController(ICustomerService customerService) : ControllerBase
+    public class CustomerController(ICustomerAppService customerAppService) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost]
@@ -29,15 +31,21 @@ namespace Dispo.Barber.API.Controllers
         public async Task<IActionResult> GetByPhone(string phone)
         {
             try
-            {
-                var result = await customerService.GetByPhoneAsync(phone);
-                return Ok(result);
-            }
+        {
+            return Ok(result);
+        }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Ocorreu um erro ao buscar o cliente.", error = ex.Message });
             }
             
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] string search)
+        {
+            var result = await customerAppService.GetForAppointment(search);
+            return Ok(result);
         }
     }
 }
