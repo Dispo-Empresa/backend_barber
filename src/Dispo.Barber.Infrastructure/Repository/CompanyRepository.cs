@@ -26,5 +26,15 @@ namespace Dispo.Barber.Infrastructure.Repository
             return await context.Companies.Include(i => i.BusinessUnities)
                                 .FirstOrDefaultAsync(w => w.Id == id);
         }
+
+        public async Task<List<long>> GetServicesByCompanyAsync(long companyId)
+        {
+            var companyService = await context.CompanyServices
+                            .Where(w => w.CompanyId == companyId)
+                            .Select(w => w.ServiceId)
+                            .ToListAsync();
+
+            return companyService;
+        }
     }
 }

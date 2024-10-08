@@ -13,6 +13,12 @@ namespace Dispo.Barber.Infrastructure.Repository
             this.context = context;
         }
 
+        public async Task<Customer> GetCustomerByPhoneAsync(string phone)
+        {
+            return await context.Customers
+                   .FirstOrDefaultAsync(w => w.Phone == phone);
+        }
+
         public async Task<List<Customer>> GetCustomersForAppointment(string search)
         {
             if (search.Any(char.IsDigit))

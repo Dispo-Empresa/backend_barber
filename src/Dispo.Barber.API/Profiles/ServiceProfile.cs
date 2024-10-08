@@ -9,6 +9,7 @@ namespace Dispo.Barber.API.Profiles
         public ServiceProfile()
         {
             CreateMap<CreateServiceDTO, Service>().ReverseMap();
+            CreateMap<ServiceInformationDTO, Service>().ReverseMap();
         }
     }
 }

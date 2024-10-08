@@ -1,6 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTO.BusinessUnity;
 using Dispo.Barber.Domain.DTO.Service;
-using Dispo.Barber.Domain.DTO.User;
 
 namespace Dispo.Barber.Domain.DTO.Company
 {

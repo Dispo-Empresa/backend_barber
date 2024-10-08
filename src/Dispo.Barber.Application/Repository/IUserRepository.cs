@@ -6,6 +6,7 @@ namespace Dispo.Barber.Application.Repository
     {
         Task<List<Appointment>> GetAppointmentsAsync(CancellationToken cancellationToken, long id);
         Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id);
+        Task<List<User>> GetUserByBusinessAsync(long businessId);
         Task<List<UserSchedule>> GetSchedulesAsync(CancellationToken cancellationToken, long id);
     }
 }
