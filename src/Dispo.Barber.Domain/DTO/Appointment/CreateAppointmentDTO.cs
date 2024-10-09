@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.DTO.Appointment
+﻿using Dispo.Barber.Domain.DTO.Customer;
+
+namespace Dispo.Barber.Domain.DTO.Appointment
 {
     public class CreateAppointmentDTO
     {

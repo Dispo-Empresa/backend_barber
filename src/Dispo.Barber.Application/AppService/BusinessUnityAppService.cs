@@ -15,5 +15,14 @@ namespace Dispo.Barber.Application.AppService
                 return await companyRepository.GetUsersAsync(id);
             });
         }
+
+        public async Task<List<User>> GetPendingUsersAsync(CancellationToken cancellationToken, long id)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<IBusinessUnityRepository>();
+                return await companyRepository.GetPendingUsersAsync(cancellationToken, id);
+            });
+        }
     }
 }

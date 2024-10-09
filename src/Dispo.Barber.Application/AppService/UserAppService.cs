@@ -1,10 +1,13 @@
 ﻿using System.Data;
+using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.Company;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
 
 namespace Dispo.Barber.Application.AppService
@@ -68,25 +71,6 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
-        public async Task DisableUserAsync(long id)
-        {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
-            {
-                var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
-                if (user is null)
-                {
-                    throw new VersionNotFoundException();
-                }
-
-                user.Active = false;
-
-                userRepository.Update(user);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
-            });
-        }
-
         public async Task UpdateAsync(long id, UpdateUserDTO updateUserDTO)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -116,6 +100,24 @@ namespace Dispo.Barber.Application.AppService
 
                 userRepository.Update(user);
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+            });
+        }
+
+        public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO)
+        {
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var userRepository = unitOfWork.GetRepository<IUserRepository>();
+                var user = await userRepository.GetAsync(id);
+                if (user is null)
+                {
+                    throw new NotFoundException("Usuário não encontrado.");
+                }
+
+                user.Status = changeStatusDTO.Status;
+
+                userRepository.Update(user);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 

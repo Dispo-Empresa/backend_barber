@@ -27,7 +27,7 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}/business-unities")]
-        public async Task<IActionResult> Get([FromRoute] long id)
+        public async Task<IActionResult> GetBusinessUnities([FromRoute] long id)
         {
             var result = await companyAppService.GetBusinessUnitiesAsync(id);
             return Ok(result);
@@ -40,5 +40,14 @@ namespace Dispo.Barber.API.Controllers
             await companyAppService.UpdateAsync(id, updateCompanyDTO);
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromRoute] long id)
+        {
+            var result = await companyAppService.GetAsync(id);
+            return Ok(result);
+        }
+
     }
 }

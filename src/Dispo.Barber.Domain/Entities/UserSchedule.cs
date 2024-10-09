@@ -20,5 +20,8 @@
         public string EndDate { get; set; }
         public bool IsRest { get; set; }
         public bool DayOff { get; set; }
+
+        public long UserId { get; set; }
+        public User User { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Dispo.Barber.Domain.DTO
+﻿namespace Dispo.Barber.Domain.DTO.Customer
 {
     public class CustomerDTO
     {

@@ -3,6 +3,7 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.Company;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -68,6 +69,22 @@ namespace Dispo.Barber.Application.AppService
 
                 companyRepository.Update(company);
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+            });
+        }
+
+        public async Task<Company> GetAsync(long id)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                var company = await companyRepository.GetAsync(id);
+                if (company is null)
+                {
+                    throw new NotFoundException("Empresa não existe.");
+                }
+
+                return company;
             });
         }
     }

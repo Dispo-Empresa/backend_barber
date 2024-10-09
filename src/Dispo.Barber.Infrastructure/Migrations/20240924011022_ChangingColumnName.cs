@@ -12,7 +12,7 @@ namespace Dispo.Barber.Persistence.Migrations
         {
             migrationBuilder.RenameColumn(
                 name: "Nome",
-                table: "Customer",
+                table: "Customers",
                 newName: "Name");
         }
 
@@ -21,7 +21,7 @@ namespace Dispo.Barber.Persistence.Migrations
         {
             migrationBuilder.RenameColumn(
                 name: "Name",
-                table: "Customer",
+                table: "Customers",
                 newName: "Nome");
         }
     }

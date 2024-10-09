@@ -28,7 +28,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public void Delete(T entity)
         {
-            context.Update(entity);
+            context.Remove(entity);
         }
 
         public async Task<T?> GetAsync(long id)

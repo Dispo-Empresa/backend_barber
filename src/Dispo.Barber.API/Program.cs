@@ -25,6 +25,7 @@ builder.Services.AddTransient<IBusinessUnityRepository, BusinessUnityRepository>
 builder.Services.AddTransient<IServiceRepository, ServiceRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
+builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 
 builder.Services.AddTransient<ICompanyService, CompanyService>();
 builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
@@ -34,6 +35,7 @@ builder.Services.AddTransient<IDashboardAppService, DashboardAppService>();
 builder.Services.AddTransient<IServiceAppService, ServiceAppService>();
 builder.Services.AddTransient<ICustomerAppService, CustomerAppService>();
 builder.Services.AddTransient<IBusinessUnityAppService, BusinessUnityAppService>();
+builder.Services.AddTransient<IScheduleAppService, ScheduleAppService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 

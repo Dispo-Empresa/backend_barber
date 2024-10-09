@@ -13,8 +13,8 @@ namespace Dispo.Barber.Application.AppService.Interface
 
         Task<List<UserSchedule>> GetUserSchedulesAsync(long id);
 
-        Task DisableUserAsync(long id);
-
         Task UpdateAsync(long id, UpdateUserDTO updateUserDTO);
+
+        Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO);
     }
 }

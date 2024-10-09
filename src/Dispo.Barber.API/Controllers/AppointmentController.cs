@@ -10,6 +10,14 @@ namespace Dispo.Barber.API.Controllers
     public class AppointmentController(IAppointmentAppService appointmentAppService) : ControllerBase
     {
         [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromRoute] long id)
+        {
+            var result = await appointmentAppService.GetAsync(id);
+            return Ok();
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentDTO createAppointmentDTO)
         {

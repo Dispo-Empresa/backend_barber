@@ -51,10 +51,10 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPatch("{id}/disable")]
-        public async Task<IActionResult> Disable([FromRoute] long id)
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> ChangeStatus(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangeStatusDTO changeStatusDTO)
         {
-            await userAppService.DisableUserAsync(id);
+            await userAppService.ChangeStatusAsync(cancellationToken, id, changeStatusDTO);
             return Ok();
         }
     }

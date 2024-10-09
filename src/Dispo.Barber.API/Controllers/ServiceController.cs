@@ -10,7 +10,7 @@ namespace Dispo.Barber.API.Controllers
     public class ServiceController(IServiceAppService serviceAppService) : ControllerBase
     {
         [AllowAnonymous]
-        [HttpPost("{id}")]
+        [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateServiceDTO createServiceDTO)
         {
             await serviceAppService.CreateAsync(createServiceDTO);

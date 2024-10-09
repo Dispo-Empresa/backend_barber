@@ -12,5 +12,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id);
 
         Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO);
+
+        Task<Company> GetAsync(long id);
     }
 }
