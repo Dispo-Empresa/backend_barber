@@ -19,6 +19,15 @@ namespace Dispo.Barber.Infrastructure.Repository
                    .FirstOrDefaultAsync(w => w.Phone == phone);
         }
 
+        public async Task<long> GetCustomerIdByPhoneAsync(string phone)
+        {
+            return await context.Customers
+                    .Where(w => w.Phone == phone)
+                    .Select(w => w.Id)
+                    .FirstOrDefaultAsync();
+
+        }
+
         public async Task<List<Customer>> GetCustomersForAppointment(string search)
         {
             if (search.Any(char.IsDigit))

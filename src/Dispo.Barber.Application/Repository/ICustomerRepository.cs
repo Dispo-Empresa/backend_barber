@@ -6,5 +6,6 @@ namespace Dispo.Barber.Application.Repository
     {
         Task<Customer> GetCustomerByPhoneAsync(string phone);
         Task<List<Customer>> GetCustomersForAppointment(string search);
+        Task<long> GetCustomerIdByPhoneAsync(string phone);
     }
 }

@@ -17,7 +17,7 @@ namespace Dispo.Barber.API.Controllers
             try
             {
                 var result = await customerService.CreateAsync(customerDTO); 
-                return Ok(result); 
+                return Ok(new { id = result}); 
             }
             catch (Exception ex)
             {

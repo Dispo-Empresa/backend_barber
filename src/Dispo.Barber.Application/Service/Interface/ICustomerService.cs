@@ -3,7 +3,7 @@ namespace Dispo.Barber.Application.Service.Interface
 {
     public interface ICustomerService
     {
-        Task<CustomerDTO> CreateAsync(CustomerDTO createUserDTO);
+        Task<long> CreateAsync(CustomerDTO customerDTO);
         Task<CustomerDTO> GetByPhoneAsync(string phone);
     }
 }
