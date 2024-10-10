@@ -11,13 +11,13 @@ namespace Dispo.Barber.Application.Service
 {
     public class CustomerService(IUnitOfWork unitOfWork, IMapper mapper) : ICustomerService
     {
-        public async Task<long> CreateAsync(CustomerDTO customerDTO)
+        public async Task<CustomerDTO> CreateAsync(CustomerDTO customerDTO)
         {
             var cancellationTokenSource = new CancellationTokenRegistration();
             customerDTO.Phone = PhoneNumberUtils.FormatPhoneNumber(customerDTO.Phone);
             var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
-            var idCustomer = await customerRepository.GetCustomerIdByPhoneAsync(customerDTO.Phone);
-            if (idCustomer == 0)
+            var customerInformation = await GetByPhoneAsync(customerDTO.Phone);
+            if (customerInformation == null)
             {
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
                 {
@@ -28,11 +28,11 @@ namespace Dispo.Barber.Application.Service
 
                 });
 
-                return await customerRepository.GetCustomerIdByPhoneAsync(customerDTO.Phone);
+                return await GetByPhoneAsync(customerDTO.Phone);
             }
             else
             {
-                return idCustomer;
+                return customerInformation;
             }
         }
 
