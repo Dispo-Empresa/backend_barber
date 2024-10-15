@@ -57,5 +57,13 @@ namespace Dispo.Barber.API.Controllers
             await userAppService.ChangeStatusAsync(cancellationToken, id, changeStatusDTO);
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpPatch("{id}/password")]
+        public async Task<IActionResult> ChangePassword(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            await userAppService.ChangePasswordAsync(cancellationToken, id, changePasswordDTO);
+            return Ok();
+        }
     }
 }

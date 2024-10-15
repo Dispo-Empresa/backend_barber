@@ -21,7 +21,6 @@ namespace Dispo.Barber.Application.AppService
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
                 var user = mapper.Map<User>(createUserDTO);
-                user.Password = PasswordEncryptor.HashPassword(user.Password);
                 user.Schedules.AddRange(BuildNormalDays());
                 await userRepository.AddAsync(user);
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
@@ -115,6 +114,24 @@ namespace Dispo.Barber.Application.AppService
                 }
 
                 user.Status = changeStatusDTO.Status;
+
+                userRepository.Update(user);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+            });
+        }
+
+        public async Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO)
+        {
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var userRepository = unitOfWork.GetRepository<IUserRepository>();
+                var user = await userRepository.GetAsync(id);
+                if (user is null)
+                {
+                    throw new NotFoundException("Usuário não encontrado.");
+                }
+
+                user.Password = PasswordEncryptor.HashPassword(changePasswordDTO.Password);
 
                 userRepository.Update(user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);

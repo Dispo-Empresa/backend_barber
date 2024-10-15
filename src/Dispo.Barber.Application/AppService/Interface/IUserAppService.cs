@@ -16,5 +16,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task UpdateAsync(long id, UpdateUserDTO updateUserDTO);
 
         Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO);
+
+        Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO);
     }
 }

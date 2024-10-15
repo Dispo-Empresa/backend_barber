@@ -5,9 +5,12 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Bundle.Entities;
+using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +40,8 @@ builder.Services.AddTransient<ICustomerAppService, CustomerAppService>();
 builder.Services.AddTransient<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddTransient<IScheduleAppService, ScheduleAppService>();
 
+builder.Services.AddTransient<IMigrationManager, MigrationManager>();
+
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
@@ -56,7 +61,6 @@ var config = new MapperConfiguration(cfg =>
 
 IMapper mapper = config.CreateMapper();
 builder.Services.AddSingleton(mapper);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,6 +69,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
+//    migrationManager.Migrate();
+//}
 
 app.UseHttpsRedirection();
 

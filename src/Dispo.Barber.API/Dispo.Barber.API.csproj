@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Dispo.Barber.Bundle\Dispo.Barber.Bundle.csproj" />
     <ProjectReference Include="..\Dispo.Barber.Application\Dispo.Barber.Application.csproj" />
     <ProjectReference Include="..\Dispo.Barber.Domain\Dispo.Barber.Domain.csproj" />
     <ProjectReference Include="..\Dispo.Barber.Infrastructure\Dispo.Barber.Infrastructure.csproj" />
