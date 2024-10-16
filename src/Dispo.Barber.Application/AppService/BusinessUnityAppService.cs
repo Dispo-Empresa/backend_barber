@@ -6,13 +6,12 @@ namespace Dispo.Barber.Application.AppService
 {
     public class BusinessUnityAppService(IUnitOfWork unitOfWork) : IBusinessUnityAppService
     {
-        public async Task<List<User>> GetUsersAsync(long id)
+        public async Task<List<User>> GetUsersAsync(CancellationToken cancellationToken, long id)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<IBusinessUnityRepository>();
-                return await companyRepository.GetUsersAsync(id);
+                return await companyRepository.GetUsersAsync(cancellationToken, id);
             });
         }
 

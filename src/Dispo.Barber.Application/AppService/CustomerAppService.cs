@@ -6,13 +6,12 @@ namespace Dispo.Barber.Application.AppService
 {
     public class CustomerAppService(IUnitOfWork unitOfWork) : ICustomerAppService
     {
-        public async Task<List<Customer>> GetForAppointment(string search)
+        public async Task<List<Customer>> GetForAppointment(CancellationToken cancellationToken, string search)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
-                return await customerRepository.GetCustomersForAppointment(search);
+                return await customerRepository.GetCustomersForAppointment(cancellationToken, search);
             });
         }
     }

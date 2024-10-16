@@ -5,14 +5,14 @@ namespace Dispo.Barber.Application.AppService.Interface
 {
     public interface ICompanyAppService
     {
-        Task CreateAsync(CreateCompanyDTO companyDTO);
+        Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO);
 
-        Task<List<Company>> GetAllAsync();
+        Task<List<Company>> GetAllAsync(CancellationToken cancellationToken);
 
-        Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id);
+        Task<List<BusinessUnity>> GetBusinessUnitiesAsync(CancellationToken cancellationToken, long id);
 
-        Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO);
+        Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateCompanyDTO updateCompanyDTO);
 
-        Task<Company> GetAsync(long id);
+        Task<Company> GetAsync(CancellationToken cancellationToken, long id);
     }
 }

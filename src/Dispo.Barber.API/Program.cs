@@ -3,14 +3,11 @@ using Dispo.Barber.API.Profiles;
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Application.Service;
-using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Bundle.Entities;
 using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +27,6 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 
-builder.Services.AddTransient<ICompanyService, CompanyService>();
 builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
 builder.Services.AddTransient<IUserAppService, UserAppService>();
 builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();

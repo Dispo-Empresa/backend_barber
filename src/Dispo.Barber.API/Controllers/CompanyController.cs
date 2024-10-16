@@ -11,43 +11,42 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateCompanyDTO companyDTO)
+        public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateCompanyDTO companyDTO)
         {
-            await companyAppService.CreateAsync(companyDTO);
+            await companyAppService.CreateAsync(cancellationToken, companyDTO);
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var result = await companyAppService.GetAllAsync();
+            var result = await companyAppService.GetAllAsync(cancellationToken);
             return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpGet("{id}/business-unities")]
-        public async Task<IActionResult> GetBusinessUnities([FromRoute] long id)
+        public async Task<IActionResult> GetBusinessUnities(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await companyAppService.GetBusinessUnitiesAsync(id);
+            var result = await companyAppService.GetBusinessUnitiesAsync(cancellationToken, id);
             return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
         {
-            await companyAppService.UpdateAsync(id, updateCompanyDTO);
+            await companyAppService.UpdateAsync(cancellationToken, id, updateCompanyDTO);
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] long id)
+        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await companyAppService.GetAsync(id);
+            var result = await companyAppService.GetAsync(cancellationToken, cancellationToken, id);
             return Ok(result);
         }
-
     }
 }

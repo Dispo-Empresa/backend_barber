@@ -15,7 +15,7 @@ namespace Dispo.Barber.Application.AppService
             {
                 var scheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
                 var schedule = mapper.Map<UserSchedule>(createScheduleDTO);
-                await scheduleRepository.AddAsync(schedule);
+                await scheduleRepository.AddAsync(cancellationToken, schedule);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
@@ -25,7 +25,7 @@ namespace Dispo.Barber.Application.AppService
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var scheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-                var schedule = await scheduleRepository.GetAsync(scheduleId) ?? throw new NotFoundException("Horário não encontrado.");
+                var schedule = await scheduleRepository.GetAsync(cancellationToken, scheduleId) ?? throw new NotFoundException("Horário não encontrado.");
                 scheduleRepository.Delete(schedule);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });

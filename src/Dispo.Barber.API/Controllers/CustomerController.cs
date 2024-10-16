@@ -1,5 +1,4 @@
-﻿using Dispo.Barber.Application.AppService;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +10,9 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] string search)
+        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromQuery] string search)
         {
-            var result = await customerAppService.GetForAppointment(search);
+            var result = await customerAppService.GetForAppointment(cancellationToken, search);
             return Ok(result);
         }
     }

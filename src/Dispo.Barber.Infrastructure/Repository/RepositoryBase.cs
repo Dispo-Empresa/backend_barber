@@ -15,10 +15,10 @@ namespace Dispo.Barber.Infrastructure.Repository
             this.context = context;
         }
 
-        public async Task AddAsync(T entity)
+        public async Task AddAsync(CancellationToken cancellationToken, T entity)
         {
             await context.Set<T>()
-                         .AddAsync(entity);
+                         .AddAsync(entity, cancellationToken);
         }
 
         public void Update(T entity)
@@ -31,23 +31,23 @@ namespace Dispo.Barber.Infrastructure.Repository
             context.Remove(entity);
         }
 
-        public async Task<T?> GetAsync(long id)
+        public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Set<T>()
-                                .FirstOrDefaultAsync(x => x.Id == id);
+                                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<List<T>> GetAsync(Expression<Func<T, bool>> expression)
+        public async Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression)
         {
             return await context.Set<T>()
                                 .Where(expression)
-                                .ToListAsync();
+                                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await context.Set<T>()
-                                .ToListAsync();
+                                .ToListAsync(cancellationToken);
         }
     }
 }

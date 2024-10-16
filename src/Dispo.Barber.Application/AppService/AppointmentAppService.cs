@@ -9,13 +9,12 @@ namespace Dispo.Barber.Application.AppService
 {
     public class AppointmentAppService(IUnitOfWork unitOfWork, IMapper mapper) : IAppointmentAppService
     {
-        public async Task<Appointment> GetAsync(long id)
+        public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointment =  await appointmentRepository.GetAsync(id);
+                var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
                 if (appointment is null)
                 {
                     throw new NotFoundException("Agendamento não existe.");
@@ -25,33 +24,31 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
-        public async Task CreateAsync(CreateAppointmentDTO createAppointmentDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
                 var appointment = mapper.Map<Appointment>(createAppointmentDTO);
-                await appointmentRepository.AddAsync(appointment);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await appointmentRepository.AddAsync(cancellationToken, appointment);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
-        public async Task InformProblemAsync(long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
+        public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointment = await appointmentRepository.GetAsync(id);
+                var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
                 if (appointment is null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new NotFoundException("Agendamento não existe.");
                 }
 
                 appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
                 appointmentRepository.Update(appointment);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
     }

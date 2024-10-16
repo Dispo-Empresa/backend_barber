@@ -9,45 +9,41 @@ namespace Dispo.Barber.Application.AppService
 {
     public class CompanyAppService(IUnitOfWork unitOfWork, IMapper mapper) : ICompanyAppService
     {
-        public async Task CreateAsync(CreateCompanyDTO companyDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
                 var company = mapper.Map<Company>(companyDTO);
-                await companyRepository.AddAsync(company);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await companyRepository.AddAsync(cancellationToken, company);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
-        public async Task<List<Company>> GetAllAsync()
+        public async Task<List<Company>> GetAllAsync(CancellationToken cancellationToken)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                return await companyRepository.GetAllAsync();
+                return await companyRepository.GetAllAsync(cancellationToken);
             });
         }
 
-        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)
+        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                return await companyRepository.GetBusinessUnitiesAsync(id);
+                return await companyRepository.GetBusinessUnitiesAsync(cancellationToken, id);
             });
         }
 
-        public async Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO)
+        public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateCompanyDTO updateCompanyDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                var company = await companyRepository.GetWithBusinessUnitiesAsync(id);
+                var company = await companyRepository.GetWithBusinessUnitiesAsync(cancellationToken, id);
                 if (company is null)
                 {
                     return;
@@ -68,17 +64,16 @@ namespace Dispo.Barber.Application.AppService
                 }
 
                 companyRepository.Update(company);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
-        public async Task<Company> GetAsync(long id)
+        public async Task<Company> GetAsync(CancellationToken cancellationToken, long id)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                var company = await companyRepository.GetAsync(id);
+                var company = await companyRepository.GetAsync(cancellationToken, id);
                 if (company is null)
                 {
                     throw new NotFoundException("Empresa não existe.");

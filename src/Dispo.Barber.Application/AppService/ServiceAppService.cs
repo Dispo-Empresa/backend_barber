@@ -7,15 +7,14 @@ namespace Dispo.Barber.Application.AppService
 {
     public class ServiceAppService(IUnitOfWork unitOfWork, IMapper mapper) : IServiceAppService
     {
-        public async Task CreateAsync(CreateServiceDTO createServiceDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var serviceRepository = unitOfWork.GetRepository<IServiceRepository>();
                 var service = mapper.Map<Domain.Entities.Service>(createServiceDTO);
-                await serviceRepository.AddAsync(service);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await serviceRepository.AddAsync(cancellationToken, service);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
     }

@@ -9,6 +9,6 @@ namespace Dispo.Barber.Domain.DTO.User
         public string? Email { get; set; }
         public string Phone { get; set; }
         public UserRole Role { get; set; }
-        public bool Active { get; set; } = true;
+        public UserStatus Status { get; set; }
     }
 }

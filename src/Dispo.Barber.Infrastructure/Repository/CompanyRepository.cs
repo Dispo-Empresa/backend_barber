@@ -13,18 +13,18 @@ namespace Dispo.Barber.Infrastructure.Repository
             this.context = context;
         }
 
-        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)
+        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Companies.Where(w => w.Id == id)
                                 .Include(i => i.BusinessUnities)
                                 .SelectMany(s => s.BusinessUnities)
-                                .ToListAsync();
+                                .ToListAsync(cancellationToken);
         }
 
-        public async Task<Company> GetWithBusinessUnitiesAsync(long id)
+        public async Task<Company> GetWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Companies.Include(i => i.BusinessUnities)
-                                .FirstOrDefaultAsync(w => w.Id == id);
+                                .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
         }
     }
 }

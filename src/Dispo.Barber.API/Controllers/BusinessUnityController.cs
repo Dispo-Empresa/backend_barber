@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +10,9 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpGet("{id}/users")]
-        public async Task<IActionResult> GetUsers([FromRoute] long id)
+        public async Task<IActionResult> GetUsers(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await businessUnityAppService.GetUsersAsync(id);
+            var result = await businessUnityAppService.GetUsersAsync(cancellationToken, id);
             return Ok(result);
         }
 

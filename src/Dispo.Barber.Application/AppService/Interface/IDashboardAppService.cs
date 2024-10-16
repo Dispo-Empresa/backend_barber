@@ -4,6 +4,6 @@ namespace Dispo.Barber.Application.AppService.Interface
 {
     public interface IDashboardAppService
     {
-        Task<Dashboard> BuildDashboardForUser(long userId);
+        Task<Dashboard> BuildDashboardForUser(CancellationToken cancellationToken, long userId);
     }
 }

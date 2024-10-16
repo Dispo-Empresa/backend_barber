@@ -56,5 +56,10 @@ namespace Dispo.Barber.Domain.Entities
 
             return $"{hours:D2}h{remainingMinutes:D2}m";
         }
+
+        public bool IsPending()
+        {
+            return Status == UserStatus.Pending;
+        }
     }
 }

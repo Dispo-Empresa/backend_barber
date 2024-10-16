@@ -4,6 +4,6 @@ namespace Dispo.Barber.Application.AppService.Interface
 {
     public interface IServiceAppService
     {
-        Task CreateAsync(CreateServiceDTO createServiceDTO);
+        Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO);
     }
 }

@@ -3,8 +3,8 @@
 public class PasswordEncryptor
 {
     private const int Iterations = 10000;
-    private const int SaltSize = 16; 
-    private const int HashSize = 32; 
+    private const int SaltSize = 16;
+    private const int HashSize = 32;
 
     public static string HashPassword(string password)
     {

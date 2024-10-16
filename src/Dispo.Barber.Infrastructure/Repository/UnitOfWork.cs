@@ -34,7 +34,7 @@ public class UnitOfWork(IServiceProvider serviceProvider) : IUnitOfWork
             await RollbackAsync(cancellationToken);
             throw;
         }
-        finally 
+        finally
         {
             await DisposeTransactionAsync();
         }

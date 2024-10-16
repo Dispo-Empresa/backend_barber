@@ -11,25 +11,25 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] long id)
+        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await appointmentAppService.GetAsync(id);
-            return Ok();
+            var result = await appointmentAppService.GetAsync(cancellationToken, cancellationToken, id);
+            return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateAppointmentDTO createAppointmentDTO)
+        public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(createAppointmentDTO);
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpPatch("{id}/inform-problem")]
-        public async Task<IActionResult> InformProblem([FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
+        public async Task<IActionResult> InformProblem(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            await appointmentAppService.InformProblemAsync(id, informAppointmentProblemDTO);
+            await appointmentAppService.InformProblemAsync(cancellationToken, id, informAppointmentProblemDTO);
             return Ok();
         }
     }

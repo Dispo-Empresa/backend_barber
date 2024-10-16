@@ -6,14 +6,13 @@ namespace Dispo.Barber.Application.AppService
 {
     public class DashboardAppService(IUnitOfWork unitOfWork) : IDashboardAppService
     {
-        public async Task<Dashboard> BuildDashboardForUser(long userId)
+        public async Task<Dashboard> BuildDashboardForUser(CancellationToken cancellationToken, long userId)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
             var dashboard = new Dashboard();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetWithAppointmentsAsync(cancellationTokenSource.Token, userId);
+                var user = await userRepository.GetWithAppointmentsAsync(cancellationToken, userId);
                 if (user is null)
                 {
                     return;

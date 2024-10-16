@@ -1,12 +1,9 @@
 ﻿using System.Data;
-using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Domain.DTO.Company;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
 
@@ -14,26 +11,29 @@ namespace Dispo.Barber.Application.AppService
 {
     public class UserAppService(IUnitOfWork unitOfWork, IMapper mapper) : IUserAppService
     {
-        public async Task CreateAsync(CreateUserDTO createUserDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
                 var user = mapper.Map<User>(createUserDTO);
                 user.Schedules.AddRange(BuildNormalDays());
-                await userRepository.AddAsync(user);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                if (user.IsPending())
+                {
+                    // TODO: Completar.
+                }
+
+                await userRepository.AddAsync(cancellationToken, user);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
-        public async Task AddServiceToUserAsync(long id, AddServiceToUserDTO addServiceToUserDTO)
+        public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, AddServiceToUserDTO addServiceToUserDTO)
         {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
+                var user = await userRepository.GetAsync(cancellationToken, id);
                 if (user is null)
                 {
                     throw new VersionNotFoundException();
@@ -46,37 +46,34 @@ namespace Dispo.Barber.Application.AppService
                 }).ToList());
 
                 userRepository.Update(user);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
-        public async Task<List<Appointment>> GetUserAppointmentsAsync(long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
+        public async Task<List<Appointment>> GetUserAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                return await userRepository.GetAppointmentsAsync(cancellationTokenSource.Token, id);
+                return await userRepository.GetAppointmentsAsync(cancellationToken, id);
             });
         }
 
-        public async Task<List<UserSchedule>> GetUserSchedulesAsync(long id)
+        public async Task<List<UserSchedule>> GetUserSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                return await userRepository.GetSchedulesAsync(cancellationTokenSource.Token, id);
+                return await userRepository.GetSchedulesAsync(cancellationToken, id);
             });
         }
 
-        public async Task UpdateAsync(long id, UpdateUserDTO updateUserDTO)
+        public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
+                var user = await userRepository.GetAsync(cancellationToken, id);
                 if (user is null)
                 {
                     return;
@@ -98,7 +95,7 @@ namespace Dispo.Barber.Application.AppService
                 }
 
                 userRepository.Update(user);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
 
@@ -107,7 +104,7 @@ namespace Dispo.Barber.Application.AppService
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
+                var user = await userRepository.GetAsync(cancellationToken, id);
                 if (user is null)
                 {
                     throw new NotFoundException("Usuário não encontrado.");
@@ -125,7 +122,7 @@ namespace Dispo.Barber.Application.AppService
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetAsync(id);
+                var user = await userRepository.GetAsync(cancellationToken, id);
                 if (user is null)
                 {
                     throw new NotFoundException("Usuário não encontrado.");

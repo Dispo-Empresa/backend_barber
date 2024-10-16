@@ -5,11 +5,11 @@ namespace Dispo.Barber.Application.Repository
 {
     public interface IRepositoryBase<T> where T : EntityBase
     {
-        Task AddAsync(T entity);
+        Task AddAsync(CancellationToken cancellationToken, T entity);
         void Update(T entity);
         void Delete(T entity);
-        Task<T?> GetAsync(long id);
-        Task<List<T>> GetAsync(Expression<Func<T, bool>> expression);
-        Task<List<T>> GetAllAsync();
+        Task<T?> GetAsync(CancellationToken cancellationToken, long id);
+        Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
+        Task<List<T>> GetAllAsync(CancellationToken cancellationToken);
     }
 }

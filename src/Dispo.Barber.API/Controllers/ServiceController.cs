@@ -11,9 +11,9 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateServiceDTO createServiceDTO)
+        public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateServiceDTO createServiceDTO)
         {
-            await serviceAppService.CreateAsync(createServiceDTO);
+            await serviceAppService.CreateAsync(cancellationToken, createServiceDTO);
             return Ok();
         }
     }

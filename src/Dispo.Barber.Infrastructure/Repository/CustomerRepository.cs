@@ -13,16 +13,16 @@ namespace Dispo.Barber.Infrastructure.Repository
             this.context = context;
         }
 
-        public async Task<List<Customer>> GetCustomersForAppointment(string search)
+        public async Task<List<Customer>> GetCustomersForAppointment(CancellationToken cancellationToken, string search)
         {
             if (search.Any(char.IsDigit))
             {
                 return await context.Customers.Where(w => w.Phone.Contains(search))
-                                              .ToListAsync();
+                                              .ToListAsync(cancellationToken);
             }
-         
+
             return await context.Customers.Where(w => w.Name.Contains(search))
-                                          .ToListAsync();
+                                          .ToListAsync(cancellationToken);
         }
 
     }
