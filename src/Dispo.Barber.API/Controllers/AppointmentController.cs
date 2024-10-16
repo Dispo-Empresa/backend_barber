@@ -18,6 +18,30 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("create-by-services")]
+        public async Task<IActionResult> CreateByServices([FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
+        {
+            foreach (var serviceId in createCreateAppointmentServicosDTO.ServiceIds)
+            {
+                var createAppointmentDTO = new CreateAppointmentDTO
+                {
+                    Date = createCreateAppointmentServicosDTO.Date,
+                    CustomerObservation = createCreateAppointmentServicosDTO.CustomerObservation,
+                    AcceptedUserObservation = createCreateAppointmentServicosDTO.AcceptedUserObservation,
+                    AcceptedUserId = createCreateAppointmentServicosDTO.AcceptedUserId,
+                    BusinessUnityId = createCreateAppointmentServicosDTO.BusinessUnityId,
+                    ServiceId = serviceId,
+                    Customer = createCreateAppointmentServicosDTO.Customer
+                };
+
+                await appointmentAppService.CreateAsync(createAppointmentDTO);
+            }
+
+            return Ok();
+        }
+
+
+        [AllowAnonymous]
         [HttpPatch("{id}/inform-problem")]
         public async Task<IActionResult> InformProblem([FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
