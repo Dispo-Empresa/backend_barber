@@ -8,7 +8,15 @@ namespace Dispo.Barber.API.Profiles
     {
         public AppointmentProfile()
         {
-            CreateMap<CreateAppointmentDTO, Appointment>().ReverseMap();
+            CreateMap<CreateAppointmentDTO, Appointment>()
+                .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.Services == null ? new List<ServiceAppointment>() : src.Services.Select(service => new ServiceAppointment
+                {
+                    Service = new Service
+                    {
+                         Id = service,
+                    }
+                })))
+                .ReverseMap();
         }
     }
 }

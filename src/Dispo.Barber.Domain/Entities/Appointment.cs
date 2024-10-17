@@ -7,9 +7,6 @@
         public string? CustomerObservation { get; set; }
         public string? AcceptedUserObservation { get; set; }
 
-        public required long ServiceId { get; set; }
-        public required Service Service { get; set; }
-
         public required long BusinessUnityId { get; set; }
         public required BusinessUnity BusinessUnity { get; set; }
 
@@ -18,5 +15,8 @@
 
         public long? AcceptedUserId { get; set; }
         public User? AcceptedUser { get; set; }
+
+        public required List<ServiceAppointment> Services { get; set; }
+
     }
 }

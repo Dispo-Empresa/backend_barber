@@ -10,7 +10,7 @@ namespace Dispo.Barber.Domain.DTO.Appointment
         public long? AcceptedUserId { get; set; }
 
         public required long BusinessUnityId { get; set; }
-        public required long ServiceId { get; set; }
+        public required List<long> Services { get; set; }
 
         public CustomerDTO Customer { get; set; }
     }
