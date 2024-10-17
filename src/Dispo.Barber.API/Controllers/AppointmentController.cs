@@ -13,8 +13,8 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(createAppointmentDTO);
-            return Ok();
+            var result = await appointmentAppService.GetAsync(cancellationToken, id);
+            return Ok(result);
         }
 
         [AllowAnonymous]

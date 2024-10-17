@@ -26,7 +26,7 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            return $"R${Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Service.Price)}";
+            return $"R${Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Services.Select(s => s.Service).Sum(s => s.Price))}";
         }
 
         public string TodayAppointments()
@@ -46,7 +46,7 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            return $"{FormatMinutesToHours(Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(w => w.Service.Duration))}";
+            return $"{FormatMinutesToHours(Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Services.Select(s => s.Service).Sum(ss => ss.Duration)))}";
         }
 
         private static string FormatMinutesToHours(int minutes)

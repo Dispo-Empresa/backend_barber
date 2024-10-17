@@ -3,6 +3,7 @@ using System;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dispo.Barber.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20241017215217_MultipleServicesToAppointment")]
+    partial class MultipleServicesToAppointment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace Dispo.Barber.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Dispo.Barber.Domain.Entities.Service", b =>
@@ -239,9 +242,6 @@ namespace Dispo.Barber.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("boolean");
-
                     b.Property<long?>("BusinessUnityId")
                         .HasColumnType("bigint");
 
@@ -260,6 +260,9 @@ namespace Dispo.Barber.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<string>("Surname")
@@ -298,7 +301,7 @@ namespace Dispo.Barber.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long?>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -412,9 +415,13 @@ namespace Dispo.Barber.Persistence.Migrations
 
             modelBuilder.Entity("Dispo.Barber.Domain.Entities.UserSchedule", b =>
                 {
-                    b.HasOne("Dispo.Barber.Domain.Entities.User", null)
+                    b.HasOne("Dispo.Barber.Domain.Entities.User", "User")
                         .WithMany("Schedules")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Dispo.Barber.Domain.Entities.Appointment", b =>
