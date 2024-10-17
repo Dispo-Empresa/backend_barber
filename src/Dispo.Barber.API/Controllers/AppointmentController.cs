@@ -13,30 +13,27 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            var result = await appointmentAppService.GetAsync(cancellationToken, id);
-            return Ok(result);
+            await appointmentAppService.CreateAsync(createAppointmentDTO);
+            return Ok();
         }
 
         [AllowAnonymous]
         [HttpPost("create-by-services")]
         public async Task<IActionResult> CreateByServices([FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
         {
-            foreach (var serviceId in createCreateAppointmentServicosDTO.ServiceIds)
+            var createAppointmentDTO = new CreateAppointmentDTO
             {
-                var createAppointmentDTO = new CreateAppointmentDTO
-                {
-                    Date = createCreateAppointmentServicosDTO.Date,
-                    CustomerObservation = createCreateAppointmentServicosDTO.CustomerObservation,
-                    AcceptedUserObservation = createCreateAppointmentServicosDTO.AcceptedUserObservation,
-                    AcceptedUserId = createCreateAppointmentServicosDTO.AcceptedUserId,
-                    BusinessUnityId = createCreateAppointmentServicosDTO.BusinessUnityId,
-                    ServiceId = serviceId,
-                    Customer = createCreateAppointmentServicosDTO.Customer
-                };
+                Date = createCreateAppointmentServicosDTO.Date,
+                CustomerObservation = createCreateAppointmentServicosDTO.CustomerObservation,
+                AcceptedUserObservation = createCreateAppointmentServicosDTO.AcceptedUserObservation,
+                AcceptedUserId = createCreateAppointmentServicosDTO.AcceptedUserId,
+                BusinessUnityId = createCreateAppointmentServicosDTO.BusinessUnityId,
+                Services = createCreateAppointmentServicosDTO.ServiceIds,
+                Customer = createCreateAppointmentServicosDTO.Customer
+            };
 
-                await appointmentAppService.CreateAsync(createAppointmentDTO);
-            }
-
+            await appointmentAppService.CreateAsync(createAppointmentDTO);
+          
             return Ok();
         }
 

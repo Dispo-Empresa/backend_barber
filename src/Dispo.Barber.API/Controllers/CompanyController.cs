@@ -55,11 +55,6 @@ namespace Dispo.Barber.API.Controllers
             {
                 return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
             }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
-        {
-            var result = await companyAppService.GetAsync(cancellationToken, id);
-            return Ok(result);
         }
     }
 }
