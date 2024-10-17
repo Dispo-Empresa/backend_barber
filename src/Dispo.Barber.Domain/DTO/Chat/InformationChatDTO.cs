@@ -10,6 +10,6 @@ namespace Dispo.Barber.Domain.DTO.Chat
         public string NameCompany { get; set; }
         public List<UserInformationDTO>? User { get; set; }
         public List<ServiceInformationDTO>? Services { get; set; }
-        public List<CreateBusinessUnityDTO>? BusinessUnities { get; set; }
+        public long BusinessUnities { get; set; }
     }
 }

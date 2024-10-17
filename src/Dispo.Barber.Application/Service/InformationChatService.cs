@@ -36,7 +36,9 @@ namespace Dispo.Barber.Application.Service
                     {
                         NameCompany = company.Name,
                         User = mapper.Map<List<UserInformationDTO>>(usersTask),
-                        Services = mapper.Map<List<ServiceInformationDTO>>(listServices)
+                        Services = mapper.Map<List<ServiceInformationDTO>>(listServices),
+                        BusinessUnities = businessIdTask
+
                     };
 
                     return informationChat;
@@ -77,7 +79,8 @@ namespace Dispo.Barber.Application.Service
                     {
                         NameCompany = company.Name,
                         User = new List<UserInformationDTO> { mapper.Map<UserInformationDTO>(user) },
-                        Services = mapper.Map<List<ServiceInformationDTO>>(services)
+                        Services = mapper.Map<List<ServiceInformationDTO>>(services),
+                        BusinessUnities = user.BusinessUnityId.Value
                     };
 
                     return informationChat;
