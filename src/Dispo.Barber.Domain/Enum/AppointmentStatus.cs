@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dispo.Barber.Domain.Utils
+namespace Dispo.Barber.Domain.Enum
 {
     public enum AppointmentStatus
     {

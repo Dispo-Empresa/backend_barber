@@ -3,6 +3,7 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -29,9 +30,9 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("{id}/services")]
-        public async Task<IActionResult> AddServiceToUser([FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
+        public async Task<IActionResult> AddServiceToUser(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
         {
-            await userAppService.AddServiceToUserAsync(id, addServiceToUserDTO);
+            await userAppService.AddServiceToUserAsync(cancellationToken, id, addServiceToUserDTO);
             return Ok();
         }
 
@@ -61,11 +62,11 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("information/{id}")]
-        public async Task<IActionResult> GetInformationChatById(long id)
+        public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
         {
             try
             {
-                var informationChat = await informationChatService.GetInformationChatByIdUser(id);
+                var informationChat = await informationChatService.GetInformationChatByIdUser(cancellationToken, id);
                 return Ok(informationChat);
             }
             catch (Exception ex)

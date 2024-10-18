@@ -1,8 +1,9 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
-using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -50,9 +51,9 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpPatch("{id}/inform-problem")]
-        public async Task<IActionResult> InformProblem([FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
+        public async Task<IActionResult> InformProblem(CancellationToken cancellationToken,[FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            await appointmentAppService.InformProblemAsync(id, informAppointmentProblemDTO);
+            await appointmentAppService.InformProblemAsync(cancellationToken, id, informAppointmentProblemDTO);
             return Ok();
         }
     }

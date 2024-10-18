@@ -3,8 +3,8 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
-using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -38,21 +38,20 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
-        public async Task InformProblemAsync(long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
+        public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointment = await appointmentRepository.GetAsync(id);
+                var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
                 if (appointment is null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new NotFoundException("Agendamento não existe.");
                 }
 
                 appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
                 appointmentRepository.Update(appointment);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
     }

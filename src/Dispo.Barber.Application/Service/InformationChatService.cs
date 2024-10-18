@@ -10,7 +10,7 @@ namespace Dispo.Barber.Application.Service
 {
     public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper) : IinformationChatService
     {
-        public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(long companyId)
+        public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken,long companyId)
         {
             try
             {
@@ -19,7 +19,7 @@ namespace Dispo.Barber.Application.Service
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
                 {
                     var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                    var company = await companyRepository.GetAsync(companyId);
+                    var company = await companyRepository.GetAsync(cancellationToken,companyId);
 
                     if (company == null)
                     {
@@ -50,7 +50,7 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-        public async Task<InformationChatDTO> GetInformationChatByIdUser(long idUser)
+        public async Task<InformationChatDTO> GetInformationChatByIdUser(CancellationToken cancellationToken, long idUser)
         {
             try
             {
@@ -59,19 +59,19 @@ namespace Dispo.Barber.Application.Service
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
                 {
                     var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                    var user = await userRepository.GetAsync(idUser);
+                    var user = await userRepository.GetAsync(cancellationToken, idUser);
 
                 if (!user.BusinessUnityId.HasValue)
                 {
                     throw new Exception($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
                 }
-                    var businessUnity =  await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(user.BusinessUnityId.Value);
+                    var businessUnity =  await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, user.BusinessUnityId.Value);
 
                 if (businessUnity == null)
                 {
                     throw new Exception($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
                 }
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(businessUnity.CompanyId);
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId);
 
                     var services = await unitOfWork.GetRepository<IServiceUserRepository>().GetServicesByUserId(idUser);
 

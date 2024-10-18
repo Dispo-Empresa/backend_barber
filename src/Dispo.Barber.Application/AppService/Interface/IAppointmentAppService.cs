@@ -6,7 +6,7 @@ namespace Dispo.Barber.Application.AppService.Interface
     public interface IAppointmentAppService
     {
         Task CreateAsync(CreateAppointmentDTO createAppointmentDTO);
-        Task InformProblemAsync(long id, InformAppointmentProblemDTO informAppointmentProblemDTO);
+        Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO);
         Task<Appointment> GetAsync(CancellationToken cancellationToken, long id);
     }
 }

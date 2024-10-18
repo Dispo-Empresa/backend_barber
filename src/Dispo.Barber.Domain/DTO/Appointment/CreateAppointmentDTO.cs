@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Domain.Utils;
+﻿using Dispo.Barber.Domain.Enum;
 
 namespace Dispo.Barber.Domain.DTO.Appointment
 {

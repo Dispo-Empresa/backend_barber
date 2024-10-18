@@ -3,6 +3,7 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Company;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -44,11 +45,11 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("information/{id}")]
-        public async Task<IActionResult> GetInformationChatById(long id)
+        public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken,long id)
         {
             try
             {
-                var informationChat = await informationChatService.GetInformationChatByIdCompanyAsync(id);
+                var informationChat = await informationChatService.GetInformationChatByIdCompanyAsync(cancellationToken,id);
                 return Ok(informationChat);
             }
             catch (Exception ex)

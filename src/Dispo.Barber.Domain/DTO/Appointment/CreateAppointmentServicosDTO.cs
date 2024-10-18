@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Domain.Utils;
+﻿using Dispo.Barber.Domain.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;

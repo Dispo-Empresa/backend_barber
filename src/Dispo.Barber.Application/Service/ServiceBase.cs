@@ -43,5 +43,10 @@ namespace Dispo.Barber.Application.Service
         {
             return await repository.GetAllAsync();
         }
+
+        public Task<T?> GetAsync(long id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
