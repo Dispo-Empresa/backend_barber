@@ -10,7 +10,7 @@ namespace Dispo.Barber.Domain.Entities
         public string? Password { get; set; }
         public string Phone { get; set; }
         public UserRole Role { get; set; }
-        public bool Active { get; set; }
+        public UserStatus Status { get; set; }
 
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }
@@ -55,6 +55,11 @@ namespace Dispo.Barber.Domain.Entities
             int remainingMinutes = minutes % 60;
 
             return $"{hours:D2}h{remainingMinutes:D2}m";
+        }
+
+        public bool IsPending()
+        {
+            return Status == UserStatus.Pending;
         }
     }
 }
