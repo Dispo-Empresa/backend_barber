@@ -13,17 +13,17 @@ namespace Dispo.Barber.API.Controllers
     {
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateUserDTO createUserDTO)
+        public async Task<IActionResult> Create(CancellationToken cancellationToken,[FromBody] CreateUserDTO createUserDTO)
         {
-            await userAppService.CreateAsync(createUserDTO);
+            await userAppService.CreateAsync(cancellationToken, createUserDTO);
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
-            await userAppService.UpdateAsync(id, updateUserDTO);
+            await userAppService.UpdateAsync(cancellationToken, id, updateUserDTO);
             return Ok();
         }
 
@@ -38,23 +38,23 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}/appointments")]
-        public async Task<IActionResult> GetUserAppointments([FromRoute] long id, [FromQuery] GetUserAppointmentsDTO getUserAppointmentsDTO)
+        public async Task<IActionResult> GetUserAppointments(CancellationToken cancellationToken, [FromRoute] long id, [FromQuery] GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
-            var result = await userAppService.GetUserAppointmentsAsync(id, getUserAppointmentsDTO);
+            var result = await userAppService.GetUserAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
             return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpGet("{id}/schedules")]
-        public async Task<IActionResult> GetUserSchedules([FromRoute] long id)
+        public async Task<IActionResult> GetUserSchedules(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await userAppService.GetUserSchedulesAsync(id);
+            var result = await userAppService.GetUserSchedulesAsync(cancellationToken, id);
             return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpPatch("{id}/disable")]
-        public async Task<IActionResult> Disable([FromRoute] long id)
+        public async Task<IActionResult> Disable(CancellationToken cancellationToken, [FromRoute] long id)
         {
             await userAppService.DisableUserAsync(id);
             return Ok();
