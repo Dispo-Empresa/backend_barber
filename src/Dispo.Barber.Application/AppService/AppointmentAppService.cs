@@ -3,12 +3,28 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Application.AppService
 {
     public class AppointmentAppService(IUnitOfWork unitOfWork, IMapper mapper) : IAppointmentAppService
     {
+        public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+                var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
+                if (appointment is null)
+                {
+                    throw new NotFoundException("Agendamento não existe.");
+                }
+
+                return appointment;
+            });
+        }
+
         public async Task CreateAsync(CreateAppointmentDTO createAppointmentDTO)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -20,6 +36,11 @@ namespace Dispo.Barber.Application.AppService
                 await appointmentRepository.AddAsync(appointment);
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
             });
+        }
+
+        public Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task InformProblemAsync(long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
