@@ -1,5 +1,4 @@
 ﻿using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO;
 using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

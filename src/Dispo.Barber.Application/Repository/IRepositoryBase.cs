@@ -8,7 +8,7 @@ namespace Dispo.Barber.Application.Repository
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
-        Task<T?> GetAsync(long id);
+        Task<T?> GetAsync(CancellationToken cancellationToken, long id);
         Task<List<T>> GetAsync(Expression<Func<T, bool>> expression);
         Task<List<T>> GetAllAsync();
     }

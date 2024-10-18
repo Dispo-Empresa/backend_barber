@@ -31,10 +31,10 @@ namespace Dispo.Barber.Infrastructure.Repository
             context.Update(entity);
         }
 
-        public async Task<T?> GetAsync(long id)
+        public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Set<T>()
-                                .FirstOrDefaultAsync(x => x.Id == id);
+                                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task<List<T>> GetAsync(Expression<Func<T, bool>> expression)
