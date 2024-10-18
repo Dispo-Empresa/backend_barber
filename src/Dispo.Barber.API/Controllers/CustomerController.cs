@@ -10,20 +10,6 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class CustomerController(ICustomerAppService customerAppService, ICustomerService customerService) : ControllerBase
     {
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CustomerDTO customerDTO)
-        {
-            try
-            {
-                var result = await customerService.CreateAsync(customerDTO); 
-                return Ok(result); 
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Ocorreu um erro ao criar o cliente.", error = ex.Message });
-            }
-        }
 
         [AllowAnonymous]
         [HttpGet("{phone}")]
