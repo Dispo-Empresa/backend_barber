@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.DTO.Appointment
+﻿using Dispo.Barber.Domain.Utils;
+
+namespace Dispo.Barber.Domain.DTO.Appointment
 {
     public class CreateAppointmentDTO
     {
@@ -9,6 +11,7 @@
 
         public required long BusinessUnityId { get; set; }
         public required List<long> Services { get; set; }
+        public required AppointmentStatus Status { get; set; }
 
         public CustomerDTO Customer { get; set; }
     }

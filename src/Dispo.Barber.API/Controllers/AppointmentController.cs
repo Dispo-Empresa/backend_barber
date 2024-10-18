@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,7 @@ namespace Dispo.Barber.API.Controllers
                 AcceptedUserId = createCreateAppointmentServicosDTO.AcceptedUserId,
                 BusinessUnityId = createCreateAppointmentServicosDTO.BusinessUnityId,
                 Services = createCreateAppointmentServicosDTO.ServiceIds,
+                Status = AppointmentStatus.InProgress,
                 Customer = createCreateAppointmentServicosDTO.Customer
             };
 

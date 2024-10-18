@@ -3,6 +3,7 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -15,6 +16,7 @@ namespace Dispo.Barber.Application.AppService
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
                 var appointment = mapper.Map<Appointment>(createAppointmentDTO);
+                appointment.Status = AppointmentStatus.Scheduled;
                 await appointmentRepository.AddAsync(appointment);
                 await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
             });

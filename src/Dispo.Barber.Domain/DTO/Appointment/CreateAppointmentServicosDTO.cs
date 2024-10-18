@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dispo.Barber.Domain.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Dispo.Barber.Domain.DTO.Appointment
 
         public required long BusinessUnityId { get; set; }
         public required List<long> ServiceIds { get; set; }
-
+        public required AppointmentStatus Status { get; set; }
         public CustomerDTO Customer { get; set; }
     }
 }
