@@ -38,11 +38,6 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
-        public Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task InformProblemAsync(long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
             var cancellationTokenSource = new CancellationTokenSource();

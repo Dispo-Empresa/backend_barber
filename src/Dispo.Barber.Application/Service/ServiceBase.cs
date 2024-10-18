@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Threading;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
 
@@ -28,9 +29,9 @@ namespace Dispo.Barber.Application.Service
             repository.Delete(entity);
         }
 
-        public async Task<T?> GetAsync(long id)
+        public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
-            return await repository.GetAsync(id);
+            return await repository.GetAsync(cancellationToken, id);
         }
 
         public async Task<List<T>> GetAsync(Expression<Func<T, bool>> expression)
