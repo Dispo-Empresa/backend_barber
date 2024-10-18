@@ -53,14 +53,6 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPatch("{id}/disable")]
-        public async Task<IActionResult> Disable(CancellationToken cancellationToken, [FromRoute] long id)
-        {
-            await userAppService.DisableUserAsync(id);
-            return Ok();
-        }
-
-        [AllowAnonymous]
         [HttpGet("information/{id}")]
         public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
         {
