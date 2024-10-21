@@ -9,6 +9,8 @@ namespace Dispo.Barber.API.Profiles
         public UserProfile()
         {
             CreateMap<CreateUserDTO, User>().ReverseMap();
+            CreateMap<UserInformationDTO, User>().ReverseMap();
+
         }
     }
 }

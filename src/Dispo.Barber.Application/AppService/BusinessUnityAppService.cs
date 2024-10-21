@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
+using System.Threading;
 
 namespace Dispo.Barber.Application.AppService
 {

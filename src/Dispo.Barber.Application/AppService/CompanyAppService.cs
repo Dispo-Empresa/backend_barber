@@ -82,5 +82,25 @@ namespace Dispo.Barber.Application.AppService
                 return company;
             });
         }
+
+        public async Task<List<Company>> GetAllAsync()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                return await companyRepository.GetAllAsync(cancellationTokenSource.Token);
+            });
+        }
+
+        public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                return await companyRepository.GetBusinessUnitiesAsync(cancellationTokenSource.Token, id);
+            });
+        }
     }
 }

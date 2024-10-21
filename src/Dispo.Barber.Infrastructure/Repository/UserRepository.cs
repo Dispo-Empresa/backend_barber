@@ -22,6 +22,13 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<User>> GetUserByBusinessAsync(long businessId)
+        {
+            return await context.Users.Include(i => i.BusinessUnity)
+                                .Where(w => w.BusinessUnityId == businessId)
+                                .ToListAsync();
+        }
+
         public async Task<List<UserSchedule>> GetSchedulesAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Users.Include(i => i.Schedules)

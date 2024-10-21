@@ -7,5 +7,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<BusinessUnity>> GetBusinessUnitiesAsync(CancellationToken cancellationToken, long id);
 
         Task<Company> GetWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id);
+
+        Task<List<long>> GetServicesByCompanyAsync(long companyId);
     }
 }
