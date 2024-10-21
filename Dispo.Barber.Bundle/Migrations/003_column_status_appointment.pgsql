@@ -1,0 +1,1 @@
+﻿alter table "Appointments" add column if not exists Status integer not null default 0

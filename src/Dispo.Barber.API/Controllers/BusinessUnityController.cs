@@ -16,7 +16,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/users/pending")]
         public async Task<IActionResult> GetPendingUsers(CancellationToken cancellationToken, [FromRoute] long id)
         {

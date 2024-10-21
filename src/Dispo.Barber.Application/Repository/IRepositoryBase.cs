@@ -11,5 +11,6 @@ namespace Dispo.Barber.Application.Repository
         Task<T?> GetAsync(CancellationToken cancellationToken, long id);
         Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
         Task<List<T>> GetAllAsync(CancellationToken cancellationToken);
+        Task<T> GetFirstAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
     }
 }
