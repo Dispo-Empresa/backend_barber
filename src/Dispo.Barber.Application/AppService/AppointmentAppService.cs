@@ -35,7 +35,7 @@ namespace Dispo.Barber.Application.AppService
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, createAppointmentDTO.Customer.Id); ;
+                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, createAppointmentDTO.Customer.Id);
 
                     if (existingCustomer != null)
                     {
