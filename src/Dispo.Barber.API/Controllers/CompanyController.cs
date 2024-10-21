@@ -3,7 +3,6 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Company;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -32,14 +31,6 @@ namespace Dispo.Barber.API.Controllers
         public async Task<IActionResult> GetBusinessUnities(CancellationToken cancellationToken, [FromRoute] long id)
         {
             var result = await companyAppService.GetBusinessUnitiesAsync(cancellationToken, id);
-            return Ok(result);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("{id}/business-unities")]
-        public async Task<IActionResult> Get([FromRoute] long id)
-        {
-            var result = await companyAppService.GetBusinessUnitiesAsync(id);
             return Ok(result);
         }
 
