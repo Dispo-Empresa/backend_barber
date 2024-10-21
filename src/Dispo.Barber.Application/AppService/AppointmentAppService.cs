@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO;
 using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
-using System.Globalization;
-using System.Threading;
-using Twilio.Base;
-using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -37,10 +32,10 @@ namespace Dispo.Barber.Application.AppService
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationTokenSource.Token, createAppointmentDTO.Customer.Id); ;
+                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, createAppointmentDTO.Customer.Id); ;
 
                     if (existingCustomer != null)
                     {
@@ -49,8 +44,8 @@ namespace Dispo.Barber.Application.AppService
 
                     var appointment = mapper.Map<Appointment>(createAppointmentDTO);
                     appointment.Status = AppointmentStatus.Scheduled;
-                    await appointmentRepository.AddAsync(appointment);
-                    await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                    await appointmentRepository.AddAsync(cancellationToken, appointment);
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
                     var msg = smsService.GenerateAppointmentMessage(appointment);
                     SendNotificationBySMS(appointment, msg);
                 });
@@ -81,16 +76,16 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
-        public async Task CancelAppointmentAsync(long id)
+        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointment = await appointmentRepository.GetAsync(cancellationTokenSource.Token, id);
+                var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
                 appointment.Status = AppointmentStatus.Canceled;
-                await appointmentRepository.AddAsync(appointment);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                await appointmentRepository.AddAsync(cancellationToken, appointment);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             });
 
         }

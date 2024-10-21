@@ -28,7 +28,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         }
 
-        public async Task<List<Customer>> GetCustomersForAppointment(string search)
+        public async Task<List<Customer>> GetCustomersForAppointment(CancellationToken cancellationToken, string search)
         {
             if (search.Any(char.IsDigit))
             {

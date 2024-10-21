@@ -83,44 +83,23 @@ namespace Dispo.Barber.Application.AppService
             });
         }
 
+        public async Task<List<Company>> GetAllAsync()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            {
+                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                return await companyRepository.GetAllAsync(cancellationTokenSource.Token);
+            });
+        }
+
         public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)
         {
             var cancellationTokenSource = new CancellationTokenSource();
             return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                return await companyRepository.GetBusinessUnitiesAsync(id);
-            });
-        }
-
-        public async Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO)
-        {
-            var cancellationTokenSource = new CancellationTokenSource();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
-            {
-                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                var company = await companyRepository.GetWithBusinessUnitiesAsync(id);
-                if (company is null)
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
-                {
-                    company.Name = updateCompanyDTO.Name;
-                }
-
-                if (company.BusinessUnities.Any())
-                {
-                    if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
-                    {
-                        var businessUnity = company.BusinessUnities.First();
-                        businessUnity.Phone = updateCompanyDTO.Phone;
-                    }
-                }
-
-                companyRepository.Update(company);
-                await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                return await companyRepository.GetBusinessUnitiesAsync(cancellationTokenSource.Token, id);
             });
         }
     }

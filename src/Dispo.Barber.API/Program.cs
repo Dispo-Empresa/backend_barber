@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
+using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Application.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,7 +78,6 @@ builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 
 // Register services
-builder.Services.AddTransient<ICompanyService, CompanyService>();
 builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
 builder.Services.AddTransient<IUserAppService, UserAppService>();
 builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();

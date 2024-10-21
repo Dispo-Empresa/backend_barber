@@ -25,7 +25,6 @@ namespace Dispo.Barber.Infrastructure.Repository
         {
             return await context.Companies.Include(i => i.BusinessUnities)
                                 .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
-            this.context = context;
         }
 
         public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id)

@@ -23,7 +23,7 @@ namespace Dispo.Barber.Application.AppService
                     // TODO: Completar.
                 }
 
-                await userRepository.AddAsync(user);
+                await userRepository.AddAsync(cancellationToken, user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }

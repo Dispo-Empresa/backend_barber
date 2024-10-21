@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Utils;
-using System.Reflection.Metadata;
 
 
 namespace Dispo.Barber.Application.Service
@@ -22,7 +21,7 @@ namespace Dispo.Barber.Application.Service
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
                 {
                     var customer = mapper.Map<Customer>(customerDTO);
-                    await customerRepository.AddAsync(customer);
+                    await customerRepository.AddAsync(cancellationTokenSource.Token, customer);
                     await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
 
 

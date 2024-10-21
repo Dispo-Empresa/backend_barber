@@ -36,15 +36,6 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
-        {
-            await companyAppService.UpdateAsync(cancellationToken, id, updateCompanyDTO);
-            var result = await companyAppService.GetAllAsync();
-            return Ok(result);
-        }
-
-        [AllowAnonymous]
         [HttpGet("{id}/business-unities")]
         public async Task<IActionResult> Get([FromRoute] long id)
         {
@@ -54,9 +45,9 @@ namespace Dispo.Barber.API.Controllers
 
         [AllowAnonymous]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
         {
-            await companyAppService.UpdateAsync(id, updateCompanyDTO);
+            await companyAppService.UpdateAsync(cancellationToken, id, updateCompanyDTO);
             return Ok();
         }
 

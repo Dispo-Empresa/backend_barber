@@ -23,13 +23,13 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(createAppointmentDTO);
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpPost("create-by-services")]
-        public async Task<IActionResult> CreateByServices([FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
+        public async Task<IActionResult> CreateByServices(CancellationToken cancellationToken, [FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
         {
             var createAppointmentDTO = new CreateAppointmentDTO
             {
@@ -43,8 +43,7 @@ namespace Dispo.Barber.API.Controllers
                 Customer = createCreateAppointmentServicosDTO.Customer
             };
 
-            await appointmentAppService.CreateAsync(createAppointmentDTO);
-          
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
             return Ok();
         }
 
@@ -61,7 +60,7 @@ namespace Dispo.Barber.API.Controllers
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            await appointmentAppService.InformProblemAsync(cancellationToken, id, informAppointmentProblemDTO);
+            await appointmentAppService.CancelAppointmentAsync(cancellationToken, id);
             return Ok();
         }
     }
