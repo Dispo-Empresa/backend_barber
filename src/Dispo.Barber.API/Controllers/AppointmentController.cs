@@ -1,7 +1,9 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -21,13 +23,43 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
+            await appointmentAppService.CreateAsync(createAppointmentDTO);
             return Ok();
         }
 
         [AllowAnonymous]
+        [HttpPost("create-by-services")]
+        public async Task<IActionResult> CreateByServices([FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
+        {
+            var createAppointmentDTO = new CreateAppointmentDTO
+            {
+                Date = createCreateAppointmentServicosDTO.Date,
+                CustomerObservation = createCreateAppointmentServicosDTO.CustomerObservation,
+                AcceptedUserObservation = createCreateAppointmentServicosDTO.AcceptedUserObservation,
+                AcceptedUserId = createCreateAppointmentServicosDTO.AcceptedUserId,
+                BusinessUnityId = createCreateAppointmentServicosDTO.BusinessUnityId,
+                Services = createCreateAppointmentServicosDTO.ServiceIds,
+                Status = AppointmentStatus.Scheduled,
+                Customer = createCreateAppointmentServicosDTO.Customer
+            };
+
+            await appointmentAppService.CreateAsync(createAppointmentDTO);
+          
+            return Ok();
+        }
+
+
+        [AllowAnonymous]
         [HttpPatch("{id}/inform-problem")]
         public async Task<IActionResult> InformProblem(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
+        {
+            await appointmentAppService.InformProblemAsync(cancellationToken, id, informAppointmentProblemDTO);
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("{id}/cancel")]
+        public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {
             await appointmentAppService.InformProblemAsync(cancellationToken, id, informAppointmentProblemDTO);
             return Ok();

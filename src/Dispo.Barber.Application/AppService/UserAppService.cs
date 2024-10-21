@@ -23,7 +23,7 @@ namespace Dispo.Barber.Application.AppService
                     // TODO: Completar.
                 }
 
-                await userRepository.AddAsync(cancellationToken, user);
+                await userRepository.AddAsync(user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
@@ -137,19 +137,19 @@ namespace Dispo.Barber.Application.AppService
 
         private List<UserSchedule> BuildNormalDays() => [
             new(DayOfWeek.Monday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Monday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Tuesday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Tuesday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Wednesday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Wednesday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Thursday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Thursday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Friday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Friday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Saturday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Saturday, "12:00", "13:30", true, false),
-                new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
-                new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
-            ];
+            new(DayOfWeek.Monday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Tuesday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Tuesday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Wednesday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Wednesday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Thursday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Thursday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Friday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Friday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Saturday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Saturday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
+            new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
+        ];
     }
 }

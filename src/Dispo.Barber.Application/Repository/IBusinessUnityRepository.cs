@@ -7,5 +7,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<User>> GetUsersAsync(CancellationToken cancellationToken, long id);
 
         Task<List<User>> GetPendingUsersAsync(CancellationToken cancellationToken, long id);
+
+        Task<long> GetIdByCompanyAsync(long companyId);
     }
 }

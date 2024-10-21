@@ -14,5 +14,11 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateCompanyDTO updateCompanyDTO);
 
         Task<Company> GetAsync(CancellationToken cancellationToken, long id);
+
+        Task<List<Company>> GetAllAsync();
+
+        Task<List<BusinessUnity>> GetBusinessUnitiesAsync(long id);
+
+        Task UpdateAsync(long id, UpdateCompanyDTO updateCompanyDTO);
     }
 }

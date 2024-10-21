@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.Entities
+﻿using Dispo.Barber.Domain.Enum;
+
+namespace Dispo.Barber.Domain.Entities
 {
     public class Appointment : EntityBase
     {
@@ -15,8 +17,8 @@
 
         public long? AcceptedUserId { get; set; }
         public User? AcceptedUser { get; set; }
-
         public required List<ServiceAppointment> Services { get; set; }
+        public AppointmentStatus Status { get; set; }
 
     }
 }
