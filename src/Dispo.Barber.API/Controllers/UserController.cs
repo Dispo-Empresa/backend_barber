@@ -82,5 +82,13 @@ namespace Dispo.Barber.API.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet("id-by-phone")]
+        public async Task<IActionResult> GetUserIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
+        {
+            var result = await userAppService.GetUserIdByPhone(cancellationToken, phone);
+            return Ok(result);
+        }
     }
 }

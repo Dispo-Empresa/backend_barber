@@ -33,5 +33,13 @@ namespace Dispo.Barber.API.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro ao buscar as informações de serviço.", error = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromRoute] long id, CancellationToken cancellationToken)
+        {
+            var result = await serviceAppService.GetServicesList(id, cancellationToken);
+            return Ok(result);
+        }
     }
 }

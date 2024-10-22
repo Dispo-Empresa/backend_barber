@@ -26,6 +26,17 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ToListAsync();
 
             return services; 
+            this.context = context;
+        }
+
+        public async Task<IList<Service>> GetServicesByCompanyAsync(long id, CancellationToken cancellationToken)
+        {
+            return await context.CompanyServices
+                                .Include(i => i.Company)
+                                .Include(i => i.Service)
+                                .Where(x => x.CompanyId == id)
+                                .Select(s => s.Service)
+                                .ToListAsync(cancellationToken);
         }
     }
 }

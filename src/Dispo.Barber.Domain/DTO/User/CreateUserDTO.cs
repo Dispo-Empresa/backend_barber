@@ -10,5 +10,7 @@ namespace Dispo.Barber.Domain.DTO.User
         public string Phone { get; set; }
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
+        public bool Active { get; set; } = true;
+        public AddServiceToUserDTO? Services { get; set; }
     }
 }

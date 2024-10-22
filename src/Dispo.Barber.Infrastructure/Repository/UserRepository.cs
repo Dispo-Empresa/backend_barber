@@ -42,5 +42,12 @@ namespace Dispo.Barber.Infrastructure.Repository
             return await context.Users.Include("Appointments.Service")
                                       .FirstOrDefaultAsync(w => w.Id == id);
         }
+
+        public async Task<long> GetIdByPhone(CancellationToken cancellationToken, string phone)
+        {
+            return await context.Users.Where(x => x.Phone == phone)
+                                      .Select(s => s.Id)
+                                      .FirstOrDefaultAsync();
+        }
     }
 }

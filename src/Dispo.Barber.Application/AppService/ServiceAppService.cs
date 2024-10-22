@@ -17,5 +17,15 @@ namespace Dispo.Barber.Application.AppService
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
         }
+
+        public async Task<IList<ServiceListDTO>> GetServicesList(long companyId, CancellationToken cancellationToken)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var serviceRepository = unitOfWork.GetRepository<IServiceRepository>();
+                var services = await serviceRepository.GetServicesByCompanyAsync(companyId, cancellationToken);
+                return mapper.Map<IList<ServiceListDTO>>(services);
+            });
+        }
     }
 }

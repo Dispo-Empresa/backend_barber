@@ -9,15 +9,25 @@ namespace Dispo.Barber.Application.AppService
 {
     public class CompanyAppService(IUnitOfWork unitOfWork, IMapper mapper) : ICompanyAppService
     {
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
+        public async Task<long> CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
         {
+            long createCompanyId = 0;
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                var serviceRepository = unitOfWork.GetRepository<IServiceRepository>();
+
                 var company = mapper.Map<Company>(companyDTO);
-                await companyRepository.AddAsync(cancellationToken, company);
+
+                foreach (var serviceCompany in company.ServicesCompany)
+                    await serviceRepository.AddAsync(serviceCompany.Service);
+
+                await companyRepository.AddAsync(company);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
+                createCompanyId = company.Id;
             });
+
+            return createCompanyId;
         }
 
         public async Task<List<Company>> GetAllAsync(CancellationToken cancellationToken)

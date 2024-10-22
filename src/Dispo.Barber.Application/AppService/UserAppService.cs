@@ -6,6 +6,7 @@ using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
+using System.Data;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -17,6 +18,8 @@ namespace Dispo.Barber.Application.AppService
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
                 var user = mapper.Map<User>(createUserDTO);
+                user.Name = "";
+                user.Password = "";
                 user.Schedules.AddRange(BuildNormalDays());
                 if (user.IsPending())
                 {
@@ -26,6 +29,9 @@ namespace Dispo.Barber.Application.AppService
                 await userRepository.AddAsync(cancellationToken, user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
+
+            if (createUserDTO.Services != null)
+                await AddServiceToUserAsync(userCreatedId, createUserDTO.Services);
         }
 
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, AddServiceToUserDTO addServiceToUserDTO)
@@ -94,6 +100,8 @@ namespace Dispo.Barber.Application.AppService
                     user.Phone = updateUserDTO.Phone;
                 }
 
+                user.Password = PasswordEncryptor.HashPassword(updateUserDTO.Password);
+
                 userRepository.Update(user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
@@ -132,6 +140,15 @@ namespace Dispo.Barber.Application.AppService
 
                 userRepository.Update(user);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
+            });
+        }
+
+        public async Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var userRepository = unitOfWork.GetRepository<IUserRepository>();
+                return await userRepository.GetIdByPhone(cancellationToken, phone);
             });
         }
 
