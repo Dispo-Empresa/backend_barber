@@ -20,9 +20,9 @@ namespace Dispo.Barber.Application.AppService
                 var company = mapper.Map<Company>(companyDTO);
 
                 foreach (var serviceCompany in company.ServicesCompany)
-                    await serviceRepository.AddAsync(serviceCompany.Service);
+                    await serviceRepository.AddAsync(cancellationToken, serviceCompany.Service);
 
-                await companyRepository.AddAsync(company);
+                await companyRepository.AddAsync(cancellationToken, company);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
                 createCompanyId = company.Id;
             });

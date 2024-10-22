@@ -5,7 +5,7 @@ namespace Dispo.Barber.Application.AppService.Interface
 {
     public interface ICompanyAppService
     {
-        Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO);
+        Task<long> CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO);
 
         Task<List<Company>> GetAllAsync(CancellationToken cancellationToken);
 

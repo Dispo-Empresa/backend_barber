@@ -6,7 +6,6 @@ using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
-using System.Data;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -14,6 +13,8 @@ namespace Dispo.Barber.Application.AppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
+            long userCreatedId = 0;
+
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
@@ -31,7 +32,7 @@ namespace Dispo.Barber.Application.AppService
             });
 
             if (createUserDTO.Services != null)
-                await AddServiceToUserAsync(userCreatedId, createUserDTO.Services);
+                await AddServiceToUserAsync(cancellationToken, userCreatedId, createUserDTO.Services);
         }
 
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, AddServiceToUserDTO addServiceToUserDTO)

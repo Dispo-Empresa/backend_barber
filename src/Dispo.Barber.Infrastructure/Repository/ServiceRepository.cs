@@ -26,7 +26,6 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ToListAsync();
 
             return services; 
-            this.context = context;
         }
 
         public async Task<IList<Service>> GetServicesByCompanyAsync(long id, CancellationToken cancellationToken)
