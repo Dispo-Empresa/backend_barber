@@ -71,7 +71,7 @@ namespace Dispo.Barber.Application.AppService
             return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                return await userRepository.GetSchedulesAsync(cancellationToken, id);
+                return await userRepository.GetValidDaysSchedulesAsync(cancellationToken, id);
             });
         }
 
