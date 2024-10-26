@@ -14,8 +14,8 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateCompanyDTO companyDTO)
         {
-            await companyAppService.CreateAsync(cancellationToken, companyDTO);
-            return Ok();
+            var result = await companyAppService.CreateAsync(cancellationToken, companyDTO);
+            return Ok(result);
         }
 
         [AllowAnonymous]
