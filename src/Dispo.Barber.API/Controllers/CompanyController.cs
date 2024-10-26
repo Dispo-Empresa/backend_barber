@@ -49,5 +49,20 @@ namespace Dispo.Barber.API.Controllers
             var result = await companyAppService.GetAsync(cancellationToken, id);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpGet("information/{id}")]
+        public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                var informationChat = await informationChatService.GetInformationChatByIdCompanyAsync(cancellationToken, id);
+                return Ok(informationChat);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
+            }
+        }
     }
 }
