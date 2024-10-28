@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Domain.DTO.Schedule;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.AppService.Interface
@@ -20,5 +21,6 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO);
 
         Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone);
+        Task<List<UserSchedule>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser);
     }
 }

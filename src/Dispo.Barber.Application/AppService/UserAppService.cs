@@ -2,6 +2,7 @@
 using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -169,5 +170,38 @@ namespace Dispo.Barber.Application.AppService
             new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
             new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
         ];
+
+        private string GetDayOfWeekString(int dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                0 => "Dom",
+                1 => "Seg",
+                2 => "Ter",
+                3 => "Qua",
+                4 => "Qui",
+                5 => "Sex",
+                6 => "Sab",
+                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Dia da semana inválido")
+            };
+        }
+
+        public async Task<List<UserSchedule>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+                var userSchedules = await userScheduleRepository.GetScheduleByUserId(idUser);
+                /*
+                var scheduleInformation = new ScheduleInformationDto
+                {
+                    DayOfWeek = userSchedules.Select(schedule => GetDayOfWeekString((int)schedule.DayOfWeek)).ToList()
+                };
+                */
+
+                return userSchedules;
+            });
+        }
+
     }
 }
