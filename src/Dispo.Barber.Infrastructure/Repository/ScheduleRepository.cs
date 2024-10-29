@@ -16,7 +16,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetScheduleByUserId(long userId)
         {
-            return await _context.UserSchedules.Where(x=> x.UserId == userId)
+            return await _context.UserSchedules.Where(x=> x.UserId == userId && x.IsRest.Equals(false) && x.DayOff.Equals(false))
                                                .ToListAsync();
         }
     }

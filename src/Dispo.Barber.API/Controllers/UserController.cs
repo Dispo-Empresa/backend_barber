@@ -69,7 +69,7 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{id}/information")]
+        [HttpGet("{id}/information-user")]
         public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
         {
             try
@@ -92,7 +92,7 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{idUser}/schedulesInformation")]
+        [HttpGet("{idUser}/information-schedules")]
         public async Task<IActionResult> GetUserSchedulesInformationByUserId(CancellationToken cancellationToken, [FromRoute] long idUser)
         {
             var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
