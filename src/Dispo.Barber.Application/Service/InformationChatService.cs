@@ -6,6 +6,7 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using System.Threading.Tasks;
 
 
 namespace Dispo.Barber.Application.Service
@@ -141,14 +142,34 @@ namespace Dispo.Barber.Application.Service
 
                 var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
                 {
-                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek) + ".", // Adiciona o ponto no final
-                    StartDate = schedule.DayOff ? null : schedule.StartDate, // Define como null se for dia de folga
-                    EndDate = schedule.DayOff ? null : schedule.EndDate, // Define como null se for dia de folga
+                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek) + ".", 
+                    StartDate = schedule.DayOff ? null : schedule.StartDate, 
+                    EndDate = schedule.DayOff ? null : schedule.EndDate, 
                     IsRest = schedule.IsRest,
                     DayOff = schedule.DayOff
                 }).ToList();
 
                 return scheduleList;
+            });
+        }
+
+
+        async Task<List<InformationAppointmentChatDto>> IinformationChatService.GetAvailableDateTimessByUserIdAsync(CancellationToken cancellationToken, long idUser)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+                var appointments = await appointmentRepository.GetAppointmentByUserIdSync(cancellationToken, idUser);
+
+                var appointmentDtos = appointments.Select(appointment => new InformationAppointmentChatDto
+                {
+                    Date = appointment.Date.ToString("yyyy-MM-dd"),  
+                    Hour = appointment.Date.ToString("HH:mm"),       
+                    DayOfWeek = appointment.Date.ToString("ddd", new System.Globalization.CultureInfo("pt-BR")) 
+                }).ToList();
+
+                return appointmentDtos;
+
             });
         }
     }
