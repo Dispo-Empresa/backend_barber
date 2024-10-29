@@ -121,13 +121,13 @@ namespace Dispo.Barber.Application.Service
         {
             return dayOfWeek switch
             {
-                0 => "Dom",
-                1 => "Seg",
-                2 => "Ter",
-                3 => "Qua",
-                4 => "Qui",
-                5 => "Sex",
-                6 => "Sab",
+                0 => "Dom.",
+                1 => "Seg.",
+                2 => "Ter.",
+                3 => "Qua.",
+                4 => "Qui.",
+                5 => "Sex.",
+                6 => "Sab.",
                 _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Dia da semana inválido")
             };
         }
