@@ -2,8 +2,10 @@
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
+using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
+using Dispo.Barber.Domain.Entities;
 
 
 namespace Dispo.Barber.Application.Service
@@ -14,9 +16,7 @@ namespace Dispo.Barber.Application.Service
         {
             try
             {
-                var cancellationTokenSource = new CancellationTokenSource();
-
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
                     var company = await companyRepository.GetAsync(cancellationToken,companyId);
@@ -28,7 +28,7 @@ namespace Dispo.Barber.Application.Service
 
                     var businessIdTask = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetIdByCompanyAsync(company.Id);
                     var usersTask = await unitOfWork.GetRepository<IUserRepository>().GetUserByBusinessAsync(businessIdTask);
-                    var companyServicesTask = await unitOfWork.GetRepository<ICompanyRepository>().GetServicesByCompanyAsync(company.Id);
+                    var companyServicesTask = await companyRepository.GetServicesByCompanyAsync(company.Id);
 
                     var listServices = await unitOfWork.GetRepository<IServiceRepository>().GetListServiceAsync(companyServicesTask);
 
@@ -54,9 +54,7 @@ namespace Dispo.Barber.Application.Service
         {
             try
             {
-                var cancellationTokenSource = new CancellationTokenSource();
-
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var userRepository = unitOfWork.GetRepository<IUserRepository>();
                     var user = await userRepository.GetAsync(cancellationToken, idUser);
@@ -117,6 +115,41 @@ namespace Dispo.Barber.Application.Service
             {
                 throw new Exception($"Erro ao obter informações do chat para barbeiro com ID {1}.", ex);
             }
+        }
+
+        private string GetDayOfWeekString(int dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                0 => "Dom",
+                1 => "Seg",
+                2 => "Ter",
+                3 => "Qua",
+                4 => "Qui",
+                5 => "Sex",
+                6 => "Sab",
+                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Dia da semana inválido")
+            };
+        }
+
+        public async Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser)
+        {
+            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+                var userSchedules = await userScheduleRepository.GetScheduleByUserId(idUser);
+
+                var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
+                {
+                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek) + ".", // Adiciona o ponto no final
+                    StartDate = schedule.DayOff ? null : schedule.StartDate, // Define como null se for dia de folga
+                    EndDate = schedule.DayOff ? null : schedule.EndDate, // Define como null se for dia de folga
+                    IsRest = schedule.IsRest,
+                    DayOff = schedule.DayOff
+                }).ToList();
+
+                return scheduleList;
+            });
         }
     }
 }

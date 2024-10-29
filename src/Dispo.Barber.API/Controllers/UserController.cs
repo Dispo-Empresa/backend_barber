@@ -92,10 +92,10 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{idUser}/schedules")]
+        [HttpGet("{idUser}/schedulesInformation")]
         public async Task<IActionResult> GetUserSchedulesInformationByUserId(CancellationToken cancellationToken, [FromRoute] long idUser)
         {
-            var result = await userAppService.GetUserSchedulesAsync(cancellationToken, idUser);
+            var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
             return Ok(result);
         }
 
