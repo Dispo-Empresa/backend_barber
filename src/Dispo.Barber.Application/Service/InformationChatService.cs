@@ -142,7 +142,7 @@ namespace Dispo.Barber.Application.Service
 
                 var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
                 {
-                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek) + ".", 
+                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek), 
                     StartDate = schedule.DayOff ? null : schedule.StartDate, 
                     EndDate = schedule.DayOff ? null : schedule.EndDate, 
                     IsRest = schedule.IsRest,
