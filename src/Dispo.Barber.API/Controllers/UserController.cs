@@ -68,7 +68,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}/information")]
         public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
         {
@@ -90,5 +90,14 @@ namespace Dispo.Barber.API.Controllers
             var result = await userAppService.GetUserIdByPhone(cancellationToken, phone);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpGet("{idUser}/information-schedules")]
+        public async Task<IActionResult> GetUserSchedulesInformationByUserId(CancellationToken cancellationToken, [FromRoute] long idUser)
+        {
+            var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
+            return Ok(result);
+        }
+
     }
 }

@@ -2,6 +2,8 @@
 using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Schedule;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -71,7 +73,7 @@ namespace Dispo.Barber.Application.AppService
             return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                return await userRepository.GetSchedulesAsync(cancellationToken, id);
+                return await userRepository.GetValidDaysSchedulesAsync(cancellationToken, id);
             });
         }
 
@@ -169,5 +171,6 @@ namespace Dispo.Barber.Application.AppService
             new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
             new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
         ];
+
     }
 }

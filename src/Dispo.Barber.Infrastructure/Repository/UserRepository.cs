@@ -29,12 +29,10 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .ToListAsync();
         }
 
-        public async Task<List<UserSchedule>> GetSchedulesAsync(CancellationToken cancellationToken, long id)
+        public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.Users.Include(i => i.Schedules)
-                                      .Where(w => w.Id == id)
-                                      .SelectMany(s => s.Schedules)
-                                      .ToListAsync();
+            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest)
+                                              .ToListAsync();
         }
 
         public async Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id)

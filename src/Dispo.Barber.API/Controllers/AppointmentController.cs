@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
+using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ namespace Dispo.Barber.API.Controllers
 {
     [Route("api/v1/appointments")]
     [ApiController]
-    public class AppointmentController(IAppointmentAppService appointmentAppService) : ControllerBase
+    public class AppointmentController(IAppointmentAppService appointmentAppService, IinformationChatService informationChatService) : ControllerBase
     {
         [Authorize]
         [HttpGet("{id}")]
@@ -62,6 +63,14 @@ namespace Dispo.Barber.API.Controllers
         {
             await appointmentAppService.CancelAppointmentAsync(cancellationToken, id);
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{idUser}/infomation")]
+        public async Task<IActionResult> GetInformationAvailableDateTimesByUser(CancellationToken cancellationToken, [FromRoute] long idUser)
+        {
+            var InformationAppointmentChatDto = await informationChatService.GetAvailableDateTimessByUserIdAsync(cancellationToken, idUser);
+            return Ok(InformationAppointmentChatDto);
         }
     }
 }

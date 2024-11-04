@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Domain.DTO.Schedule;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.AppService.Interface
