@@ -138,11 +138,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
-//    migrationManager.Migrate();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
+    migrationManager.Migrate();
+}
 
 app.UseHttpsRedirection();
 

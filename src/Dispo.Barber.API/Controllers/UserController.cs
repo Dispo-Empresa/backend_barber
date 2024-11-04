@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class UserController(IUserAppService userAppService, IinformationChatService informationChatService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateUserDTO createUserDTO)
         {
@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
@@ -27,7 +27,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost("{id}/services")]
         public async Task<IActionResult> AddServiceToUser(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
         {
@@ -35,7 +35,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/appointments")]
         public async Task<IActionResult> GetUserAppointments(CancellationToken cancellationToken, [FromRoute] long id, [FromQuery] GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
@@ -43,7 +43,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/schedules")]
         public async Task<IActionResult> GetUserSchedules(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -52,7 +52,7 @@ namespace Dispo.Barber.API.Controllers
         }
 
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> ChangeStatus(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangeStatusDTO changeStatusDTO)
         {
@@ -60,7 +60,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPatch("{id}/password")]
         public async Task<IActionResult> ChangePassword(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangePasswordDTO changePasswordDTO)
         {
@@ -68,7 +68,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/information")]
         public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
         {
@@ -83,7 +83,7 @@ namespace Dispo.Barber.API.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("id-by-phone")]
         public async Task<IActionResult> GetUserIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
         {

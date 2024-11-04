@@ -1,7 +1,9 @@
-﻿namespace Dispo.Barber.Application.AppService.Interface
+﻿using Dispo.Barber.Domain.DTO.Authentication;
+
+namespace Dispo.Barber.Application.AppService.Interface
 {
     public interface IAuthAppService
     {
-        Task<string> Authenticate(CancellationToken cancellationToken, string phone, string password);
+        Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password);
     }
 }

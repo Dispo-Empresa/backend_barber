@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class AppointmentController(IAppointmentAppService appointmentAppService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
@@ -27,7 +27,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost("create-by-services")]
         public async Task<IActionResult> CreateByServices(CancellationToken cancellationToken, [FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
         {
@@ -48,7 +48,7 @@ namespace Dispo.Barber.API.Controllers
         }
 
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPatch("{id}/inform-problem")]
         public async Task<IActionResult> InformProblem(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
@@ -56,7 +56,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {

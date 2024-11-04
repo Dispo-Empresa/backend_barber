@@ -10,7 +10,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class CompanyController(ICompanyAppService companyAppService, IinformationChatService informationChatService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateCompanyDTO companyDTO)
         {
@@ -18,7 +18,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
@@ -26,7 +26,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/business-unities")]
         public async Task<IActionResult> GetBusinessUnities(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -34,7 +34,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateCompanyDTO updateCompanyDTO)
         {
@@ -42,7 +42,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
         {

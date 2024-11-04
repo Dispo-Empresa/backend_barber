@@ -1,10 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -16,7 +12,7 @@ namespace Dispo.Barber.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, string phone, string password)
         {
-            var jwt = await authAppService.Authenticate(cancellationToken, phone, password);
+            var jwt = await authAppService.AuthenticateAsync(cancellationToken, phone, password);
             return Ok(jwt);
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -9,7 +8,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class BusinessUnityController(IBusinessUnityAppService businessUnityAppService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}/users")]
         public async Task<IActionResult> GetUsers(CancellationToken cancellationToken, [FromRoute] long id)
         {

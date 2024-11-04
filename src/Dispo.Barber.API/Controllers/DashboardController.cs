@@ -8,7 +8,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class DashboardController(IDashboardAppService dashboardAppService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> BuildDashboard(CancellationToken cancellationToken, [FromRoute] long id)
         {

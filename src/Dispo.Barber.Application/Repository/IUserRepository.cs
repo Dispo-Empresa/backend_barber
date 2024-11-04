@@ -11,6 +11,9 @@ namespace Dispo.Barber.Application.Repository
         Task<List<UserSchedule>> GetSchedulesAsync(CancellationToken cancellationToken, long id);
 
         Task<List<User>> GetUserByBusinessAsync(long businessId);
+
         Task<long> GetIdByPhone(CancellationToken cancellationToken, string phone);
+
+        Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone);
     }
 }

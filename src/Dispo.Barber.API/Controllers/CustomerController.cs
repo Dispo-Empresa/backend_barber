@@ -10,7 +10,7 @@ namespace Dispo.Barber.API.Controllers
     public class CustomerController(ICustomerAppService customerAppService, ICustomerService customerService) : ControllerBase
     {
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{phone}")]
         public async Task<IActionResult> GetByPhone(string phone)
         {

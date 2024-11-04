@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers
     [ApiController]
     public class ServiceController(IServiceAppService serviceAppService, IinformationChatService informationChatService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateServiceDTO createServiceDTO)
         {
@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost("information")]
         public async Task<IActionResult> GetInformationChatByService([FromBody] List<long> serviceIds)
         {
@@ -34,7 +34,7 @@ namespace Dispo.Barber.API.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] long id, CancellationToken cancellationToken)
         {

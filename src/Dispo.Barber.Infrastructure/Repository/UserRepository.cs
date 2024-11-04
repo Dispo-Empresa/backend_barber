@@ -49,5 +49,11 @@ namespace Dispo.Barber.Infrastructure.Repository
                                       .Select(s => s.Id)
                                       .FirstOrDefaultAsync();
         }
+
+        public async Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone)
+        {
+            return await context.Users.Include(i => i.BusinessUnity.Company)
+                                      .FirstOrDefaultAsync(w => w.Phone == phone);
+        }
     }
 }

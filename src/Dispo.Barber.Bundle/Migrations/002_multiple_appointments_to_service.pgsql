@@ -1,16 +1,16 @@
 ﻿ALTER TABLE public."Users" ALTER COLUMN "Surname" DROP NOT NULL;
 
 -- Drop foreign key constraint between Appointments and Services
-ALTER TABLE "Appointments" DROP CONSTRAINT "FK_Appointments_Services_ServiceId";
+ALTER TABLE "Appointments" DROP CONSTRAINT IF EXISTS "FK_Appointments_Services_ServiceId";
 
 -- Drop the index on ServiceId in the Appointments table
 DROP INDEX IF EXISTS "IX_Appointments_ServiceId";
 
 -- Drop the ServiceId column from the Appointments table
-ALTER TABLE "Appointments" DROP COLUMN "ServiceId";
+ALTER TABLE "Appointments" DROP COLUMN IF EXISTS "ServiceId";
 
 -- Create the new AppointmentServices table
-CREATE TABLE "AppointmentServices" (
+CREATE TABLE IF NOT EXISTS "AppointmentServices" (
     "AppointmentId" bigint NOT NULL,
     "ServiceId" bigint NOT NULL,
     "Id" bigint NOT NULL,
@@ -20,4 +20,4 @@ CREATE TABLE "AppointmentServices" (
 );
 
 -- Create the index on ServiceId in the AppointmentServices table
-CREATE INDEX "IX_AppointmentServices_ServiceId" ON "AppointmentServices" ("ServiceId");
+CREATE INDEX IF NOT EXISTS "IX_AppointmentServices_ServiceId" ON "AppointmentServices" ("ServiceId");
