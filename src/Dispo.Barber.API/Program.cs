@@ -67,32 +67,32 @@ builder.Services.AddTransient<ISmsService, SmsService>(provider =>
 });
 
 // Register repositories
-builder.Services.AddTransient<DbContext, ApplicationContext>();
-builder.Services.AddTransient<IAppointmentRepository, AppointmentRepository>();
-builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
-builder.Services.AddTransient<IBusinessUnityRepository, BusinessUnityRepository>();
-builder.Services.AddTransient<IServiceRepository, ServiceRepository>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
-builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
-builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
+builder.Services.AddScoped<DbContext, ApplicationContext>();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IBusinessUnityRepository, BusinessUnityRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<IServiceUserRepository, ServiceUserRepository>();
 
 // Register services
-builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
-builder.Services.AddTransient<IUserAppService, UserAppService>();
-builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();
-builder.Services.AddTransient<IDashboardAppService, DashboardAppService>();
-builder.Services.AddTransient<IServiceAppService, ServiceAppService>();
-builder.Services.AddTransient<ICustomerService, CustomerService>();
-builder.Services.AddTransient<IinformationChatService, InformationChatService>();
-builder.Services.AddTransient<ICustomerAppService, CustomerAppService>();
-builder.Services.AddTransient<IBusinessUnityAppService, BusinessUnityAppService>();
-builder.Services.AddTransient<IScheduleAppService, ScheduleAppService>();
-builder.Services.AddTransient<IAuthAppService, AuthAppService>();
+builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
+builder.Services.AddScoped<IUserAppService, UserAppService>();
+builder.Services.AddScoped<IAppointmentAppService, AppointmentAppService>();
+builder.Services.AddScoped<IDashboardAppService, DashboardAppService>();
+builder.Services.AddScoped<IServiceAppService, ServiceAppService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IinformationChatService, InformationChatService>();
+builder.Services.AddScoped<ICustomerAppService, CustomerAppService>();
+builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
+builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
+builder.Services.AddScoped<IAuthAppService, AuthAppService>();
 
-builder.Services.AddTransient<IMigrationManager, MigrationManager>();
+builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt

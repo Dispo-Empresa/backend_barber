@@ -7,7 +7,7 @@ using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class CompanyAppService(IUnitOfWork unitOfWork, IMapper mapper) : ICompanyAppService
+    public class CompanyAppService(IUnitOfWork unitOfWork, IMapper mapper, ICompanyRepository companyRepository) : ICompanyAppService
     {
         public async Task<long> CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
         {
@@ -34,7 +34,6 @@ namespace Dispo.Barber.Application.AppService
         {
             return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
-                var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
                 return await companyRepository.GetAllAsync(cancellationToken);
             });
         }
