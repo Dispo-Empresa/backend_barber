@@ -2,8 +2,6 @@
 using AutoMapper;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Domain.DTO.Schedule;
-using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -21,7 +19,6 @@ namespace Dispo.Barber.Application.AppService
             {
                 var userRepository = unitOfWork.GetRepository<IUserRepository>();
                 var user = mapper.Map<User>(createUserDTO);
-                user.Name = "";
                 user.Password = "";
                 user.Schedules.AddRange(BuildNormalDays());
                 if (user.IsPending())
@@ -33,11 +30,11 @@ namespace Dispo.Barber.Application.AppService
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
 
-            if (createUserDTO.Services != null)
+            if (createUserDTO.Services.Any())
                 await AddServiceToUserAsync(cancellationToken, userCreatedId, createUserDTO.Services);
         }
 
-        public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, AddServiceToUserDTO addServiceToUserDTO)
+        public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
             await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
             {
@@ -48,7 +45,7 @@ namespace Dispo.Barber.Application.AppService
                     throw new VersionNotFoundException();
                 }
 
-                user.ServicesUser.AddRange(addServiceToUserDTO.Services.Select(s => new ServiceUser
+                user.ServicesUser.AddRange(services.Select(s => new ServiceUser
                 {
                     UserId = user.Id,
                     ServiceId = s
