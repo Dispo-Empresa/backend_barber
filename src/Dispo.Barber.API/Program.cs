@@ -97,7 +97,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
-                .UseNpgsql(Environment.GetEnvironmentVariable("BARBER_CONNECTION_STRING")));
+                .UseNpgsql("Host=localHost;Port=5432;User Id=postgres;Password=12345678;Database=barber;"));
+
+
 
 builder.Services.AddRequestTimeouts();
 

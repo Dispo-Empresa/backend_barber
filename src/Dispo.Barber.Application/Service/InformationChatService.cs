@@ -141,37 +141,12 @@ namespace Dispo.Barber.Application.Service
 
                 var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
                 {
-                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek), 
-                    StartDate = schedule.DayOff ? null : schedule.StartDate, 
-                    EndDate = schedule.DayOff ? null : schedule.EndDate, 
-                    IsRest = schedule.IsRest,
-                    DayOff = schedule.DayOff
+                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
                 }).ToList();
 
                 return scheduleList;
             });
         }
-
-
-        async Task<List<InformationAppointmentChatDto>> IinformationChatService.GetAvailableDateTimessByUserIdAsync(CancellationToken cancellationToken, long idUser)
-        {
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
-            {
-                var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointments = await appointmentRepository.GetAppointmentByUserIdSync(cancellationToken, idUser);
-
-                var appointmentDtos = appointments.Select(appointment => new InformationAppointmentChatDto
-                {
-                    Date = appointment.Date.ToString("yyyy-MM-dd"),  
-                    Hour = appointment.Date.ToString("HH:mm"),       
-                    DayOfWeek = appointment.Date.ToString("ddd", new System.Globalization.CultureInfo("pt-BR")) 
-                }).ToList();
-
-                return appointmentDtos;
-
-            });
-        }
-
 
         public async Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
         {
