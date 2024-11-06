@@ -8,7 +8,7 @@ namespace Dispo.Barber.Application.AppService.Interface
     {
         Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO);
 
-        Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, AddServiceToUserDTO addServiceToUserDTO);
+        Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> addServiceToUserDTO);
 
         Task<List<Appointment>> GetUserAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 

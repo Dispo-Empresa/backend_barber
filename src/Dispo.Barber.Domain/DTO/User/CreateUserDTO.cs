@@ -11,6 +11,6 @@ namespace Dispo.Barber.Domain.DTO.User
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public bool Active { get; set; } = true;
-        public AddServiceToUserDTO? Services { get; set; }
+        public List<long> Services { get; set; }
     }
 }

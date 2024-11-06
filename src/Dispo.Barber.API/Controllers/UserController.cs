@@ -8,7 +8,7 @@ namespace Dispo.Barber.API.Controllers
 {
     [Route("api/v1/users")]
     [ApiController]
-    public class UserController(IUserAppService userAppService, IinformationChatService informationChatService) : ControllerBase
+    public class UserController(IUserAppService userAppService, IinformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
     {
         [Authorize]
         [HttpPost]
@@ -30,7 +30,7 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost("{id}/services")]
         public async Task<IActionResult> AddServiceToUser(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)
         {
-            await userAppService.AddServiceToUserAsync(cancellationToken, id, addServiceToUserDTO);
+            await userAppService.AddServiceToUserAsync(cancellationToken, id, addServiceToUserDTO.Services);
             return Ok();
         }
 
@@ -98,5 +98,11 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpGet("{id}/dashboards")]
+        public async Task<IActionResult> BuildDashboard(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await dashboardAppService.BuildDashboardForUser(cancellationToken, id));
+        }
     }
 }

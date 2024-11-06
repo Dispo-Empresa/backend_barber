@@ -24,5 +24,13 @@ namespace Dispo.Barber.API.Controllers
             await scheduleAppService.DeleteAsync(cancellationToken, id);
             return Ok();
         }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await scheduleAppService.DeleteAsync(cancellationToken, id);
+            return Ok();
+        }
     }
 }
