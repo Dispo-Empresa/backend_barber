@@ -157,8 +157,10 @@ namespace Dispo.Barber.Application.Service
                     var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
                     DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
                     var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+                    var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+                   
 
-                    var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules);
+                    var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
                     var availableSlots = new Dictionary<string, List<string>>
             {
                 { "morning", new List<string>() },
@@ -231,7 +233,7 @@ namespace Dispo.Barber.Application.Service
 
 
 
-        private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules)
+        private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules, bool dayIsEqual)
         {
             var timeIntervals = new List<DateTime>();
             foreach (var userSchedule in userSchedules)
@@ -262,7 +264,16 @@ namespace Dispo.Barber.Application.Service
                         // Verifica se o horário é maior que o horário atual
                         DateTime intervalDateTime = DateTime.Today.Add(currentTime);
 
-                        timeIntervals.Add(intervalDateTime);
+                        if (dayIsEqual && !(currentTime >= currentTimeSpan))
+                        {
+                            currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                            continue;
+                        }
+                        else
+                        {
+                            timeIntervals.Add(intervalDateTime);
+                        }
+                        
                         
                     }
                     else

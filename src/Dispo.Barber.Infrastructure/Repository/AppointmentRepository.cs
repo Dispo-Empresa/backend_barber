@@ -25,7 +25,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ThenInclude(s => s.Service)
                 .Where(x => x.AcceptedUserId == userId
                             && x.Date.Date == dateTimeSchedule.Date
-                            && x.Status != AppointmentStatus.Completed)
+                            && x.status != AppointmentStatus.Completed)
                 .ToListAsync(cancellationToken);
 
             return appointment;
@@ -34,7 +34,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<Appointment>> GetAppointmentByUserIdSync(CancellationToken cancellationToken, long userId)
         {
-                return await context.Appointments.Where(x => x.AcceptedUserId == userId && x.Date >= DateTime.UtcNow && x.Status != AppointmentStatus.Completed)
+                return await context.Appointments.Where(x => x.AcceptedUserId == userId && x.Date >= DateTime.UtcNow && x.status != AppointmentStatus.Completed)
                                           .ToListAsync(cancellationToken);
         }              
     }
