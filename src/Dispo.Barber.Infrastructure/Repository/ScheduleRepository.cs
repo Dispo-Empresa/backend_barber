@@ -22,7 +22,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetScheduleByUserId(long userId)
         {
-            return await _context.UserSchedules.Where(x=> x.UserId == userId && x.DayOff.Equals(false))
+            return await _context.UserSchedules.Where(x=> x.UserId == userId && x.DayOff.Equals(false) && x.IsRest.Equals(false))
                                                .ToListAsync();
         }
 
