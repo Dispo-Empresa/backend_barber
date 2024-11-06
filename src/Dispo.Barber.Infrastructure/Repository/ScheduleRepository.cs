@@ -14,10 +14,17 @@ namespace Dispo.Barber.Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<List<UserSchedule>> GetScheduleByUserDayOfWeek(long userId, DayOfWeek dayOfWeek)
+        {
+            return await _context.UserSchedules.Where(x => x.UserId == userId && x.DayOff.Equals(false) && x.DayOfWeek.Equals(dayOfWeek))
+                                   .ToListAsync();
+        }
+
         public async Task<List<UserSchedule>> GetScheduleByUserId(long userId)
         {
             return await _context.UserSchedules.Where(x=> x.UserId == userId && x.DayOff.Equals(false))
                                                .ToListAsync();
         }
+
     }
 }

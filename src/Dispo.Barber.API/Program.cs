@@ -76,6 +76,7 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
+builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
 
 // Register services
 builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
