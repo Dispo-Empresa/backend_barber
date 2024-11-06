@@ -3,19 +3,20 @@ using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-public class UnitOfWork(IServiceProvider serviceProvider) : IUnitOfWork
+public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProvider) : IUnitOfWork
 {
     private bool _disposed;
     private string _errorMessage = string.Empty;
     private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
 
-    private ApplicationContext? context;
     private IDbContextTransaction? transaction;
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
-        context = serviceProvider.GetRequiredService<ApplicationContext>();
-        transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        if (transaction == null) 
+        {
+            transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        }
     }
 
     public async Task CommitAsync(CancellationToken cancellationToken)

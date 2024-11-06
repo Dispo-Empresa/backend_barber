@@ -9,6 +9,9 @@
             CompanyId = user.BusinessUnity?.CompanyId;
             BusinessUnityId = user.BusinessUnityId;
             Phone = user.Phone;
+            CompanyName = user.BusinessUnity.Company.Name;
+            CompanyPhone = user.BusinessUnity.Phone;
+            Name = user.Name;
         }
 
         public AuthenticationResult()
@@ -20,5 +23,8 @@
         public long? CompanyId { get; set; }
         public long? BusinessUnityId { get; set; }
         public string Phone { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyPhone { get; set; }
+        public string Name { get; set; }
     }
 }

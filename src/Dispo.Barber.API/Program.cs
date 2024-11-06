@@ -79,21 +79,21 @@ builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
 builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
 
 // Register services
-builder.Services.AddTransient<ICompanyAppService, CompanyAppService>();
-builder.Services.AddTransient<IUserAppService, UserAppService>();
-builder.Services.AddTransient<IAppointmentAppService, AppointmentAppService>();
-builder.Services.AddTransient<IDashboardAppService, DashboardAppService>();
-builder.Services.AddTransient<IServiceAppService, ServiceAppService>();
-builder.Services.AddTransient<ICustomerService, CustomerService>();
-builder.Services.AddTransient<IinformationChatService, InformationChatService>();
-builder.Services.AddTransient<ICustomerAppService, CustomerAppService>();
-builder.Services.AddTransient<IBusinessUnityAppService, BusinessUnityAppService>();
-builder.Services.AddTransient<IScheduleAppService, ScheduleAppService>();
-builder.Services.AddTransient<IAuthAppService, AuthAppService>();
+builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
+builder.Services.AddScoped<IUserAppService, UserAppService>();
+builder.Services.AddScoped<IAppointmentAppService, AppointmentAppService>();
+builder.Services.AddScoped<IDashboardAppService, DashboardAppService>();
+builder.Services.AddScoped<IServiceAppService, ServiceAppService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IinformationChatService, InformationChatService>();
+builder.Services.AddScoped<ICustomerAppService, CustomerAppService>();
+builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
+builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
+builder.Services.AddScoped<IAuthAppService, AuthAppService>();
 
-builder.Services.AddTransient<IMigrationManager, MigrationManager>();
+builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
