@@ -9,7 +9,7 @@ namespace Dispo.Barber.Application.Service.Interface
     {
         Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken,long idCompany);
         Task<InformationChatDTO> GetInformationChatByIdUser(CancellationToken cancellationToken, long idUser);
-        Task<InformationChatDTO> GetInformationChatByIdService(List<long> idServices);
+        Task<InformationChatUserDTO> GetInformationChatByIdService(List<long> idServices);
         Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser);
         Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto );
 

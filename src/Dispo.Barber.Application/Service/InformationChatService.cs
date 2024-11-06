@@ -91,7 +91,7 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-        public async Task<InformationChatDTO> GetInformationChatByIdService(List<long> idServices)
+        public async Task<InformationChatUserDTO> GetInformationChatByIdService(List<long> idServices)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace Dispo.Barber.Application.Service
                     return await serviceRepository.GetUsersByServiceId(idServices);
                 });
 
-                var informationChat = new InformationChatDTO
+                var informationChat = new InformationChatUserDTO
                 {
                     User = mapper.Map<List<UserInformationDTO>>(userList)
                 };
