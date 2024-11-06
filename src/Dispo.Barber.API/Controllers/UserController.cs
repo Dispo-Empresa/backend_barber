@@ -3,7 +3,6 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
