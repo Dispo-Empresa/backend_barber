@@ -11,6 +11,8 @@ namespace Dispo.Barber.Application.Repository
 
         void Delete(T entity);
 
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
         Task<T?> GetAsync(CancellationToken cancellationToken, long id);
 
         Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);

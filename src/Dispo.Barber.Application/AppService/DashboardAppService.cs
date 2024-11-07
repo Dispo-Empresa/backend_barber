@@ -1,33 +1,24 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class DashboardAppService(IUnitOfWork unitOfWork) : IDashboardAppService
+    public class DashboardAppService(ILogger<DashboardAppService> logger, IUnitOfWork unitOfWork, IDashboardService service) : IDashboardAppService
     {
         public async Task<Dashboard> BuildDashboardForUser(CancellationToken cancellationToken, long userId)
         {
-            var dashboard = new Dashboard();
-            await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
+            try
             {
-                var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                var user = await userRepository.GetWithAppointmentsAsync(cancellationToken, userId);
-                if (user is null)
-                {
-                    return;
-                }
-
-                dashboard.Itens = new List<DashboardItem>
-                {
-                    new DashboardItem { Name = "Agendamentos Hoje", DisplayInformation = user.TodayAppointments() },
-                    new DashboardItem { Name = "Ganhos Estimados", DisplayInformation = user.EstimatedGains() },
-                    new DashboardItem { Name = "Horas Agendadas", DisplayInformation = user.ScheduledHours() },
-                    new DashboardItem { Name = "% de Aproveitamento de Cadeira", DisplayInformation = user.ChairUsage() },
-                };
-            });
-            return dashboard;
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.BuildDashboardForUser(cancellationToken, userId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error building dashboard.");
+                throw;
+            }
         }
-
     }
 }

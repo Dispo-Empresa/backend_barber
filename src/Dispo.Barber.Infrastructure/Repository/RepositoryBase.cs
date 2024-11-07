@@ -31,6 +31,16 @@ namespace Dispo.Barber.Infrastructure.Repository
             context.Remove(entity);
         }
 
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            if (context is null)
+            {
+                throw new NullReferenceException("No open context to save.");
+            }
+
+            return await context.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
             return await context.Set<T>().AsNoTracking()

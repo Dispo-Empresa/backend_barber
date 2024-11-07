@@ -1,10 +1,11 @@
 ﻿using Dispo.Barber.Domain.DTO.Service;
 
-namespace Dispo.Barber.Application.AppService.Interface
+namespace Dispo.Barber.Application.Service.Interface
 {
-    public interface IServiceAppService
+    public interface IServiceService
     {
         Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO);
+
         Task<IList<ServiceListDTO>> GetServicesList(CancellationToken cancellationToken, long companyId);
     }
 }
