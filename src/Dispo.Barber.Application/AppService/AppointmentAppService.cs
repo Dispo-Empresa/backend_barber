@@ -43,7 +43,7 @@ namespace Dispo.Barber.Application.AppService
                     }
 
                     var appointment = mapper.Map<Appointment>(createAppointmentDTO);
-                    appointment.status = AppointmentStatus.Scheduled;
+                    appointment.Status = AppointmentStatus.Scheduled;
                     await appointmentRepository.AddAsync(cancellationToken, appointment);
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                     var msg = smsService.GenerateAppointmentMessage(appointment);
@@ -83,7 +83,7 @@ namespace Dispo.Barber.Application.AppService
             {
                 var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
                 var appointment = await appointmentRepository.GetAsync(cancellationToken, id);
-                appointment.status = AppointmentStatus.Canceled;
+                appointment.Status = AppointmentStatus.Canceled;
                 await appointmentRepository.AddAsync(cancellationToken, appointment);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             });
