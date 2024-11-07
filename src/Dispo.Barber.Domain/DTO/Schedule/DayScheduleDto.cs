@@ -9,9 +9,5 @@ namespace Dispo.Barber.Domain.DTO.Schedule
     public class DayScheduleDto
     {
         public string DayOfWeek { get; set; }
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
-        public bool IsRest { get; set; }
-        public bool DayOff { get; set; }
     }
 }

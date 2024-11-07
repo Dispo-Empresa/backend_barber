@@ -64,13 +64,5 @@ namespace Dispo.Barber.API.Controllers
             await appointmentAppService.CancelAppointmentAsync(cancellationToken, id);
             return Ok();
         }
-
-        [AllowAnonymous]
-        [HttpGet("{idUser}/infomation")]
-        public async Task<IActionResult> GetInformationAvailableDateTimesByUser(CancellationToken cancellationToken, [FromRoute] long idUser)
-        {
-            var InformationAppointmentChatDto = await informationChatService.GetAvailableDateTimessByUserIdAsync(cancellationToken, idUser);
-            return Ok(InformationAppointmentChatDto);
-        }
     }
 }

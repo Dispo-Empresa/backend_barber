@@ -6,7 +6,6 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
-using System.Threading.Tasks;
 
 
 namespace Dispo.Barber.Application.Service
@@ -92,7 +91,7 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-        public async Task<InformationChatDTO> GetInformationChatByIdService(List<long> idServices)
+        public async Task<InformationChatUserDTO> GetInformationChatByIdService(List<long> idServices)
         {
             try
             {
@@ -104,7 +103,7 @@ namespace Dispo.Barber.Application.Service
                     return await serviceRepository.GetUsersByServiceId(idServices);
                 });
 
-                var informationChat = new InformationChatDTO
+                var informationChat = new InformationChatUserDTO
                 {
                     User = mapper.Map<List<UserInformationDTO>>(userList)
                 };
@@ -142,35 +141,192 @@ namespace Dispo.Barber.Application.Service
 
                 var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
                 {
-                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek), 
-                    StartDate = schedule.DayOff ? null : schedule.StartDate, 
-                    EndDate = schedule.DayOff ? null : schedule.EndDate, 
-                    IsRest = schedule.IsRest,
-                    DayOff = schedule.DayOff
+                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
                 }).ToList();
 
                 return scheduleList;
             });
         }
 
-
-        async Task<List<InformationAppointmentChatDto>> IinformationChatService.GetAvailableDateTimessByUserIdAsync(CancellationToken cancellationToken, long idUser)
+        public async Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
         {
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            try
             {
-                var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                var appointments = await appointmentRepository.GetAppointmentByUserIdSync(cancellationToken, idUser);
-
-                var appointmentDtos = appointments.Select(appointment => new InformationAppointmentChatDto
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
-                    Date = appointment.Date.ToString("yyyy-MM-dd"),  
-                    Hour = appointment.Date.ToString("HH:mm"),       
-                    DayOfWeek = appointment.Date.ToString("ddd", new System.Globalization.CultureInfo("pt-BR")) 
-                }).ToList();
+                    var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+                    DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
+                    var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+                    var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+                   
 
-                return appointmentDtos;
+                    var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
+                    var availableSlots = new Dictionary<string, List<string>>
+            {
+                { "morning", new List<string>() },
+                { "afternoon", new List<string>() },
+                { "evening", new List<string>() }
+            };
 
-            });
+                    var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+                    var AppointmentServiceRepository = unitOfWork.GetRepository<IServiceAppointmentRepository>();
+
+                    // Buscar todos os agendamentos
+                    var appointments = await AppointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
+
+                    // Cria uma lista de intervalos de horários ocupados
+                    List<(double Start, double End)> occupiedSlots = new List<(double, double)>();
+
+                    // Para cada agendamento, calcular o horário de início e fim
+                    foreach (var appointment in appointments)
+                    {
+                        var dateStart = appointment.Date.TimeOfDay;
+                        var timeMinuteStart = dateStart.TotalMinutes;
+                        var duration = SumDurationService(appointment.Services);
+                        var dateEnd = timeMinuteStart + duration; // horário de término em minutos
+
+                        // Adiciona o intervalo de tempo ocupado na lista de slots ocupados
+                        occupiedSlots.Add((timeMinuteStart, dateEnd));
+                    }
+
+                    // Filtra os slots removendo os que estão ocupados ou que não têm tempo suficiente para a duração
+                    foreach (var slot in slots)
+                    {
+                        var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
+
+                        // Verifica se o slot está dentro de algum intervalo de agendamento
+                        bool isSlotOccupied = occupiedSlots.Any(occupied =>
+                            slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
+
+                        if (!isSlotOccupied)
+                        {
+                            // Verifica o próximo intervalo disponível
+                            var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
+
+                            // Verifica se o próximo intervalo está ocupado
+                            bool isSlotAvailable = !occupiedSlots.Any(occupied =>
+                                slotEndTime > occupied.Start && slotEndTime <= occupied.End);
+
+                            if (isSlotAvailable)
+                            {
+                                // Converte o TimeSpan para string no formato "HH:mm"
+                                string slotTime = slot.TimeOfDay.ToString(@"hh\:mm");
+
+                                // Categoriza o horário do slot
+                                string period = CategorizePeriod(slot);
+
+                                // Adiciona o horário ao período correspondente se não estiver ocupado
+                                availableSlots[period].Add(slotTime);
+                            }
+                        }
+                    }
+
+                    return availableSlots;
+                });
+            }
+            catch (Exception ex)
+            {
+                // Trate ou logue o erro adequadamente
+                throw;
+            }
         }
+
+
+
+        private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules, bool dayIsEqual)
+        {
+            var timeIntervals = new List<DateTime>();
+            foreach (var userSchedule in userSchedules)
+            {
+                
+                // Verifica se o barbeiro não trabalha naquele dia
+                if (userSchedule.DayOff)
+                {
+                    return timeIntervals; // Retorna uma lista vazia
+                }
+
+                TimeSpan startTime = TimeSpan.Parse(userSchedule.StartDate);
+                TimeSpan endTime = TimeSpan.Parse(userSchedule.EndDate);
+
+                // Inicializa o horário atual com o horário de início
+                TimeSpan currentTime = startTime;
+
+                // Obtém o horário atual
+                DateTime currentDateTime = DateTime.Now;
+                TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
+
+                // Loop para gerar os intervalos de tempo
+                while (currentTime < endTime)
+                {
+                    // Se o horário atual está no período de descanso, pula para o próximo intervalo
+                    if (!userSchedule.IsRest)
+                    {
+                        // Verifica se o horário é maior que o horário atual
+                        DateTime intervalDateTime = DateTime.Today.Add(currentTime);
+
+                        if (dayIsEqual && !(currentTime >= currentTimeSpan))
+                        {
+                            currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                            continue;
+                        }
+                        else
+                        {
+                            timeIntervals.Add(intervalDateTime);
+                        }
+                        
+                        
+                    }
+                    else
+                    {
+                        DateTime restStartTime = DateTime.Today.Add(startTime); // Início do intervalo de descanso
+                        DateTime restEndTime = DateTime.Today.Add(endTime); // Fim do intervalo de descanso
+
+                        // Remover horários que estão dentro do intervalo de descanso
+                        timeIntervals.RemoveAll(slot => slot >= restStartTime && slot < restEndTime);
+                        break;
+
+                    }
+
+                    // Avança o horário atual com base na duração
+                    currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                }
+            }
+                
+
+
+
+            return timeIntervals;
+        }
+        
+        private int SumDurationService(List<ServiceAppointment> serviceAppointments)
+        {
+            int duration = 0;
+            foreach (var serviceAppointment in serviceAppointments)
+            {
+                duration += serviceAppointment.Service.Duration;
+            }
+            return duration;
+        }
+        
+
+        private string CategorizePeriod(DateTime slot)
+        {
+            var hour = slot.Hour;
+
+            if (hour >= 6 && hour < 12)
+            {
+                return "morning";
+            }
+            else if (hour >= 12 && hour < 18)
+            {
+                return "afternoon";
+            }
+            else
+            {
+                return "evening";
+            }
+        }
+
+
     }
 }

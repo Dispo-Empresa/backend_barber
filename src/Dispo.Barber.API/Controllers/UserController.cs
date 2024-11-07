@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,5 +105,23 @@ namespace Dispo.Barber.API.Controllers
         {
             return Ok(await dashboardAppService.BuildDashboardForUser(cancellationToken, id));
         }
+
+        [AllowAnonymous]
+        [HttpGet("information-get-available-slots")]
+        public async Task<IActionResult> GetAvailableSlotsAsync(CancellationToken cancellationToken, [FromQuery] AvailableSlotRequestDto requestDto)
+        {
+            try
+            {
+                var result = await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while fetching available slots.", Details = ex.Message });
+            }
+        }
+
+
     }
 }

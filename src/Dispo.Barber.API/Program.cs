@@ -67,15 +67,16 @@ builder.Services.AddTransient<ISmsService, SmsService>(provider =>
 });
 
 // Register repositories
-builder.Services.AddScoped<DbContext, ApplicationContext>();
-builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-builder.Services.AddScoped<IBusinessUnityRepository, BusinessUnityRepository>();
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
-builder.Services.AddScoped<IServiceUserRepository, ServiceUserRepository>();
+builder.Services.AddTransient<DbContext, ApplicationContext>();
+builder.Services.AddTransient<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddTransient<ICompanyRepository, CompanyRepository>();
+builder.Services.AddTransient<IBusinessUnityRepository, BusinessUnityRepository>();
+builder.Services.AddTransient<IServiceRepository, ServiceRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
+builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
+builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
@@ -96,7 +97,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
-                .UseNpgsql(Environment.GetEnvironmentVariable("BARBER_CONNECTION_STRING")));
+                            .UseNpgsql(Environment.GetEnvironmentVariable("BARBER_CONNECTION_STRING")));
+
+
 
 builder.Services.AddRequestTimeouts();
 

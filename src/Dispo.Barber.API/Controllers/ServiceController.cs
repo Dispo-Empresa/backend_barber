@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("information")]
         public async Task<IActionResult> GetInformationChatByService([FromBody] List<long> serviceIds)
         {
