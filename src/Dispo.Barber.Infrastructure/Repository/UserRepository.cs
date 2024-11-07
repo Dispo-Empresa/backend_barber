@@ -37,7 +37,8 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.Users.Include("Appointments.Service")
+            return await context.Users.Include("Appointments.Services.Service")
+                                      .Include(i => i.Schedules)
                                       .FirstOrDefaultAsync(w => w.Id == id);
         }
 

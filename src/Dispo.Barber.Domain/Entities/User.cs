@@ -49,6 +49,25 @@ namespace Dispo.Barber.Domain.Entities
             return $"{FormatMinutesToHours(Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Services.Select(s => s.Service).Sum(ss => ss.Duration)))}";
         }
 
+        public string ChairUsage()
+        {
+            if (Appointments.Count == 0)
+            {
+                return "N/A";
+            }
+
+            var restingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && w.IsRest).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
+            var summedRestingHours = BulkSumDates(restingHours);
+
+            var workingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && !w.IsRest).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
+            var summedWorkingHours = BulkSumDates(workingHours);
+
+            var totalAppointmentDuration = Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Select(s => s.Services.Sum(s => s.Service.Duration)).Sum();
+            var durationTimeSpan = TimeSpan.FromMinutes(totalAppointmentDuration);
+            var hourMinute = durationTimeSpan.ToString(@"hh\:mm");
+            return $"{Convert.ToInt32(hourMinute.Replace(":", "")) * 100 / Convert.ToInt32(GetDifference(summedWorkingHours, summedRestingHours).Replace(":", ""))}%";
+        }
+
         private static string FormatMinutesToHours(int minutes)
         {
             int hours = minutes / 60;
@@ -60,6 +79,32 @@ namespace Dispo.Barber.Domain.Entities
         public bool IsPending()
         {
             return Status == UserStatus.Pending;
+        }
+
+        private string GetDifference(string endDate, string startDate)
+        {
+            var startTime = TimeSpan.Parse(startDate);
+            var endTime = TimeSpan.Parse(endDate);
+            var difference = startTime - endTime;
+            return difference.ToString(@"hh\:mm");
+        }
+
+        private string SumDates(string firstDate, string secondDate)
+        {
+            var startTime = TimeSpan.Parse(firstDate);
+            var endTime = TimeSpan.Parse(secondDate);
+            var difference = startTime + endTime;
+            return difference.ToString(@"hh\:mm");
+        }
+
+        private string BulkSumDates(List<string> dates)
+        {
+            var summedHours = "00:00";
+            foreach (var workingHour in dates)
+            {
+                summedHours = SumDates(workingHour, summedHours);
+            }
+            return summedHours;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Dispo.Barber.Application.AppService
                     new DashboardItem { Name = "Agendamentos Hoje", DisplayInformation = user.TodayAppointments() },
                     new DashboardItem { Name = "Ganhos Estimados", DisplayInformation = user.EstimatedGains() },
                     new DashboardItem { Name = "Horas Agendadas", DisplayInformation = user.ScheduledHours() },
+                    new DashboardItem { Name = "% de Aproveitamento de Cadeira", DisplayInformation = user.ChairUsage() },
                 };
             });
             return dashboard;

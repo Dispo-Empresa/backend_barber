@@ -113,6 +113,7 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
         catch
         {
             await RollbackAsync(cancellationToken);
+            throw;
         }
         finally
         {

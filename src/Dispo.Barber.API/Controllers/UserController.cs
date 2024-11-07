@@ -98,7 +98,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}/dashboards")]
         public async Task<IActionResult> BuildDashboard(CancellationToken cancellationToken, [FromRoute] long id)
         {

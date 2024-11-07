@@ -33,7 +33,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.Set<T>()
+            return await context.Set<T>().AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 

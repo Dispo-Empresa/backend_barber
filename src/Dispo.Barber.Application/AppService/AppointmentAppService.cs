@@ -8,6 +8,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dispo.Barber.Application.AppService
 {
@@ -34,29 +35,25 @@ namespace Dispo.Barber.Application.AppService
             {
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () =>
                 {
+                    var appointment = mapper.Map<Appointment>(createAppointmentDTO);
                     var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, createAppointmentDTO.Customer.Id);
-
+                    var existingCustomer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, createAppointmentDTO.Customer.Id.Value);
                     if (existingCustomer != null)
                     {
-                        createAppointmentDTO.Customer = mapper.Map<CustomerDTO>(existingCustomer);
+                        appointment.Customer = null;
+                        appointment.CustomerId = existingCustomer.Id;
                     }
 
-                    var appointment = mapper.Map<Appointment>(createAppointmentDTO);
                     appointment.Status = AppointmentStatus.Scheduled;
                     await appointmentRepository.AddAsync(cancellationToken, appointment);
                     await unitOfWork.SaveChangesAsync(cancellationToken);
-                    var msg = smsService.GenerateAppointmentMessage(appointment);
-                    SendNotificationBySMS(appointment, msg);
+                    //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
                 });
-
             }
             catch (Exception e)
             {
-
                 throw;
             }
-
         }
 
         public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
@@ -90,9 +87,9 @@ namespace Dispo.Barber.Application.AppService
 
         }
 
-        private async Task SendNotificationBySMS(Appointment appointment, string msg)
+        private async Task SendNotificationBySMS(Appointment appointment)
         {
-            smsService.SendMessageAsync(appointment.Customer.Phone, msg, MessageType.Sms);
+            smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
         }
     }
 }
