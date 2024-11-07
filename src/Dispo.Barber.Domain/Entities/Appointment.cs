@@ -19,7 +19,7 @@ namespace Dispo.Barber.Domain.Entities
         public User? AcceptedUser { get; set; }
         public required List<ServiceAppointment> Services { get; set; }
 
-        public AppointmentStatus status { get; set; }
+        public AppointmentStatus Status { get; set; }
 
     }
 }
