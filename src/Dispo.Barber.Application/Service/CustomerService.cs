@@ -8,7 +8,7 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Application.Service
 {
-    public class CustomerService(IUnitOfWork unitOfWork, IMapper mapper) : ICustomerService
+    public class CustomerService(IUnitOfWork unitOfWork, IMapper mapper, ICustomerRepository repository) : ICustomerService
     {
         public async Task<CustomerDTO> CreateAsync(CustomerDTO customerDTO)
         {
@@ -46,6 +46,11 @@ namespace Dispo.Barber.Application.Service
             });
 
             return mapper.Map<CustomerDTO>(customer);
+        }
+
+        public async Task<List<Customer>> GetForAppointment(CancellationToken cancellationToken, string search)
+        {
+            return await repository.GetCustomersForAppointment(cancellationToken, search);
         }
     }
 }

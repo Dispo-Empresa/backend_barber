@@ -1,11 +1,11 @@
 ﻿using Dispo.Barber.Domain.DTO.Company;
 using Dispo.Barber.Domain.Entities;
 
-namespace Dispo.Barber.Application.AppService.Interface
+namespace Dispo.Barber.Application.Service.Interface
 {
-    public interface ICompanyAppService
+    public interface ICompanyService
     {
-        Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO);
+        Task<long> CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO);
 
         Task<List<Company>> GetAllAsync(CancellationToken cancellationToken);
 

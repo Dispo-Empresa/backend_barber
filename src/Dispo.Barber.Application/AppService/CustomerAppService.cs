@@ -1,18 +1,24 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class CustomerAppService(IUnitOfWork unitOfWork) : ICustomerAppService
+    public class CustomerAppService(ILogger<CustomerAppService> logger, IUnitOfWork unitOfWork, ICustomerService service) : ICustomerAppService
     {
         public async Task<List<Customer>> GetForAppointment(CancellationToken cancellationToken, string search)
         {
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+			try
+			{
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetForAppointment(cancellationToken, search));
+            }
+            catch (Exception e)
             {
-                var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
-                return await customerRepository.GetCustomersForAppointment(cancellationToken, search);
-            });
+                logger.LogError(e, "Error getting customers.");
+                throw;
+            }
         }
     }
 }
