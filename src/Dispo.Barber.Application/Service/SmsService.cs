@@ -24,31 +24,38 @@ namespace Dispo.Barber.Application.Service
         }
         public string GenerateAppointmentMessage(Appointment appointment)
         {
-            var idAppointment = appointment.Id;
+            try
+            {
+                var idAppointment = appointment.Id;
 
-            return $"Olá, {appointment.Customer.Name}! Seu agendamento foi confirmado para o dia {appointment.Date:dd/MM/yyyy}. " +
-                   $"Se por algum motivo você precisar cancelar, clique no link abaixo:\n{CANCELLATION_URL_BASE}{idAppointment}\n" +
-                   "Estamos à disposição para qualquer dúvida!";
+                return $"Olá, {appointment.Customer.Name}! Seu agendamento foi confirmado para o dia {appointment.Date:dd/MM/yyyy}. " +
+                       $"Se por algum motivo você precisar cancelar, clique no link abaixo:\n{CANCELLATION_URL_BASE}{idAppointment}\n" +
+                       "Estamos à disposição para qualquer dúvida!";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao gerar a mensagem de confirmação de agendamento.", ex);
+            }
         }
 
 
         public async Task<string> SendMessageAsync(string phoneNumber, string messageBody, string messageType)
         {
-            phoneNumber = PhoneNumberUtils.FormatPhoneNumber(phoneNumber);
-
-            TwilioClient.Init(_accountSid, _authToken);
-
-            var verificationCode = new Random().Next(1000, 9999).ToString();
-
-            var fullMessageBody = string.IsNullOrEmpty(messageBody)
-                ? $"Seu código de verificação é: {verificationCode}"
-                : messageBody.Replace("{code}", verificationCode);
-
-            string typeMsg = messageType == MessageType.WhatsApp ? _twilioPhoneNumberWhats : _twilioPhoneNumber;
-            string toPhoneNumber = MessageType.ToPrefix(messageType) + phoneNumber;
-
             try
             {
+                phoneNumber = PhoneNumberUtils.FormatPhoneNumber(phoneNumber);
+
+                TwilioClient.Init(_accountSid, _authToken);
+
+                var verificationCode = new Random().Next(1000, 9999).ToString();
+
+                var fullMessageBody = string.IsNullOrEmpty(messageBody)
+                    ? $"Seu código de verificação é: {verificationCode}"
+                    : messageBody.Replace("{code}", verificationCode);
+
+                string typeMsg = messageType == MessageType.WhatsApp ? _twilioPhoneNumberWhats : _twilioPhoneNumber;
+                string toPhoneNumber = MessageType.ToPrefix(messageType) + phoneNumber;
+
                 var message = await MessageResource.CreateAsync(
                     to: new PhoneNumber(toPhoneNumber),
                     from: new PhoneNumber(typeMsg),
@@ -62,7 +69,6 @@ namespace Dispo.Barber.Application.Service
                 throw new ApplicationException($"Erro ao enviar {messageType}.", ex);
             }
         }
-
 
     }
 }
