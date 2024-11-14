@@ -12,45 +12,68 @@ namespace Dispo.Barber.Application.Service
     {
         public async Task<CustomerDTO> CreateAsync(CustomerDTO customerDTO)
         {
-            var cancellationTokenSource = new CancellationTokenRegistration();
-            customerDTO.Phone = PhoneNumberUtils.FormatPhoneNumber(customerDTO.Phone);
-            var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
-            var customerInformation = await GetByPhoneAsync(customerDTO.Phone);
-            if (customerInformation == null)
+            try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                var cancellationTokenSource = new CancellationTokenSource();
+                customerDTO.Phone = PhoneNumberUtils.FormatPhoneNumber(customerDTO.Phone);
+                var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
+
+                var customerInformation = await GetByPhoneAsync(customerDTO.Phone);
+
+                if (customerInformation == null)
                 {
-                    var customer = mapper.Map<Customer>(customerDTO);
-                    await customerRepository.AddAsync(cancellationTokenSource.Token, customer);
-                    await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                    await unitOfWork.ExecuteUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                    {
+                        var customer = mapper.Map<Customer>(customerDTO);
+                        await customerRepository.AddAsync(cancellationTokenSource.Token, customer);
+                        await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
+                    });
 
-
-                });
-
-                return await GetByPhoneAsync(customerDTO.Phone);
+                    return await GetByPhoneAsync(customerDTO.Phone); 
+                }
+                else
+                {
+                    return customerInformation;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return customerInformation;
+                throw new Exception("Ocorreu um erro ao criar o cliente.", ex);
             }
         }
 
         public async Task<CustomerDTO> GetByPhoneAsync(string phone)
         {
-            phone = PhoneNumberUtils.FormatPhoneNumber(phone);
-            var cancellationTokenSource = new CancellationTokenSource();
-            var customer = await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+            try
             {
-                var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
-                return await customerRepository.GetCustomerByPhoneAsync(phone);
-            });
+                phone = PhoneNumberUtils.FormatPhoneNumber(phone);
+                var cancellationTokenSource = new CancellationTokenSource();
+                var customer = await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
+                {
+                    var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
+                    return await customerRepository.GetCustomerByPhoneAsync(phone);
+                });
 
-            return mapper.Map<CustomerDTO>(customer);
+                return mapper.Map<CustomerDTO>(customer);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao buscar o cliente pelo telefone.", ex);
+            }
         }
+
 
         public async Task<List<Customer>> GetForAppointment(CancellationToken cancellationToken, string search)
         {
-            return await repository.GetCustomersForAppointment(cancellationToken, search);
+            try
+            {
+                return await repository.GetCustomersForAppointment(cancellationToken, search);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao buscar clientes para o agendamento.", ex);
+            }
         }
+
     }
 }

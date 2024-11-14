@@ -95,8 +95,15 @@ namespace Dispo.Barber.API.Controllers
         [HttpGet("{idUser}/information-schedules")]
         public async Task<IActionResult> GetUserSchedulesInformationByUserId(CancellationToken cancellationToken, [FromRoute] long idUser)
         {
-            var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
-            return Ok(result);
+            try
+            {
+                var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro ao processar sua solicitação: {ex.Message}");
+            }
         }
 
         [AllowAnonymous]
