@@ -30,6 +30,7 @@ namespace Dispo.Barber.Application.Service
             }
 
             appointment.Status = AppointmentStatus.Scheduled;
+            appointment.Customer.Phone = PhoneNumberUtils.FormatPhoneNumber(appointment.Customer.Phone);
             await repository.AddAsync(cancellationToken, appointment);
             await repository.SaveChangesAsync(cancellationToken);
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
