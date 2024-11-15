@@ -96,6 +96,9 @@ builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 
