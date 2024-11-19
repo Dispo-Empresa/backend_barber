@@ -16,10 +16,8 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<Appointment>> GetAppointmentByUserAndDateIdSync(CancellationToken cancellationToken, long userId, DateTime dateTimeSchedule)
         {
-            // Define o DateTime como UTC
             dateTimeSchedule = DateTime.SpecifyKind(dateTimeSchedule, DateTimeKind.Utc);
 
-            // Consulta para encontrar o agendamento
             var appointment = await context.Appointments
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Service)

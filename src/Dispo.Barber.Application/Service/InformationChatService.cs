@@ -118,35 +118,27 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-        private string GetDayOfWeekString(int dayOfWeek)
-        {
-            return dayOfWeek switch
-            {
-                0 => "Dom.",
-                1 => "Seg.",
-                2 => "Ter.",
-                3 => "Qua.",
-                4 => "Qui.",
-                5 => "Sex.",
-                6 => "Sab.",
-                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Dia da semana inválido")
-            };
-        }
-
         public async Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser)
         {
-            return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            try
             {
-                var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-                var userSchedules = await userScheduleRepository.GetScheduleByUserId(idUser);
-
-                var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
-                    DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
-                }).ToList();
+                    var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+                    var userSchedules = await userScheduleRepository.GetScheduleByUserId(idUser);
 
-                return scheduleList;
-            });
+                    var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
+                    {
+                        DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
+                    }).ToList();
+
+                    return scheduleList;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao obter os agendamentos do usuário.", ex);
+            }
         }
 
         public async Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
@@ -163,60 +155,49 @@ namespace Dispo.Barber.Application.Service
 
                     var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
                     var availableSlots = new Dictionary<string, List<string>>
-            {
-                { "morning", new List<string>() },
-                { "afternoon", new List<string>() },
-                { "evening", new List<string>() }
-            };
+                    {
+                        { "morning", new List<string>() },
+                        { "afternoon", new List<string>() },
+                        { "evening", new List<string>() }
+                    };
 
                     var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
                     var AppointmentServiceRepository = unitOfWork.GetRepository<IServiceAppointmentRepository>();
 
-                    // Buscar todos os agendamentos
                     var appointments = await AppointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
 
-                    // Cria uma lista de intervalos de horários ocupados
                     List<(double Start, double End)> occupiedSlots = new List<(double, double)>();
 
-                    // Para cada agendamento, calcular o horário de início e fim
                     foreach (var appointment in appointments)
                     {
                         var dateStart = appointment.Date.TimeOfDay;
                         var timeMinuteStart = dateStart.TotalMinutes;
                         var duration = SumDurationService(appointment.Services);
-                        var dateEnd = timeMinuteStart + duration; // horário de término em minutos
+                        var dateEnd = timeMinuteStart + duration;
 
-                        // Adiciona o intervalo de tempo ocupado na lista de slots ocupados
                         occupiedSlots.Add((timeMinuteStart, dateEnd));
                     }
 
-                    // Filtra os slots removendo os que estão ocupados ou que não têm tempo suficiente para a duração
                     foreach (var slot in slots)
                     {
                         var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
 
-                        // Verifica se o slot está dentro de algum intervalo de agendamento
                         bool isSlotOccupied = occupiedSlots.Any(occupied =>
                             slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
 
                         if (!isSlotOccupied)
                         {
-                            // Verifica o próximo intervalo disponível
                             var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
 
-                            // Verifica se o próximo intervalo está ocupado
                             bool isSlotAvailable = !occupiedSlots.Any(occupied =>
                                 slotEndTime > occupied.Start && slotEndTime <= occupied.End);
 
                             if (isSlotAvailable)
                             {
-                                // Converte o TimeSpan para string no formato "HH:mm"
                                 string slotTime = slot.TimeOfDay.ToString(@"hh\:mm");
 
-                                // Categoriza o horário do slot
                                 string period = CategorizePeriod(slot);
 
-                                // Adiciona o horário ao período correspondente se não estiver ocupado
                                 availableSlots[period].Add(slotTime);
                             }
                         }
@@ -227,11 +208,24 @@ namespace Dispo.Barber.Application.Service
             }
             catch (Exception ex)
             {
-                // Trate ou logue o erro adequadamente
-                throw;
+                throw new Exception("Ocorreu um erro ao tentar obter os horários disponíveis.", ex);
             }
         }
 
+        private string GetDayOfWeekString(int dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                0 => "Dom.",
+                1 => "Seg.",
+                2 => "Ter.",
+                3 => "Qua.",
+                4 => "Qui.",
+                5 => "Sex.",
+                6 => "Sab.",
+                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Dia da semana inválido")
+            };
+        }
 
 
         private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules, bool dayIsEqual)
@@ -240,29 +234,24 @@ namespace Dispo.Barber.Application.Service
             foreach (var userSchedule in userSchedules)
             {
                 
-                // Verifica se o barbeiro não trabalha naquele dia
                 if (userSchedule.DayOff)
                 {
-                    return timeIntervals; // Retorna uma lista vazia
+                    return timeIntervals;
                 }
 
                 TimeSpan startTime = TimeSpan.Parse(userSchedule.StartDate);
                 TimeSpan endTime = TimeSpan.Parse(userSchedule.EndDate);
 
-                // Inicializa o horário atual com o horário de início
                 TimeSpan currentTime = startTime;
 
                 // Obtém o horário atual
                 DateTime currentDateTime = LocalTime.Now;
                 TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
 
-                // Loop para gerar os intervalos de tempo
                 while (currentTime < endTime)
                 {
-                    // Se o horário atual está no período de descanso, pula para o próximo intervalo
                     if (!userSchedule.IsRest)
                     {
-                        // Verifica se o horário é maior que o horário atual
                         DateTime intervalDateTime = DateTime.Today.Add(currentTime);
 
                         if (dayIsEqual && !(currentTime >= currentTimeSpan))
@@ -279,23 +268,18 @@ namespace Dispo.Barber.Application.Service
                     }
                     else
                     {
-                        DateTime restStartTime = DateTime.Today.Add(startTime); // Início do intervalo de descanso
-                        DateTime restEndTime = DateTime.Today.Add(endTime); // Fim do intervalo de descanso
+                        DateTime restStartTime = DateTime.Today.Add(startTime); 
+                        DateTime restEndTime = DateTime.Today.Add(endTime); 
 
-                        // Remover horários que estão dentro do intervalo de descanso
                         timeIntervals.RemoveAll(slot => slot >= restStartTime && slot < restEndTime);
                         break;
 
                     }
 
-                    // Avança o horário atual com base na duração
                     currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
                 }
             }
                 
-
-
-
             return timeIntervals;
         }
         
