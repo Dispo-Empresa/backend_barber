@@ -1,10 +1,11 @@
-﻿using Dispo.Barber.Domain.Entities;
+﻿using Dispo.Barber.Domain.DTO.User;
+using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Repository
 {
     public interface IUserRepository : IRepositoryBase<User>
     {
-        Task<List<Appointment>> GetAppointmentsAsync(CancellationToken cancellationToken, long id);
+        Task<List<Appointment>> GetAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id);
 

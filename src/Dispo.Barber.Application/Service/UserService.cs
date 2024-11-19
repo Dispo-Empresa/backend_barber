@@ -76,7 +76,7 @@ namespace Dispo.Barber.Application.Service
 
         public async Task<List<Appointment>> GetUserAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
-            return await repository.GetAppointmentsAsync(cancellationToken, id);
+            return await repository.GetAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
         }
 
         public async Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone)

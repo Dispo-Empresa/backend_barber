@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Entities
 {
@@ -36,7 +37,7 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            return $"{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Now)}/{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1))}";
+            return $"{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= LocalTime.Now)}/{Appointments.Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1))}";
         }
 
         public string ScheduledHours()

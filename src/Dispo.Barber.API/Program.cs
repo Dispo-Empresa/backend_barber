@@ -1,6 +1,9 @@
+using System.Globalization;
+using System;
 using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
+using Dispo.Barber.API.Hubs;
 using Dispo.Barber.API.Profiles;
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
@@ -21,10 +24,14 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -96,6 +103,9 @@ builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 
@@ -121,7 +131,6 @@ var config = new MapperConfiguration(cfg =>
 
 IMapper mapper = config.CreateMapper();
 builder.Services.AddSingleton(mapper);
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
@@ -167,5 +176,7 @@ app.UseCors(x => x.AllowAnyHeader()
       .WithOrigins("http://localhost:7173", "http://localhost:3001", "http://localhost:3000", "http://localhost", "http://192.168.3.21:3000", "http://192.168.3.21"));
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("/notification");
 
 app.Run();

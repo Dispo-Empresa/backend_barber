@@ -29,13 +29,6 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ToListAsync(cancellationToken);
 
             return appointment;
-        }
-
-
-        public async Task<List<Appointment>> GetAppointmentByUserIdSync(CancellationToken cancellationToken, long userId)
-        {
-                return await context.Appointments.Where(x => x.AcceptedUserId == userId && x.Date >= DateTime.UtcNow && x.Status != AppointmentStatus.Completed)
-                                          .ToListAsync(cancellationToken);
-        }              
+        }             
     }
 }

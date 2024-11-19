@@ -6,6 +6,7 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Utils;
 
 
 namespace Dispo.Barber.Application.Service
@@ -252,7 +253,7 @@ namespace Dispo.Barber.Application.Service
                 TimeSpan currentTime = startTime;
 
                 // Obtém o horário atual
-                DateTime currentDateTime = DateTime.Now;
+                DateTime currentDateTime = LocalTime.Now;
                 TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
 
                 // Loop para gerar os intervalos de tempo
