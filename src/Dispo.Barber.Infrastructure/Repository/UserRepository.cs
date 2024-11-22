@@ -17,7 +17,9 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<Appointment>> GetAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
-            return await context.Appointments.Include("Services.Service")
+            return await context.Appointments
+                                .Include("Services.Service")
+                                .Include("Customer")
                                 .Where(w => w.AcceptedUserId == id && w.Date >= getUserAppointmentsDTO.StartDate && w.Date <= getUserAppointmentsDTO.EndDate)
                                 .ToListAsync(cancellationToken);
         }

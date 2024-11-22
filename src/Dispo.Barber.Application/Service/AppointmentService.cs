@@ -5,6 +5,7 @@ using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
+using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Application.Service
 {
