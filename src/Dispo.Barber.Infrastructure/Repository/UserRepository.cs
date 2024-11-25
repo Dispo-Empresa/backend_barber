@@ -62,5 +62,20 @@ namespace Dispo.Barber.Infrastructure.Repository
             return await context.Users.Include("BusinessUnity.Company")
                                       .FirstOrDefaultAsync(w => w.Slug == userSlug && w.BusinessUnity != null && w.BusinessUnity.Company != null && w.BusinessUnity.Company.Slug == companySlug);
         }
+
+        public async Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId)
+        {
+            return await context.Users.Include("BusinessUnity")
+                                      .Where(w => w.BusinessUnity != null && w.BusinessUnity.CompanyId == companyId)
+                                      .Select(s => new UserDTO
+                                      {
+                                          Id = s.Id,
+                                          Name = s.Name,
+                                          Phone = s.Phone,
+                                          Picture = string.Empty,
+                                          Status = s.Status
+                                      })
+                                      .ToListAsync();
+        }
     }
 }

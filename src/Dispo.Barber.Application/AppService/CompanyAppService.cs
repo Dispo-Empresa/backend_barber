@@ -2,12 +2,13 @@
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Company;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class CompanyAppService(ILogger<CompanyAppService> logger, IUnitOfWork unitOfWork, ICompanyService service) : ICompanyAppService
+    public class CompanyAppService(ILogger<CompanyAppService> logger, IUnitOfWork unitOfWork, ICompanyService service, IUserService userService) : ICompanyAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
         {
@@ -70,6 +71,19 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error getting companies.");
+                throw;
+            }
+        }
+
+        public async Task<List<UserDTO>> GetUsersAsync(CancellationToken cancellationToken, long companyId)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await userService.GetByCompanyId(cancellationToken, companyId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user by ID.");
                 throw;
             }
         }
