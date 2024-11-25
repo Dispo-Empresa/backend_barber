@@ -16,5 +16,7 @@ namespace Dispo.Barber.Application.Repository
         Task<long> GetIdByPhone(CancellationToken cancellationToken, string phone);
 
         Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone);
+
+        Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
     }
 }

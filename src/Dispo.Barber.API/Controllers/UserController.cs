@@ -129,6 +129,19 @@ namespace Dispo.Barber.API.Controllers
             }
         }
 
+        [Tags("Link")]
+        [Authorize]
+        [HttpGet("{companySlug}/{userSlug}")]
+        public async Task<IActionResult> GetByCompanyAndUserSlug(CancellationToken cancellationToken, [FromRoute] string companySlug, [FromRoute] string userSlug)
+        {
+            return Ok(await userAppService.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug));
+        }
 
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetByIdAsync(cancellationToken, id));
+        }
     }
 }

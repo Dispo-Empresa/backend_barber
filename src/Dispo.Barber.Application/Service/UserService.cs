@@ -1,11 +1,11 @@
-﻿using Dispo.Barber.Application.Repository;
-using System.Data;
+﻿using System.Data;
+using AutoMapper;
+using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Exception;
-using AutoMapper;
+using Dispo.Barber.Domain.Extension;
 
 namespace Dispo.Barber.Application.Service
 {
@@ -67,6 +67,8 @@ namespace Dispo.Barber.Application.Service
                 // TODO: Completar.
             }
 
+            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
 
@@ -116,6 +118,16 @@ namespace Dispo.Barber.Application.Service
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug)
+        {
+            return await repository.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug);
+        }
+
+        public async Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetFirstAsync(cancellationToken, id, "BusinessUnity.Company");
         }
 
         private List<UserSchedule> BuildNormalDays() => [

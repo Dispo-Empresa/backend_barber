@@ -12,6 +12,7 @@
             CompanyName = user.BusinessUnity.Company.Name;
             CompanyPhone = user.BusinessUnity.Phone;
             Name = user.Name;
+            Slug = user.EntireSlug();
         }
 
         public AuthenticationResult()
@@ -26,5 +27,6 @@
         public string CompanyName { get; set; }
         public string CompanyPhone { get; set; }
         public string Name { get; set; }
+        public string Slug { get; set; }
     }
 }

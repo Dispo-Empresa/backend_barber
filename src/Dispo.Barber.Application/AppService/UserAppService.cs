@@ -3,6 +3,7 @@ using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Exception;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
@@ -109,6 +110,32 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error getting user ID.");
+                throw;
+            }
+        }
+
+        public async Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug) ?? throw new NotFoundException("Usuário não encontrado com o link."));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user by slugs: {@CompanySlug}/{@UserSlug}.", companySlug, userSlug);
+                throw;
+            }
+        }
+
+        public async Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado."));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user by ID.");
                 throw;
             }
         }

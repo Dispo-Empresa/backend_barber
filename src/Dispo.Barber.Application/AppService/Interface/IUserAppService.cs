@@ -21,5 +21,9 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO);
 
         Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone);
+
+        Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
+
+        Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id);
     }
 }
