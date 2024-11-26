@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Infrastructure.Context;
@@ -27,6 +28,6 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ToListAsync(cancellationToken);
 
             return appointment;
-        }             
+        }
     }
 }

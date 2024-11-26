@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service) : IUserAppService
+    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service, ICustomerService customerService) : IUserAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
@@ -132,6 +133,19 @@ namespace Dispo.Barber.Application.AppService
             try
             {
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado."));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user by ID.");
+                throw;
+            }
+        }
+
+        public async Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await customerService.GetUserCustomersAsync(cancellationToken, userId));
             }
             catch (Exception e)
             {

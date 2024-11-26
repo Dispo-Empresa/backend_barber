@@ -75,5 +75,22 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
+        public async Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId)
+        {
+            var customers = await repository.GetUserCustomersAsync(cancellationToken, userId);
+            var groupedCustomers = customers.GroupBy(g => g.Id);
+            var customerDetails = new List<CustomerDetailDTO>();
+            foreach (var customer in groupedCustomers)
+            {
+                customerDetails.Add(new CustomerDetailDTO
+                {
+                    Id = customer.First().Id,
+                    Name = customer.First().Name,
+                    LastAppointment = customer.OrderByDescending(o => o.LastAppointment).First().LastAppointment,
+                    Frequency = customer.Count()
+                });
+            }
+            return customerDetails;
+        }
     }
 }

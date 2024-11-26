@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -40,5 +41,18 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await context.Appointments.Include(i => i.AcceptedUser)
+                                      .Include(i => i.Customer)
+                                      .Where(w => w.AcceptedUserId == userId)
+                                      .Select(s => new CustomerDetailDTO
+                                      {
+                                          Id = s.Customer.Id,
+                                          Name = s.Customer.Name,
+                                          LastAppointment = s.Date,
+                                      })
+                                      .ToListAsync();
+        }
     }
 }

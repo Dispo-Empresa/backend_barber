@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.Entities;
+﻿using Dispo.Barber.Domain.DTO.Customer;
+using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Repository
 {
@@ -9,5 +10,7 @@ namespace Dispo.Barber.Application.Repository
         Task<Customer> GetCustomerByPhoneAsync(string phone);
 
         Task<long> GetCustomerIdByPhoneAsync(string phone);
+
+        Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId);
     }
 }
