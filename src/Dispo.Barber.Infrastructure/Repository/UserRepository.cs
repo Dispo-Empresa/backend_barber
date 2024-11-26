@@ -1,4 +1,6 @@
 ﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Schedule;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Infrastructure.Context;
@@ -75,7 +77,35 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Picture = string.Empty,
                                           Status = s.Status
                                       })
-                                      .ToListAsync();
+                                      .ToListAsync(cancellationToken);
+        }
+
+        public async Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Include(i => i.BusinessUnity)
+                                      .Include(i => i.Appointments).ThenInclude(i => i.Services)
+                                      .Where(w => w.Id == id)
+                                      .Select(s => new UserDetailDTO
+                                      {
+                                          Id = s.Id,
+                                          Name = s.Name,
+                                          Phone = s.Phone,
+                                          Picture = string.Empty,
+                                          Status = s.Status,
+                                          Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
+                                          {
+                                              StartDate = s.StartDate,
+                                              EndDate = s.EndDate,
+                                              DayOfWeek = s.DayOfWeek,
+                                              DayOff = s.DayOff
+                                          }).ToList(),
+                                          Services = s.Appointments.SelectMany(s => s.Services).Select(s => s.Service).Select(s => new ServiceDetailDTO
+                                          {
+                                              Id = s.Id,
+                                              Description = s.Description,
+                                          }).ToList()
+                                      })
+                                      .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

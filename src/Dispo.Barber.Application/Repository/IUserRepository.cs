@@ -20,5 +20,7 @@ namespace Dispo.Barber.Application.Repository
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
 
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
+
+        Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
     }
 }

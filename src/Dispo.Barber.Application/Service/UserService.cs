@@ -1,7 +1,9 @@
-﻿using System.Data;
+﻿using System.ComponentModel.Design;
+using System.Data;
 using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -125,14 +127,34 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug);
         }
 
-        public async Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id)
-        {
-            return await repository.GetFirstAsync(cancellationToken, id, "BusinessUnity.Company");
-        }
-
         public async Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId)
         {
             return await repository.GetByCompanyId(cancellationToken, companyId);
+        }
+
+        public async Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            var user = await repository.GetByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+            if (!user.Services.Any())
+            {
+                return user;
+            }
+
+            var services = user.Services;
+            var servicesGroup = user.Services.GroupBy(g => g.Id);
+            var totalRealized = user.Services.Count();
+            user.Services = new List<ServiceDetailDTO>();
+            foreach (var service in servicesGroup)
+            {
+                user.Services.Add(new ServiceDetailDTO
+                {
+                    Description = service.First().Description,
+                    Id = service.First().Id,
+                    Realized = service.Count(),
+                    RealizedPercentage = decimal.Round(service.Count() * 100m / totalRealized, 1),
+                });
+            }
+            return user;
         }
 
         private List<UserSchedule> BuildNormalDays() => [

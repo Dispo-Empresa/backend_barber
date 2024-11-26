@@ -23,7 +23,7 @@ namespace Dispo.Barber.Application.Service.Interface
 
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
 
-        Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id);
+        Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
 
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
     }

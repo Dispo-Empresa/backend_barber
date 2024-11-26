@@ -127,7 +127,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<User?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        public async Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id)
         {
             try
             {
