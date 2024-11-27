@@ -34,7 +34,7 @@ namespace Dispo.Barber.API.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize] // VALIDAR
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] long id, CancellationToken cancellationToken)
         {
