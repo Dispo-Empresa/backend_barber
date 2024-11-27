@@ -12,6 +12,7 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<InformationChatUserDTO> GetInformationChatByIdService(List<long> idServices);
         Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser);
         Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto );
+        Task<Dictionary<string, List<string>>> GetSuggestionAppointment();
 
     }
 }

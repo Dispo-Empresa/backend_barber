@@ -1,10 +1,12 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 
 namespace Dispo.Barber.API.Controllers
 {
@@ -65,5 +67,13 @@ namespace Dispo.Barber.API.Controllers
             await appointmentAppService.CancelAppointmentAsync(cancellationToken, id);
             return Ok();
         }
+
+        [HttpPost("generate-suggestions")]
+        public async Task<IActionResult> GenerateSuggestions()
+        {
+            var retorno = await informationChatService.GetSuggestionAppointment();
+            return Ok(retorno);
+        }
+    
     }
 }
