@@ -27,17 +27,16 @@ namespace Dispo.Barber.Application.Service
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim("phone", user.Phone),
-            };
-
             var tokenHandler = new JwtSecurityTokenHandler();
             return new AuthenticationResult(tokenHandler.WriteToken(new JwtSecurityToken(
                 issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
                 audience: Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                claims: claims,
+                claims: new[]
+                {
+                    new Claim("id", user.Id.ToString()),
+                    new Claim("phone", user.Phone),
+                    new Claim("link", user.EntireSlug() ?? string.Empty),
+                },
                 expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: credentials
             )), user);

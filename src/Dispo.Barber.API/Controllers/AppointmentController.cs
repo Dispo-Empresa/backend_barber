@@ -3,7 +3,6 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
-using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -26,7 +25,6 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            var time = LocalTime.Now;
             await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
             return Ok();
         }

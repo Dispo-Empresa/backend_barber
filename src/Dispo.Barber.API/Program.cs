@@ -98,6 +98,7 @@ builder.Services.AddScoped<ICustomerAppService, CustomerAppService>();
 builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
 builder.Services.AddScoped<IAuthAppService, AuthAppService>();
+
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();

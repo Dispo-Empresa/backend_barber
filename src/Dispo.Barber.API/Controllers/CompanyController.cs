@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Company;
+using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +64,13 @@ namespace Dispo.Barber.API.Controllers
             {
                 return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
             }
+        }
+
+        [Authorize]
+        [HttpGet("{id}/users")]
+        public async Task<IActionResult> GetUsers(CancellationToken cancellationToken, long id)
+        {
+            return Ok(await companyAppService.GetUsersAsync(cancellationToken, id));
         }
     }
 }

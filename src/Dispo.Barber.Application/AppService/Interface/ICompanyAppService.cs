@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTO.Company;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.AppService.Interface
@@ -14,5 +15,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateCompanyDTO updateCompanyDTO);
 
         Task<Company> GetAsync(CancellationToken cancellationToken, long id);
+
+        Task<List<UserDTO>> GetUsersAsync(CancellationToken cancellationToken, long companyId);
     }
 }

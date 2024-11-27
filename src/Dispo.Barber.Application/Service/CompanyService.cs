@@ -17,6 +17,8 @@ namespace Dispo.Barber.Application.Service
                 await serviceRepository.AddAsync(cancellationToken, serviceCompany.Service);
             }
 
+            company.Slug = company.Name.ToLowerInvariant().Replace(" ", "-");
+
             await repository.AddAsync(cancellationToken, company);
             await repository.SaveChangesAsync(cancellationToken);
             return company.Id;
@@ -43,6 +45,7 @@ namespace Dispo.Barber.Application.Service
             if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
             {
                 company.Name = updateCompanyDTO.Name;
+                company.Slug = company.Name.ToLowerInvariant().Replace(" ", "-");
             }
 
             if (company.BusinessUnities.Any())

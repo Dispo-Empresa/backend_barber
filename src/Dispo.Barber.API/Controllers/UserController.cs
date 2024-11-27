@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [Authorize]
+        //[Authorize] // VALIDAR
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
@@ -43,7 +43,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize] // VALIDAR
         [HttpGet("{id}/schedules")]
         public async Task<IActionResult> GetUserSchedules(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -129,6 +129,19 @@ namespace Dispo.Barber.API.Controllers
             }
         }
 
+        [Tags("Link")]
+        [Authorize]
+        [HttpGet("{companySlug}/{userSlug}")]
+        public async Task<IActionResult> GetByCompanyAndUserSlug(CancellationToken cancellationToken, [FromRoute] string companySlug, [FromRoute] string userSlug)
+        {
+            return Ok(await userAppService.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug));
+        }
 
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetByIdAsync(cancellationToken, id));
+        }
     }
 }
