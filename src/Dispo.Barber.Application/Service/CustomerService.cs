@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Utils;
@@ -62,7 +63,6 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-
         public async Task<List<Customer>> GetForAppointment(CancellationToken cancellationToken, string search)
         {
             try
@@ -91,6 +91,18 @@ namespace Dispo.Barber.Application.Service
                 });
             }
             return customerDetails;
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await repository.GetCustomerAppointmentsAsync(cancellationToken, id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao buscar clientes para o agendamento.", ex);
+            }
         }
     }
 }

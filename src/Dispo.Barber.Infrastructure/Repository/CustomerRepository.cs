@@ -1,5 +1,7 @@
 ﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Customer;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +55,23 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           LastAppointment = s.Date,
                                       })
                                       .ToListAsync();
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Appointments
+                          .Where(w => w.CustomerId == id)
+                          .Select(s => new AppointmentDetailDTO
+                          {
+                              Id = s.Id,
+                              Data = s.Date,
+                              Services = s.Services.Select(s => s.Service).Select(s => new ServiceDetailDTO
+                              {
+                                  Id = s.Id,
+                                  Description = s.Description,
+                              }).ToList()
+                          })
+                          .ToListAsync();
         }
     }
 }

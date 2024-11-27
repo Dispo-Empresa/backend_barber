@@ -32,5 +32,12 @@ namespace Dispo.Barber.API.Controllers
             var result = await customerAppService.GetForAppointment(cancellationToken, search);
             return Ok(result);
         }
+
+        [HttpGet("{id}/appointments")]
+        public async Task<IActionResult> GetAppointments(CancellationToken cancellationToken, long id)
+        {
+            var result = await customerAppService.GetCustomerAppointmentsAsync(cancellationToken, id);
+            return Ok(result);
+        }
     }
 }
