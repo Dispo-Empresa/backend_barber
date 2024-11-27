@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Utils;
+using System;
+using System.Collections.Generic;
 
 
 namespace Dispo.Barber.Application.Service
@@ -212,6 +217,155 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
+        public async Task<Dictionary<string, List<string>>> GetSuggestionAppointment()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+            DateTime referenceDate = DateTime.Now;
+            int daysBefore = 60;
+            var datesAppointments = new Dictionary<string, List<string>>
+            {
+                { "dados que serão feita sugestão", new List<string>() },
+                { "sugestão", new List<string>() }
+            };
+
+            var appointments = await AppointmentRepository.GetFrequentAppointmentsByDaysBeforeAsync(cancellationTokenSource.Token, daysBefore);
+
+            foreach (var appointment in appointments)
+            {
+                var customerAppointments = appointment.Customer.Appointments
+                .OrderByDescending(a => a.Date) // Ordenar por data decrescente (últimos agendamentos primeiro)
+                .Take(5) // Pegar os dois últimos agendamentos
+                .ToList();
+
+                if (customerAppointments.Count >= 5) 
+                {
+                    var intervalCounts = new Dictionary<int, int>();
+
+                    for (int i = 0; i < customerAppointments.Count - 1; i++)
+                    {
+                        var currentAppointment = customerAppointments[i];
+                        var nextAppointment = customerAppointments[i + 1];
+
+                        var interval = (int)Math.Round((currentAppointment.Date - nextAppointment.Date).TotalDays);
+
+                        if (intervalCounts.ContainsKey(interval))
+                        {
+                            intervalCounts[interval]++;
+                        }
+                        else
+                        {
+                            intervalCounts[interval] = 1;
+                        }
+                    }
+                    // duas forma de fazer pegando o maior intervalo ou logo abaixo calcular a media entre cada intervalor
+                    var mostCustumerFrequentInterval = intervalCounts
+                    .OrderByDescending(kvp => kvp.Value) 
+                    .ThenByDescending(kvp => kvp.Key)   
+                    .First();
+
+                    var averageInterval = Math.Round(intervalCounts
+                    .Select(kvp => kvp.Key) 
+                    .Average()); 
+
+                    var latestAppointment = customerAppointments[0];
+                    var intervalDataReference = Math.Round((referenceDate.Date - latestAppointment.Date).TotalDays);
+
+                    if (intervalDataReference >= averageInterval || intervalDataReference >= mostCustumerFrequentInterval.Key)
+                    {
+
+                        var allCustomerAppointments = appointment.Customer.Appointments
+                        .OrderBy(a => a.Date)
+                        .Select(a => new { a.Date, DayOfWeek = a.Date.DayOfWeek, a.Customer }) // Selecionar data e dia da semana
+                        .ToList();
+
+                        var allCustomerHourAppointments = appointment.Customer.Appointments
+                        .OrderBy(a => a.Date) // Ordenar por data
+                        .Select(a => new { a.Date, Hour = a.Date.Hour, Minute = a.Date.Minute }) // Selecionar hora e minuto de cada agendamento
+                        .ToList();
+
+                        var groupedDays = allCustomerAppointments
+                        .GroupBy(a => a.DayOfWeek)
+                        .OrderByDescending(g => g.Count()) // Ordenar pelo número de agendamentos (prioridade na frequência)
+                        .ThenByDescending(g => g.Max(a => a.Date)) // Se houver empate, priorizar o mais recente pela data
+                        .ToList();
+
+                        var groupedByHourAndMinute = allCustomerHourAppointments
+                            .GroupBy(a => new { a.Hour, a.Minute }) // Agrupar por hora e minuto
+                            .Select(g => new {
+                                Time = $"{g.Key.Hour}:{g.Key.Minute:D2}", // Formatar hora e minuto como string "HH:mm"
+                                Count = g.Count(), // Contar agendamentos no grupo
+                                LatestDate = g.Max(a => a.Date) // Pegar a última data do grupo
+                            })
+                            .OrderByDescending(g => g.Count) // Ordenar pela quantidade de agendamentos
+                            .ThenByDescending(g => g.LatestDate) // Em caso de empate, ordenar pela data mais recente
+                            .ToList();
+
+                        var mostFrequentTime = groupedByHourAndMinute.FirstOrDefault();
+
+                        var mostFrequentDay = groupedDays.FirstOrDefault();
+
+                        var referenceDateOfWeek = referenceDate.AddDays(averageInterval); // duas forma posso colocar a media ou o ultimo agendamento
+
+                        if (referenceDateOfWeek.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            referenceDateOfWeek.AddDays(1);
+                        }
+
+                        if (referenceDateOfWeek.DayOfWeek != mostFrequentDay.Last().DayOfWeek)
+                        {
+                            // Se a diferença for de 1 dia, tenta ajustar diretamente
+                            int difference = (int)referenceDateOfWeek.DayOfWeek - (int)mostFrequentDay.Last().DayOfWeek;
+
+                            if (Math.Abs(difference) >= 1)
+                            {
+                                if ((int)referenceDateOfWeek.DayOfWeek > (int)mostFrequentDay.Last().DayOfWeek)
+                                {
+                                    // Se o dia de referência for mais tarde na semana que o mais frequente, vá para o próximo ciclo
+                                    referenceDateOfWeek = referenceDateOfWeek.AddDays(-difference);
+                                    if (referenceDateOfWeek <= referenceDate)
+                                        referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference*2));
+
+                                }
+                                else
+                                {
+                                    // Se o dia de referência for mais cedo que o mais frequente, ajuste para frente
+                                    referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference));
+                                }
+                            }
+                        }
+
+                        var adjustedReferenceDate = new List<string>
+                        {
+                            DateTime.SpecifyKind(referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay, DateTimeKind.Utc).ToString("yyyy-MM-dd HH:mm:ss") 
+                        };
+
+                        // var adjustedReferenceDate = (referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay);
+                        var teste = customerAppointments
+                        .Select(x => x.Date.ToString("yyyy-MM-dd HH:mm:ss")) // Converter para string no formato desejado
+                        .OrderBy(x => x) // Ordenar como string
+                        .ToList();
+
+                        datesAppointments["dados que serão feita sugestão"].AddRange(teste);
+                        datesAppointments["sugestão"].AddRange(adjustedReferenceDate);
+
+                        return datesAppointments;
+                        // ja tenho a data e o horario
+                        // verificar agora se essa data que ele esta preparando é feriado se tem horario dando preferencia sempre pro dia e horario
+
+
+
+
+                    }  
+                       
+                }   
+
+            }
+
+            return datesAppointments;
+        }
+
+
         private string GetDayOfWeekString(int dayOfWeek)
         {
             return dayOfWeek switch
@@ -244,7 +398,6 @@ namespace Dispo.Barber.Application.Service
 
                 TimeSpan currentTime = startTime;
 
-                // Obtém o horário atual
                 DateTime currentDateTime = LocalTime.Now;
                 TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
 

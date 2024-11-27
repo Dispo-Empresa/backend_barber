@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [Authorize]
+        //[Authorize] // VALIDAR
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
@@ -43,7 +43,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize] // VALIDAR
         [HttpGet("{id}/schedules")]
         public async Task<IActionResult> GetUserSchedules(CancellationToken cancellationToken, [FromRoute] long id)
         {

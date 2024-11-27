@@ -28,9 +28,12 @@ namespace Dispo.Barber.Application.Service
                 appointment.Customer = null;
                 appointment.CustomerId = existingCustomer.Id;
             }
+            else
+            {
+                appointment.Customer.Phone = PhoneNumberUtils.FormatPhoneNumber(appointment.Customer.Phone);
+            }
 
             appointment.Status = AppointmentStatus.Scheduled;
-            appointment.Customer.Phone = PhoneNumberUtils.FormatPhoneNumber(appointment.Customer.Phone);
             await repository.AddAsync(cancellationToken, appointment);
             await repository.SaveChangesAsync(cancellationToken);
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
