@@ -65,5 +65,11 @@ namespace Dispo.Barber.Infrastructure.Repository
             return await context.Set<T>()
                                 .FirstOrDefaultAsync(expression, cancellationToken);
         }
+
+        public async Task<T> GetFirstAsync(CancellationToken cancellationToken, long id, string include)
+        {
+            return await context.Set<T>().Include(include)
+                                .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+        }
     }
 }

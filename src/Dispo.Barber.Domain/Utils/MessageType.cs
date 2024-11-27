@@ -7,7 +7,7 @@
 
         public static string ToPrefix(string messageType)
         {
-            return messageType.ToLower() switch
+            return messageType.ToLowerInvariant() switch
             {
                 "sms" => "",
                 "whatsapp" => "whatsapp:",
