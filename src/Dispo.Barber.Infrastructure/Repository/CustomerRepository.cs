@@ -38,7 +38,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                 return await context.Customers.Where(w => w.Phone.Contains(search))
                                               .ToListAsync(cancellationToken);
             }
-         
+
             return await context.Customers.Where(w => w.Name.Contains(search))
                                           .ToListAsync(cancellationToken);
         }
@@ -72,6 +72,16 @@ namespace Dispo.Barber.Infrastructure.Repository
                               }).ToList()
                           })
                           .ToListAsync();
+        }
+
+        public async Task<List<CustomerDetailDTO>> GetCustomersAsync(CancellationToken cancellationToken)
+        {
+            return await context.Appointments.Select(s => new CustomerDetailDTO
+            {
+                Id = s.Customer.Id,
+                Name = s.Customer.Name,
+                LastAppointment = s.Date,
+            }).ToListAsync();
         }
     }
 }

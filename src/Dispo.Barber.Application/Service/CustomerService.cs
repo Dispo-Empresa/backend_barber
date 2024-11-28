@@ -30,7 +30,7 @@ namespace Dispo.Barber.Application.Service
                         await unitOfWork.SaveChangesAsync(cancellationTokenSource.Token);
                     });
 
-                    return await GetByPhoneAsync(customerDTO.Phone); 
+                    return await GetByPhoneAsync(customerDTO.Phone);
                 }
                 else
                 {
@@ -95,14 +95,26 @@ namespace Dispo.Barber.Application.Service
 
         public async Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id)
         {
-            try
+            return await repository.GetCustomerAppointmentsAsync(cancellationToken, id);
+
+        }
+
+        public async Task<List<CustomerDetailDTO>> GetCustomersAsync(CancellationToken cancellationToken)
+        {
+            var customers = await repository.GetCustomersAsync(cancellationToken);
+            var groupedCustomers = customers.GroupBy(g => g.Id);
+            var customerDetails = new List<CustomerDetailDTO>();
+            foreach (var customer in groupedCustomers)
             {
-                return await repository.GetCustomerAppointmentsAsync(cancellationToken, id);
+                customerDetails.Add(new CustomerDetailDTO
+                {
+                    Id = customer.First().Id,
+                    Name = customer.First().Name,
+                    LastAppointment = customer.OrderByDescending(o => o.LastAppointment).First().LastAppointment,
+                    Frequency = customer.Count()
+                });
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Ocorreu um erro ao buscar clientes para o agendamento.", ex);
-            }
+            return [.. customerDetails.OrderBy(o => o.Name)];
         }
     }
 }

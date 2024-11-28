@@ -14,5 +14,7 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId);
 
         Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id);
+
+        Task<List<CustomerDetailDTO>> GetCustomersAsync(CancellationToken cancellationToken);
     }
 }
