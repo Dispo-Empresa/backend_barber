@@ -36,7 +36,7 @@ namespace Dispo.Barber.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            var result = await customerAppService.GetCustomerAppointmentsAsync(cancellationToken, id);
+            var result = await customerAppService.GetByIdAsync(cancellationToken, id);
             return Ok(result);
         }
 

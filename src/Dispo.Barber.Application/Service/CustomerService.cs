@@ -4,6 +4,7 @@ using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
 
 
@@ -115,6 +116,11 @@ namespace Dispo.Barber.Application.Service
                 });
             }
             return [.. customerDetails.OrderBy(o => o.Name)];
+        }
+
+        public async Task<CustomerDetailDTO> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Cliente não encontrado.");
         }
     }
 }
