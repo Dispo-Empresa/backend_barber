@@ -93,6 +93,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Phone = s.Phone,
                                           Picture = string.Empty,
                                           Status = s.Status,
+                                          Link = s.Slug,
                                           Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
                                           {
                                               StartDate = s.StartDate,
