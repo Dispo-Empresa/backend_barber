@@ -160,6 +160,11 @@ namespace Dispo.Barber.Application.Service
             return user;
         }
 
+        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetServicesAsync(cancellationToken, id);
+        }
+
         private List<UserSchedule> BuildNormalDays() => [
             new(DayOfWeek.Monday, "08:00", "18:00", false, false),
             new(DayOfWeek.Monday, "12:00", "13:30", true, false),

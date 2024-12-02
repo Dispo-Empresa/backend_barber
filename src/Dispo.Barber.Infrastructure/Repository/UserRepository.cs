@@ -109,5 +109,18 @@ namespace Dispo.Barber.Infrastructure.Repository
                                       })
                                       .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.UserServices
+                            .Where(w => w.UserId == id)
+                            .Select(s => new ServiceInformationDTO
+                            {
+                                Id = s.Service.Id,
+                                Description = s.Service.Description,
+                                Duration = s.Service.Duration,
+                                Price = s.Service.Price
+                            }).ToListAsync();
+        }
     }
 }

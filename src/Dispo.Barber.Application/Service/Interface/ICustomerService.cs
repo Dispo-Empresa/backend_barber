@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Customer;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.Entities;
 namespace Dispo.Barber.Application.Service.Interface
 {

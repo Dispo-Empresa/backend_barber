@@ -150,5 +150,11 @@ namespace Dispo.Barber.API.Controllers
         {
             return Ok(await userAppService.GetUserCustomersAsync(cancellationToken, id));
         }
+
+        [HttpGet("{id}/services")]
+        public async Task<IActionResult> GetServices(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetServicesAsync(cancellationToken, id));
+        }
     }
 }
