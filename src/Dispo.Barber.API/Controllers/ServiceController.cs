@@ -41,5 +41,12 @@ namespace Dispo.Barber.API.Controllers
             var result = await serviceAppService.GetServicesList(cancellationToken, id);
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await serviceAppService.GetAllServicesList(cancellationToken);
+            return Ok(result);
+        }
     }
 }
