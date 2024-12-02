@@ -26,7 +26,7 @@ namespace Dispo.Barber.API.Controllers
 
         }
 
-        [HttpGet("search")]
+        [HttpGet("search/{search}")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] string search)
         {
             var result = await customerAppService.GetForAppointment(cancellationToken, search);
