@@ -52,6 +52,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                       {
                                           Id = s.Customer.Id,
                                           Name = s.Customer.Name,
+                                          Phone = s.Customer.Phone,
                                           LastAppointment = s.Date,
                                       })
                                       .ToListAsync();
@@ -64,13 +65,14 @@ namespace Dispo.Barber.Infrastructure.Repository
                           .Select(s => new AppointmentDetailDTO
                           {
                               Id = s.Id,
-                              Data = s.Date,
+                              Date = s.Date,
                               Services = s.Services.Select(s => s.Service).Select(s => new ServiceDetailDTO
                               {
                                   Id = s.Id,
                                   Description = s.Description,
                               }).ToList()
                           })
+                          .OrderByDescending(x => x.Date)
                           .ToListAsync();
         }
 

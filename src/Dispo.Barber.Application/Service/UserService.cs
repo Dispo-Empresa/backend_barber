@@ -116,7 +116,10 @@ namespace Dispo.Barber.Application.Service
                 user.Phone = updateUserDTO.Phone;
             }
 
-            user.Password = PasswordEncryptor.HashPassword(updateUserDTO.Password);
+            if (!string.IsNullOrEmpty(updateUserDTO.Password))
+            {
+                user.Password = PasswordEncryptor.HashPassword(updateUserDTO.Password);
+            }
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);

@@ -87,6 +87,7 @@ namespace Dispo.Barber.Application.Service
                 {
                     Id = customer.First().Id,
                     Name = customer.First().Name,
+                    Phone = customer.First().Phone,
                     LastAppointment = customer.OrderByDescending(o => o.LastAppointment).First().LastAppointment,
                     Frequency = customer.Count()
                 });

@@ -34,5 +34,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task<IList<ServiceListDTO>> GetAllServicesList(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetAllServicesList(cancellationToken));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting services.");
+                throw;
+            }
+        }
     }
 }
