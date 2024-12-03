@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Customer;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Repository
@@ -17,5 +18,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id);
 
         Task<List<CustomerDetailDTO>> GetCustomersAsync(CancellationToken cancellationToken);
+
+        Task<CustomerDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
     }
 }

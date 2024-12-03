@@ -84,7 +84,21 @@ namespace Dispo.Barber.Infrastructure.Repository
                 Name = s.Customer.Name,
                 Phone = s.Customer.Phone,
                 LastAppointment = s.Date,
+                Phone = s.Customer.Phone,
             }).ToListAsync();
+        }
+
+        public async Task<CustomerDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Customers.Include(i => i.Appointments)
+                .Where(w => w.Id == id)
+                .Select(s => new CustomerDetailDTO
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Frequency = s.Appointments.Count,
+                    LastAppointment = s.Appointments != null && s.Appointments.Count != 0 ? s.Appointments.OrderByDescending(o => o.Id).First().Date : null,
+                }).FirstOrDefaultAsync();
         }
     }
 }
