@@ -3,6 +3,7 @@ using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
@@ -40,6 +41,19 @@ namespace Dispo.Barber.Application.AppService
             try
             {
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetAllServicesList(cancellationToken));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting services.");
+                throw;
+            }
+        }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateServiceDTO updateServiceDTO)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UpdateAsync(cancellationToken, id, updateServiceDTO));
             }
             catch (Exception e)
             {

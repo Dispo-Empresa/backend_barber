@@ -48,5 +48,13 @@ namespace Dispo.Barber.API.Controllers
             var result = await serviceAppService.GetAllServicesList(cancellationToken);
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateServiceDTO updateServiceDTO)
+        {
+            await serviceAppService.UpdateAsync(cancellationToken, id, updateServiceDTO);
+            return Ok();
+        }
     }
 }
