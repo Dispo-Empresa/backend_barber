@@ -82,6 +82,7 @@ namespace Dispo.Barber.Infrastructure.Repository
             {
                 Id = s.Customer.Id,
                 Name = s.Customer.Name,
+                Phone = s.Customer.Phone,
                 LastAppointment = s.Date,
             }).ToListAsync();
         }
