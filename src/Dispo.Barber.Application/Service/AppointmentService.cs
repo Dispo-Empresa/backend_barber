@@ -30,7 +30,7 @@ namespace Dispo.Barber.Application.Service
             }
             else
             {
-                appointment.Customer.Phone = PhoneNumberUtils.FormatPhoneNumber(appointment.Customer.Phone);
+                appointment.Customer.Phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
             }
 
             appointment.Status = AppointmentStatus.Scheduled;
