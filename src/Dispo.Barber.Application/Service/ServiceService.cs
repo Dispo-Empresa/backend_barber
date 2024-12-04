@@ -2,6 +2,7 @@
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.Service
 {
@@ -24,6 +25,29 @@ namespace Dispo.Barber.Application.Service
         {
             var services = await repository.GetAllAsync(cancellationToken);
             return mapper.Map<IList<ServiceListDTO>>(services);
+        }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateServiceDTO updateServiceDTO)
+        {
+            var service = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Serviço não encontrado.");
+
+            if (service.Price != updateServiceDTO.Price)
+            {
+                service.Price = updateServiceDTO.Price;
+            }
+
+            if (service.Description != updateServiceDTO.Description)
+            {
+                service.Description = updateServiceDTO.Description;
+            }
+
+            if (service.Duration != updateServiceDTO.Duration)
+            {
+                service.Duration = updateServiceDTO.Duration;
+            }
+
+            repository.Update(service);
+            await repository.SaveChangesAsync(cancellationToken);
         }
     }
 }
