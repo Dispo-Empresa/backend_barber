@@ -14,8 +14,14 @@ namespace Dispo.Barber.Application.Service
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
         {
             var appointment = await repository.GetAsync(cancellationToken, id);
+
+            if (appointment is null)
+            {
+                throw new NotFoundException("Agendamento não existe.");
+            }
+
             appointment.Status = AppointmentStatus.Canceled;
-            await repository.AddAsync(cancellationToken, appointment);
+            repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
         }
 
@@ -53,6 +59,7 @@ namespace Dispo.Barber.Application.Service
             }
 
             appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
+            appointment.Status = AppointmentStatus.Canceled;
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
         }
