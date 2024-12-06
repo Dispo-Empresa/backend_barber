@@ -13,6 +13,7 @@
             CompanyPhone = user.BusinessUnity.Phone;
             Name = user.Name;
             Slug = user.EntireSlug();
+            Photo = user.Photo;
         }
 
         public AuthenticationResult()
@@ -28,5 +29,6 @@
         public string CompanyPhone { get; set; }
         public string Name { get; set; }
         public string Slug { get; set; }
+        public byte[]? Photo { get; set; }
     }
 }
