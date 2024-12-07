@@ -43,7 +43,7 @@ namespace Dispo.Barber.Application.Service
         {
             try
             {
-                phoneNumber = PhoneNumberUtils.FormatPhoneNumber(phoneNumber);
+                phoneNumber = StringUtils.FormatPhoneNumber(phoneNumber);
 
                 TwilioClient.Init(_accountSid, _authToken);
 

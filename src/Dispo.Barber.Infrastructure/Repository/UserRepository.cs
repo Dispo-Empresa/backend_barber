@@ -1,5 +1,4 @@
 ﻿using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
@@ -24,6 +23,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .Include("Services.Service")
                                 .Include("Customer")
                                 .Where(w => w.AcceptedUserId == id && w.Date >= getUserAppointmentsDTO.StartDate && w.Date <= getUserAppointmentsDTO.EndDate)
+                                .OrderBy(x => x.Date)
                                 .ToListAsync(cancellationToken);
         }
 

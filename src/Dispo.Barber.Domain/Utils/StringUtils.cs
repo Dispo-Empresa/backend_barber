@@ -1,6 +1,6 @@
 ﻿namespace Dispo.Barber.Domain.Utils
 {
-    public static class PhoneNumberUtils
+    public static class StringUtils
     {
         public static string FormatPhoneNumber(string phoneNumber)
         {

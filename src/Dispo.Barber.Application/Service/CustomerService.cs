@@ -18,7 +18,7 @@ namespace Dispo.Barber.Application.Service
             try
             {
                 var cancellationTokenSource = new CancellationTokenSource();
-                customerDTO.Phone = PhoneNumberUtils.FormatPhoneNumber(customerDTO.Phone);
+                customerDTO.Phone = StringUtils.FormatPhoneNumber(customerDTO.Phone);
                 var customerRepository = unitOfWork.GetRepository<ICustomerRepository>();
 
                 var customerInformation = await GetByPhoneAsync(customerDTO.Phone);
@@ -49,7 +49,7 @@ namespace Dispo.Barber.Application.Service
         {
             try
             {
-                phone = PhoneNumberUtils.FormatPhoneNumber(phone);
+                phone = Domain.Utils.StringUtils.FormatPhoneNumber(phone);
                 var cancellationTokenSource = new CancellationTokenSource();
                 var customer = await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
                 {

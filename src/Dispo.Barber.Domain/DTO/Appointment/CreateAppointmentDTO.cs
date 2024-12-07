@@ -12,7 +12,7 @@ namespace Dispo.Barber.Domain.DTO.Appointment
 
         public required long BusinessUnityId { get; set; }
         public required List<long> Services { get; set; }
-        public required AppointmentStatus Status { get; set; }
+        public required AppointmentStatus? Status { get; set; }
 
         public CustomerDTO Customer { get; set; }
     }
