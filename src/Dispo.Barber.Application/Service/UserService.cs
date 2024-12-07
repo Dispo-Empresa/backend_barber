@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Design;
 using System.Data;
+using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
@@ -163,6 +164,14 @@ namespace Dispo.Barber.Application.Service
         public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
         {
             return await repository.GetServicesAsync(cancellationToken, id);
+        }
+
+        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[] photo)
+        {
+            var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+            user.Photo = photo;
+            repository.Update(user);
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private List<UserSchedule> BuildNormalDays() => [

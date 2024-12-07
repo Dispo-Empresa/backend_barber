@@ -1,4 +1,6 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
+﻿using System.Numerics;
+using System.Threading;
+using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.User;
@@ -155,6 +157,25 @@ namespace Dispo.Barber.API.Controllers
         public async Task<IActionResult> GetServices(CancellationToken cancellationToken, [FromRoute] long id)
         {
             return Ok(await userAppService.GetServicesAsync(cancellationToken, id));
+        }
+
+        [HttpPost("{id}/photo")]
+        public async Task<IActionResult> UploadPhoto(CancellationToken cancellationToken, [FromRoute] long id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file was uploaded.");
+            }
+
+            byte[] byteArrayImage;
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream, cancellationToken);
+                byteArrayImage = stream.ToArray();
+            }
+
+            await userAppService.UploadImageAsync(cancellationToken, id, byteArrayImage);
+            return Ok();
         }
     }
 }

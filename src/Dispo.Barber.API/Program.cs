@@ -180,4 +180,6 @@ app.MapControllers();
 
 app.MapHub<NotificationHub>("/notification");
 
+app.UseStaticFiles();
+
 app.Run();
