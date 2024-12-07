@@ -66,6 +66,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                           {
                               Id = s.Id,
                               Date = s.Date,
+                              Status = s.Status,
                               Services = s.Services.Select(s => s.Service).Select(s => new ServiceDetailDTO
                               {
                                   Id = s.Id,
