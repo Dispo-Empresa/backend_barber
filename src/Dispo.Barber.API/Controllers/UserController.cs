@@ -160,18 +160,17 @@ namespace Dispo.Barber.API.Controllers
         }
 
         [HttpPost("{id}/photo")]
-        public async Task<IActionResult> UploadPhoto(CancellationToken cancellationToken, [FromRoute] long id, IFormFile file)
+        public async Task<IActionResult> UploadPhoto(CancellationToken cancellationToken, [FromRoute] long id, IFormFile? file)
         {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("No file was uploaded.");
-            }
+            byte[]? byteArrayImage = null;
 
-            byte[] byteArrayImage;
-            using (var stream = new MemoryStream())
+            if (file != null && file.Length != 0)
             {
-                await file.CopyToAsync(stream, cancellationToken);
-                byteArrayImage = stream.ToArray();
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream, cancellationToken);
+                    byteArrayImage = stream.ToArray();
+                }
             }
 
             await userAppService.UploadImageAsync(cancellationToken, id, byteArrayImage);

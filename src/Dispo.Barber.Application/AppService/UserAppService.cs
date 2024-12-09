@@ -168,7 +168,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[] photo)
+        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo)
         {
             try
             {

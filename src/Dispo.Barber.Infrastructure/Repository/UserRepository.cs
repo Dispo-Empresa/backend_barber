@@ -75,7 +75,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Id = s.Id,
                                           Name = s.Name,
                                           Phone = s.Phone,
-                                          Picture = string.Empty,
+                                          Photo = s.Photo,
                                           Status = s.Status
                                       })
                                       .ToListAsync(cancellationToken);
@@ -91,7 +91,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Id = s.Id,
                                           Name = s.Name,
                                           Phone = s.Phone,
-                                          Picture = string.Empty,
+                                          Photo = s.Photo,
                                           Status = s.Status,
                                           Link = s.Slug,
                                           Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
