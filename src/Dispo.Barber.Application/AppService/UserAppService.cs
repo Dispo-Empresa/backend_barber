@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service, ICustomerService customerService) : IUserAppService
+    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service, ICustomerService customerService, IAppointmentService appointmentService) : IUserAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
@@ -173,6 +173,32 @@ namespace Dispo.Barber.Application.AppService
             try
             {
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UploadImageAsync(cancellationToken, id, photo));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task CancelAllTodayAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllTodayAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await appointmentService.GetNextAppointmentsAsync(cancellationToken, id));
             }
             catch (Exception e)
             {

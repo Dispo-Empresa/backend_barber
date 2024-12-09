@@ -45,7 +45,13 @@ namespace Dispo.Barber.API.Controllers
             return Ok(result);
         }
 
-        //[Authorize] // VALIDAR
+        //[Authorize]
+        [HttpGet("{id}/appointments/next")]
+        public async Task<IActionResult> GetUserAppointments(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetNextAppointmentsAsync(cancellationToken, id));
+        }
+
         [HttpGet("{id}/schedules")]
         public async Task<IActionResult> GetUserSchedules(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -153,12 +159,14 @@ namespace Dispo.Barber.API.Controllers
             return Ok(await userAppService.GetUserCustomersAsync(cancellationToken, id));
         }
 
+        [Authorize]
         [HttpGet("{id}/services")]
         public async Task<IActionResult> GetServices(CancellationToken cancellationToken, [FromRoute] long id)
         {
             return Ok(await userAppService.GetServicesAsync(cancellationToken, id));
         }
 
+        [Authorize]
         [HttpPost("{id}/photo")]
         public async Task<IActionResult> UploadPhoto(CancellationToken cancellationToken, [FromRoute] long id, IFormFile file)
         {
@@ -175,6 +183,14 @@ namespace Dispo.Barber.API.Controllers
             }
 
             await userAppService.UploadImageAsync(cancellationToken, id, byteArrayImage);
+            return Ok();
+        }
+
+        //[Authorize]
+        [HttpPost("{id}/appointments/cancel-today")]
+        public async Task<IActionResult> CancelAllToday(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await userAppService.CancelAllTodayAsync(cancellationToken, id);
             return Ok();
         }
     }

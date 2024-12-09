@@ -1,7 +1,7 @@
 ﻿using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +37,6 @@ namespace Dispo.Barber.Infrastructure.Repository
             return distinctAppointments;
         }
 
-
         public async Task<List<Appointment>> GetAppointmentByUserAndDateIdSync(CancellationToken cancellationToken, long userId, DateTime dateTimeSchedule)
         {
             dateTimeSchedule = DateTime.SpecifyKind(dateTimeSchedule, DateTimeKind.Utc);
@@ -45,12 +44,28 @@ namespace Dispo.Barber.Infrastructure.Repository
             var appointment = await context.Appointments
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Service)
-                .Where(x => x.AcceptedUserId == userId
-                            && x.Date.Date == dateTimeSchedule.Date
-                            && x.Status != AppointmentStatus.Completed)
+                .Where(w => w.AcceptedUserId == userId
+                            && w.Date.Date == dateTimeSchedule.Date
+                            && w.Status != AppointmentStatus.Completed)
                 .ToListAsync(cancellationToken);
 
             return appointment;
+        }
+
+        public async Task<bool> CancelAllTodayAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await context.Appointments
+                .Where(w => w.AcceptedUserId == userId && w.Date.Date == LocalTime.Now.Date)
+                .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
+        }
+
+        public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await context.Appointments.Include("Services.Service").Include("Customer")
+                .Where(w => w.AcceptedUserId == userId && w.Date.Date == LocalTime.Now.Date && w.Date >= LocalTime.Now && w.Status == AppointmentStatus.Scheduled)
+                .OrderBy(o => o.Date)
+                .Take(10)
+                .ToListAsync(cancellationToken);
         }
     }
 }

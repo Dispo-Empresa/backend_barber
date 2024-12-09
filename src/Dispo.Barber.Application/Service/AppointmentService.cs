@@ -64,6 +64,18 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task CancelAllTodayAsync(CancellationToken cancellationToken, long userId)
+        {
+            // TODO: Notificar clientes que tiveram os agendamentos cancelados.
+            await repository.CancelAllTodayAsync(cancellationToken, userId);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await repository.GetNextAppointmentsAsync(cancellationToken, userId);
+        }
+
         //private async Task SendNotificationBySMS(Appointment appointment)
         //{
         //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
