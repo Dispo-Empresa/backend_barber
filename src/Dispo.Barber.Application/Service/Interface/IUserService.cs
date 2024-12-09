@@ -30,6 +30,6 @@ namespace Dispo.Barber.Application.Service.Interface
 
         Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
 
-        Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[] photo);
+        Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
     }
 }

@@ -166,7 +166,7 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetServicesAsync(cancellationToken, id);
         }
 
-        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[] photo)
+        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo)
         {
             var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
             user.Photo = photo;

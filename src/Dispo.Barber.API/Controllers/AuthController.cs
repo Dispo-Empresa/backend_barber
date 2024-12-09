@@ -1,9 +1,6 @@
-﻿using Dispo.Barber.API.Hubs;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dispo.Barber.API.Controllers
 {
