@@ -8,7 +8,7 @@ namespace Dispo.Barber.Application.Repository
 
         Task<List<Appointment>> GetFrequentAppointmentsByDaysBeforeAsync(CancellationToken cancellationToken, int daysBefore);
 
-        Task<bool> CancelAllTodayAsync(CancellationToken cancellationToken, long userId);
+        Task<bool> CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date);
 
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId);
     }

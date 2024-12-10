@@ -52,17 +52,17 @@ namespace Dispo.Barber.Infrastructure.Repository
             return appointment;
         }
 
-        public async Task<bool> CancelAllTodayAsync(CancellationToken cancellationToken, long userId)
+        public async Task<bool> CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date)
         {
             return await context.Appointments
-                .Where(w => w.AcceptedUserId == userId && w.Date.Date == LocalTime.Now.Date)
+                .Where(w => w.AcceptedUserId == userId && w.Date.Date == date.Date)
                 .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
         }
 
         public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)
         {
             return await context.Appointments.Include("Services.Service").Include("Customer")
-                .Where(w => w.AcceptedUserId == userId && w.Date.Date == LocalTime.Now.Date && w.Date >= LocalTime.Now && w.Status == AppointmentStatus.Scheduled)
+                .Where(w => w.AcceptedUserId == userId && w.Date >= LocalTime.Now.Date && w.Status == AppointmentStatus.Scheduled)
                 .OrderBy(o => o.Date)
                 .Take(10)
                 .ToListAsync(cancellationToken);

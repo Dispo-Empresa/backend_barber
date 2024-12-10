@@ -181,11 +181,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task CancelAllTodayAsync(CancellationToken cancellationToken, long id)
+        public async Task CancelAllByDateAsync(CancellationToken cancellationToken, long id, DateTime date)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllTodayAsync(cancellationToken, id));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllByDateAsync(cancellationToken, id, date));
             }
             catch (Exception e)
             {

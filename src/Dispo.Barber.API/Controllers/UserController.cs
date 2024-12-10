@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Threading;
+using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
@@ -186,10 +187,10 @@ namespace Dispo.Barber.API.Controllers
         }
 
         //[Authorize]
-        [HttpPost("{id}/appointments/cancel-today")]
-        public async Task<IActionResult> CancelAllToday(CancellationToken cancellationToken, [FromRoute] long id)
+        [HttpPost("{id}/appointments/cancel-by-date")]
+        public async Task<IActionResult> CancelAllByDate(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] DateTime date)
         {
-            await userAppService.CancelAllTodayAsync(cancellationToken, id);
+            await userAppService.CancelAllByDateAsync(cancellationToken, id, date);
             return Ok();
         }
     }

@@ -33,7 +33,7 @@ namespace Dispo.Barber.Application.AppService.Interface
 
         Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
 
-        Task CancelAllTodayAsync(CancellationToken cancellationToken, long id);
+        Task CancelAllByDateAsync(CancellationToken cancellationToken, long id, DateTime date);
 
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long id);
     }

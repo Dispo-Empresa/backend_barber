@@ -64,10 +64,10 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task CancelAllTodayAsync(CancellationToken cancellationToken, long userId)
+        public async Task CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date)
         {
             // TODO: Notificar clientes que tiveram os agendamentos cancelados.
-            await repository.CancelAllTodayAsync(cancellationToken, userId);
+            await repository.CancelAllByDateAsync(cancellationToken, userId, date);
             await repository.SaveChangesAsync(cancellationToken);
         }
 
