@@ -234,7 +234,7 @@ namespace Dispo.Barber.Application.Service
             foreach (var appointment in appointments)
             {
                 var customerAppointments = appointment.Customer.Appointments
-                .OrderByDescending(a => a.Date) // Ordenar por data decrescente (últimos agendamentos primeiro)
+                .OrderByDescending(a => a.Date) 
                 .Take(5) // Pegar os dois últimos agendamentos
                 .ToList();
 
@@ -258,7 +258,7 @@ namespace Dispo.Barber.Application.Service
                             intervalCounts[interval] = 1;
                         }
                     }
-                    // duas forma de fazer pegando o maior intervalo ou logo abaixo calcular a media entre cada intervalor
+
                     var mostCustumerFrequentInterval = intervalCounts
                     .OrderByDescending(kvp => kvp.Value) 
                     .ThenByDescending(kvp => kvp.Key)   
@@ -287,18 +287,18 @@ namespace Dispo.Barber.Application.Service
                         var groupedDays = allCustomerAppointments
                         .GroupBy(a => a.DayOfWeek)
                         .OrderByDescending(g => g.Count()) // Ordenar pelo número de agendamentos (prioridade na frequência)
-                        .ThenByDescending(g => g.Max(a => a.Date)) // Se houver empate, priorizar o mais recente pela data
+                        .ThenByDescending(g => g.Max(a => a.Date)) 
                         .ToList();
 
                         var groupedByHourAndMinute = allCustomerHourAppointments
-                            .GroupBy(a => new { a.Hour, a.Minute }) // Agrupar por hora e minuto
+                            .GroupBy(a => new { a.Hour, a.Minute }) 
                             .Select(g => new {
-                                Time = $"{g.Key.Hour}:{g.Key.Minute:D2}", // Formatar hora e minuto como string "HH:mm"
-                                Count = g.Count(), // Contar agendamentos no grupo
-                                LatestDate = g.Max(a => a.Date) // Pegar a última data do grupo
+                                Time = $"{g.Key.Hour}:{g.Key.Minute:D2}", 
+                                Count = g.Count(), 
+                                LatestDate = g.Max(a => a.Date) 
                             })
-                            .OrderByDescending(g => g.Count) // Ordenar pela quantidade de agendamentos
-                            .ThenByDescending(g => g.LatestDate) // Em caso de empate, ordenar pela data mais recente
+                            .OrderByDescending(g => g.Count) 
+                            .ThenByDescending(g => g.LatestDate) 
                             .ToList();
 
                         var mostFrequentTime = groupedByHourAndMinute.FirstOrDefault();
@@ -321,7 +321,7 @@ namespace Dispo.Barber.Application.Service
                             {
                                 if ((int)referenceDateOfWeek.DayOfWeek > (int)mostFrequentDay.Last().DayOfWeek)
                                 {
-                                    // Se o dia de referência for mais tarde na semana que o mais frequente, vá para o próximo ciclo
+                                    
                                     referenceDateOfWeek = referenceDateOfWeek.AddDays(-difference);
                                     if (referenceDateOfWeek <= referenceDate)
                                         referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference*2));
@@ -329,21 +329,66 @@ namespace Dispo.Barber.Application.Service
                                 }
                                 else
                                 {
-                                    // Se o dia de referência for mais cedo que o mais frequente, ajuste para frente
+                                   
                                     referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference));
                                 }
                             }
                         }
 
+
+
+                        var topBarberAppointments = appointment.Customer.Appointments
+                        .GroupBy(a => a.AcceptedUser) // Agrupar por barbeiro
+                        .Select(group => new
+                        {
+                            Barber = group.Key,
+                            TotalAppointments = group.Count() // Contar agendamentos
+                        })
+                        .OrderByDescending(barber => barber.TotalAppointments) // Ordenar pelos mais agendados
+                        .FirstOrDefault(); 
+
+
+                        var topServiceAppointments = appointment.Customer.Appointments
+                        .SelectMany(a => a.Services) 
+                        .GroupBy(service => service) 
+                        .Select(group => new
+                        {
+                            Service = group.Key,
+                            TotalAppointments = group.Count()
+                        })
+                        .OrderByDescending(service => service.TotalAppointments)
+                        .FirstOrDefault();
+
+
+                        if (!topServiceAppointments.Service.Service.UserServices.Any(x => x.UserId == topBarberAppointments.Barber.Id))
+                        {
+                            topBarberAppointments = null;
+                        }
+
+                        
+                        if (topBarberAppointments == null)
+                        {
+                            var newUserByService = topServiceAppointments.Service.Service.UserServices.FirstOrDefault();
+
+                            
+                        }
+
+
+
                         var adjustedReferenceDate = new List<string>
                         {
-                            DateTime.SpecifyKind(referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay, DateTimeKind.Utc).ToString("yyyy-MM-dd HH:mm:ss") 
+                            $"Ultimo agendamento: {DateTime.SpecifyKind(latestAppointment.Date, DateTimeKind.Utc):yyyy-MM-dd HH:mm:ss}" + Environment.NewLine +
+                            $"Sugestão feita: {DateTime.SpecifyKind(referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay, DateTimeKind.Utc):yyyy-MM-dd HH:mm:ss}" + Environment.NewLine +
+                            $"Barbeiro: {topBarberAppointments.Barber.Name}" + Environment.NewLine +
+                            $"Serviço: {topServiceAppointments.Service.Service.Description}" + Environment.NewLine +
+                            $"Cliente: {appointment.Customer.Name}"
                         };
+
 
                         // var adjustedReferenceDate = (referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay);
                         var teste = customerAppointments
-                        .Select(x => x.Date.ToString("yyyy-MM-dd HH:mm:ss")) // Converter para string no formato desejado
-                        .OrderBy(x => x) // Ordenar como string
+                        .Select(x => x.Date.ToString("yyyy-MM-dd HH:mm:ss")) 
+                        .OrderBy(x => x) 
                         .ToList();
 
                         datesAppointments["dados que serão feita sugestão"].AddRange(teste);
