@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Service.Interface
@@ -26,5 +27,9 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
 
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
+
+        Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
+
+        Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
     }
 }

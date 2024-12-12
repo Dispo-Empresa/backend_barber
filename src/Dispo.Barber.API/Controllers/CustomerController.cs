@@ -11,8 +11,8 @@ namespace Dispo.Barber.API.Controllers
     {
 
         [AllowAnonymous]
-        [HttpGet("{phone}")]
-        public async Task<IActionResult> GetByPhone(string phone)
+        [HttpGet("phone")]
+        public async Task<IActionResult> GetByPhone([FromQuery] string phone)
         {
             try
             {
@@ -26,10 +26,31 @@ namespace Dispo.Barber.API.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromQuery] string search)
+        [HttpGet("search/{search}")]
+        public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] string search)
         {
             var result = await customerAppService.GetForAppointment(cancellationToken, search);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            var result = await customerAppService.GetByIdAsync(cancellationToken, id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await customerAppService.GetCustomersAsync(cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/appointments")]
+        public async Task<IActionResult> GetAppointments(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            var result = await customerAppService.GetCustomerAppointmentsAsync(cancellationToken, id);
             return Ok(result);
         }
     }

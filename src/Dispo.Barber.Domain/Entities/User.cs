@@ -13,6 +13,7 @@ namespace Dispo.Barber.Domain.Entities
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public string Slug { get; set; }
+        public byte[]? Photo { get; set; }
 
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }

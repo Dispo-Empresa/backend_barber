@@ -1,5 +1,4 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +39,21 @@ namespace Dispo.Barber.API.Controllers
         {
             var result = await serviceAppService.GetServicesList(cancellationToken, id);
             return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await serviceAppService.GetAllServicesList(cancellationToken);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateServiceDTO updateServiceDTO)
+        {
+            await serviceAppService.UpdateAsync(cancellationToken, id, updateServiceDTO);
+            return Ok();
         }
     }
 }

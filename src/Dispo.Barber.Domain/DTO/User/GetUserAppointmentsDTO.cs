@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.DTO.User
+﻿using Dispo.Barber.Domain.Enum;
+
+namespace Dispo.Barber.Domain.DTO.User
 {
     public class GetUserAppointmentsDTO
     {

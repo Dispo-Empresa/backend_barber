@@ -23,6 +23,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .Include("Services.Service")
                                 .Include("Customer")
                                 .Where(w => w.AcceptedUserId == id && w.Date >= getUserAppointmentsDTO.StartDate && w.Date <= getUserAppointmentsDTO.EndDate)
+                                .OrderBy(x => x.Date)
                                 .ToListAsync(cancellationToken);
         }
 
@@ -74,7 +75,7 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Id = s.Id,
                                           Name = s.Name,
                                           Phone = s.Phone,
-                                          Picture = string.Empty,
+                                          Photo = s.Photo,
                                           Status = s.Status
                                       })
                                       .ToListAsync(cancellationToken);
@@ -90,8 +91,9 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Id = s.Id,
                                           Name = s.Name,
                                           Phone = s.Phone,
-                                          Picture = string.Empty,
+                                          Photo = s.Photo,
                                           Status = s.Status,
+                                          Link = s.Slug,
                                           Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
                                           {
                                               StartDate = s.StartDate,
@@ -106,6 +108,19 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           }).ToList()
                                       })
                                       .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.UserServices
+                            .Where(w => w.UserId == id)
+                            .Select(s => new ServiceInformationDTO
+                            {
+                                Id = s.Service.Id,
+                                Description = s.Service.Description,
+                                Duration = s.Service.Duration,
+                                Price = s.Service.Price
+                            }).ToListAsync();
         }
     }
 }

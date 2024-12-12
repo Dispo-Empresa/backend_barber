@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Repository
@@ -22,5 +23,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
 
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
+
+        Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
     }
 }

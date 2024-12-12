@@ -1,6 +1,8 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Customer;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exception;
@@ -8,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service) : IUserAppService
+    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service, ICustomerService customerService, IAppointmentService appointmentService) : IUserAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
@@ -136,6 +138,71 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error getting user by ID.");
+                throw;
+            }
+        }
+
+        public async Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await customerService.GetUserCustomersAsync(cancellationToken, userId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user by ID.");
+                throw;
+            }
+        }
+
+        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetServicesAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UploadImageAsync(cancellationToken, id, photo));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task CancelAllByDateAsync(CancellationToken cancellationToken, long id, DateTime date)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllByDateAsync(cancellationToken, id, date));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await appointmentService.GetNextAppointmentsAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
                 throw;
             }
         }

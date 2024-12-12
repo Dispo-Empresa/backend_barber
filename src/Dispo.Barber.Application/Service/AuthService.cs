@@ -5,6 +5,7 @@ using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Authentication;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +19,11 @@ namespace Dispo.Barber.Application.Service
             if (!PasswordEncryptor.VerifyPassword(password, user.Password))
             {
                 throw new NotFoundException("Usuário não encontrado.");
+            }
+
+            if (user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("Usuário não está ativo.");
             }
 
             return CreateToken(user);

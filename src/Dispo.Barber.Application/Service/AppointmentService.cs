@@ -14,8 +14,14 @@ namespace Dispo.Barber.Application.Service
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
         {
             var appointment = await repository.GetAsync(cancellationToken, id);
+
+            if (appointment is null)
+            {
+                throw new NotFoundException("Agendamento não existe.");
+            }
+
             appointment.Status = AppointmentStatus.Canceled;
-            await repository.AddAsync(cancellationToken, appointment);
+            repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
         }
 
@@ -30,7 +36,7 @@ namespace Dispo.Barber.Application.Service
             }
             else
             {
-                appointment.Customer.Phone = PhoneNumberUtils.FormatPhoneNumber(appointment.Customer.Phone);
+                appointment.Customer.Phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
             }
 
             appointment.Status = AppointmentStatus.Scheduled;
@@ -53,8 +59,21 @@ namespace Dispo.Barber.Application.Service
             }
 
             appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
+            appointment.Status = AppointmentStatus.Canceled;
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date)
+        {
+            // TODO: Notificar clientes que tiveram os agendamentos cancelados.
+            await repository.CancelAllByDateAsync(cancellationToken, userId, date);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await repository.GetNextAppointmentsAsync(cancellationToken, userId);
         }
 
         //private async Task SendNotificationBySMS(Appointment appointment)
