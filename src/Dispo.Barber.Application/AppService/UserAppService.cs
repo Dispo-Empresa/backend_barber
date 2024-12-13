@@ -5,7 +5,9 @@ using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
+using Dispo.Barber.Domain.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
@@ -42,7 +44,22 @@ namespace Dispo.Barber.Application.AppService
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    var appointments = await service.GetUserAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
+                    foreach (var appointment in appointments.Where(w => w.Date <= LocalTime.Now && w.Status == AppointmentStatus.Scheduled))
+                    {
+                        var duration = appointment.Services.Select(w => w.Service).Sum(w => w.Duration);
+                        if (appointment.Date.AddMinutes(duration) >= LocalTime.Now)
+                        {
+                            continue;
+                        }
+
+                        appointment.Status = AppointmentStatus.Completed;
+                    }
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
+                    return appointments;
+                }, true);
             }
             catch (Exception e)
             {
