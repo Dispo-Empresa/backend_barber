@@ -4,6 +4,7 @@ using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Twilio.Rest.Verify.V2;
 
 namespace Dispo.Barber.Infrastructure.Repository
 {
@@ -23,7 +24,7 @@ namespace Dispo.Barber.Infrastructure.Repository
             // Obter agendamentos dentro do intervalo
             var appointments = await context.Appointments
                 .Include(a => a.AcceptedUser)
-                .Include("Services.Service")
+                .Include("Services.Service.UserServices")
                 .Include(a => a.Customer) // Incluímos os dados dos clientes
                 .Where(a => a.Date.Date >= startDate.Date
                             && a.Date.Date <= referenceDate.Date

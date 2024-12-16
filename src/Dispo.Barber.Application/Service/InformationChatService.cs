@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Dispo.Barber.Application.AppService;
+using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Chat;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
@@ -12,11 +15,15 @@ using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Utils;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Reflection.Metadata.BlobBuilder;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Dispo.Barber.Application.Service
 {
-    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper) : IinformationChatService
+    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentAppService appointmentAppService) : IinformationChatService
     {
         public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken,long companyId)
         {
@@ -152,63 +159,7 @@ namespace Dispo.Barber.Application.Service
             {
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
-                    var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-                    DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
-                    var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
-                    var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
-                   
-
-                    var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
-                    var availableSlots = new Dictionary<string, List<string>>
-                    {
-                        { "morning", new List<string>() },
-                        { "afternoon", new List<string>() },
-                        { "evening", new List<string>() }
-                    };
-
-                    var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                    var AppointmentServiceRepository = unitOfWork.GetRepository<IServiceAppointmentRepository>();
-
-                    var appointments = await AppointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
-
-                    List<(double Start, double End)> occupiedSlots = new List<(double, double)>();
-
-                    foreach (var appointment in appointments)
-                    {
-                        var dateStart = appointment.Date.TimeOfDay;
-                        var timeMinuteStart = dateStart.TotalMinutes;
-                        var duration = SumDurationService(appointment.Services);
-                        var dateEnd = timeMinuteStart + duration;
-
-                        occupiedSlots.Add((timeMinuteStart, dateEnd));
-                    }
-
-                    foreach (var slot in slots)
-                    {
-                        var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
-
-                        bool isSlotOccupied = occupiedSlots.Any(occupied =>
-                            slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
-
-                        if (!isSlotOccupied)
-                        {
-                            var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
-
-                            bool isSlotAvailable = !occupiedSlots.Any(occupied =>
-                                slotEndTime > occupied.Start && slotEndTime <= occupied.End);
-
-                            if (isSlotAvailable)
-                            {
-                                string slotTime = slot.TimeOfDay.ToString(@"hh\:mm");
-
-                                string period = CategorizePeriod(slot);
-
-                                availableSlots[period].Add(slotTime);
-                            }
-                        }
-                    }
-
-                    return availableSlots;
+                    return await GetAvailableSlotsInternalAsync(cancellationToken, availableSlotRequestDto);
                 });
             }
             catch (Exception ex)
@@ -217,197 +168,354 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-        public async Task<Dictionary<string, List<string>>> GetSuggestionAppointment()
+        private async Task<Dictionary<string, List<string>>> GetAvailableSlotsInternalAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
-            var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-            DateTime referenceDate = DateTime.Now;
-            int daysBefore = 60;
-            var datesAppointments = new Dictionary<string, List<string>>
-            {
-                { "dados que serão feita sugestão", new List<string>() },
-                { "sugestão", new List<string>() }
-            };
+            var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+            DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
+            var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+            var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
-            var appointments = await AppointmentRepository.GetFrequentAppointmentsByDaysBeforeAsync(cancellationTokenSource.Token, daysBefore);
+            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
+            var availableSlots = InitializeAvailableSlots();
+
+            var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+            var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
+
+            var occupiedSlots = GetOccupiedSlots(appointments);
+
+            PopulateAvailableSlots(slots, occupiedSlots, availableSlotRequestDto, availableSlots);
+
+            return availableSlots;
+        }
+
+        private async Task<Dictionary<string, List<TimeSpan>>> GetAvailableSlotsInternalSuggestedAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
+        {
+            var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+            DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
+            var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+            var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+
+            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
+            var availableSlots = InitializeAvailableSuggestedSlots();
+
+            var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+            var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
+
+            var occupiedSlots = GetOccupiedSlots(appointments);
+
+            PopulateAvailableSuggestedSlots(slots, occupiedSlots, availableSlotRequestDto, availableSlots);
+
+            return availableSlots;
+        }
+
+        private Dictionary<string, List<string>> InitializeAvailableSlots()
+        {
+            return new Dictionary<string, List<string>>
+            {
+                { "morning", new List<string>() },
+                { "afternoon", new List<string>() },
+                { "evening", new List<string>() }
+            };
+        }
+
+        private Dictionary<string, List<TimeSpan>> InitializeAvailableSuggestedSlots()
+        {
+            return new Dictionary<string, List<TimeSpan>>
+            {
+                { "morning", new List<TimeSpan>() },
+                { "afternoon", new List<TimeSpan>() },
+                { "evening", new List<TimeSpan>() }
+            };
+        }
+
+        private List<(double Start, double End)> GetOccupiedSlots(IEnumerable<Appointment> appointments)
+        {
+            var occupiedSlots = new List<(double Start, double End)>();
 
             foreach (var appointment in appointments)
             {
-                var customerAppointments = appointment.Customer.Appointments
-                .OrderByDescending(a => a.Date) 
-                .Take(5) // Pegar os dois últimos agendamentos
-                .ToList();
+                var dateStart = appointment.Date.TimeOfDay;
+                var timeMinuteStart = dateStart.TotalMinutes;
+                var duration = SumDurationService(appointment.Services);
+                var dateEnd = timeMinuteStart + duration;
 
-                if (customerAppointments.Count >= 5) 
+                occupiedSlots.Add((timeMinuteStart, dateEnd));
+            }
+
+            return occupiedSlots;
+        }
+
+        private void PopulateAvailableSlots(IEnumerable<DateTime> slots, List<(double Start, double End)> occupiedSlots, AvailableSlotRequestDto availableSlotRequestDto, Dictionary<string, List<string>> availableSlots)
+        {
+            foreach (var slot in slots)
+            {
+                var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
+
+                bool isSlotOccupied = occupiedSlots.Any(occupied =>
+                    slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
+
+                if (!isSlotOccupied)
                 {
-                    var intervalCounts = new Dictionary<int, int>();
+                    var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
 
-                    for (int i = 0; i < customerAppointments.Count - 1; i++)
+                    bool isSlotAvailable = !occupiedSlots.Any(occupied =>
+                        slotEndTime > occupied.Start && slotEndTime <= occupied.End);
+
+                    if (isSlotAvailable)
                     {
-                        var currentAppointment = customerAppointments[i];
-                        var nextAppointment = customerAppointments[i + 1];
+                        string slotTime = slot.TimeOfDay.ToString(@"hh\:mm");
 
-                        var interval = (int)Math.Round((currentAppointment.Date - nextAppointment.Date).TotalDays);
+                        string period = CategorizePeriod(slot);
 
-                        if (intervalCounts.ContainsKey(interval))
-                        {
-                            intervalCounts[interval]++;
-                        }
-                        else
-                        {
-                            intervalCounts[interval] = 1;
-                        }
+                        availableSlots[period].Add(slotTime);
                     }
+                }
+            }
+        }
 
-                    var mostCustumerFrequentInterval = intervalCounts
-                    .OrderByDescending(kvp => kvp.Value) 
-                    .ThenByDescending(kvp => kvp.Key)   
-                    .First();
+        private void PopulateAvailableSuggestedSlots(IEnumerable<DateTime> slots, List<(double Start, double End)> occupiedSlots, AvailableSlotRequestDto availableSlotRequestDto, Dictionary<string, List<TimeSpan>> availableSlots)
+        {
+            foreach (var slot in slots)
+            {
+                var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
 
-                    var averageInterval = Math.Round(intervalCounts
-                    .Select(kvp => kvp.Key) 
-                    .Average()); 
+                bool isSlotOccupied = occupiedSlots.Any(occupied =>
+                    slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
 
-                    var latestAppointment = customerAppointments[0];
-                    var intervalDataReference = Math.Round((referenceDate.Date - latestAppointment.Date).TotalDays);
+                if (!isSlotOccupied)
+                {
+                    var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
 
-                    if (intervalDataReference >= averageInterval || intervalDataReference >= mostCustumerFrequentInterval.Key)
+                    bool isSlotAvailable = !occupiedSlots.Any(occupied =>
+                        slotEndTime > occupied.Start && slotEndTime <= occupied.End);
+
+                    if (isSlotAvailable)
                     {
+                        var slotTime = slot.TimeOfDay;
 
-                        var allCustomerAppointments = appointment.Customer.Appointments
-                        .OrderBy(a => a.Date)
-                        .Select(a => new { a.Date, DayOfWeek = a.Date.DayOfWeek, a.Customer }) // Selecionar data e dia da semana
-                        .ToList();
+                        string period = CategorizePeriod(slot);
 
-                        var allCustomerHourAppointments = appointment.Customer.Appointments
-                        .OrderBy(a => a.Date) // Ordenar por data
-                        .Select(a => new { a.Date, Hour = a.Date.Hour, Minute = a.Date.Minute }) // Selecionar hora e minuto de cada agendamento
-                        .ToList();
+                        availableSlots[period].Add(slotTime);
+                    }
+                }
+            }
+        }
 
-                        var groupedDays = allCustomerAppointments
-                        .GroupBy(a => a.DayOfWeek)
-                        .OrderByDescending(g => g.Count()) // Ordenar pelo número de agendamentos (prioridade na frequência)
-                        .ThenByDescending(g => g.Max(a => a.Date)) 
-                        .ToList();
 
-                        var groupedByHourAndMinute = allCustomerHourAppointments
-                            .GroupBy(a => new { a.Hour, a.Minute }) 
-                            .Select(g => new {
-                                Time = $"{g.Key.Hour}:{g.Key.Minute:D2}", 
-                                Count = g.Count(), 
-                                LatestDate = g.Max(a => a.Date) 
-                            })
-                            .OrderByDescending(g => g.Count) 
-                            .ThenByDescending(g => g.LatestDate) 
-                            .ToList();
 
-                        var mostFrequentTime = groupedByHourAndMinute.FirstOrDefault();
+        public async Task<bool> GetSuggestionAppointmentAsync()
+        {
+            try
+            {
+                var cancellationTokenSource = new CancellationTokenSource();
+                var AppointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+                DateTime referenceDate = DateTime.Now;
+                int daysBefore = 60;
 
-                        var mostFrequentDay = groupedDays.FirstOrDefault();
+                var appointments = await AppointmentRepository.GetFrequentAppointmentsByDaysBeforeAsync(cancellationTokenSource.Token, daysBefore);
 
-                        var referenceDateOfWeek = referenceDate.AddDays(averageInterval); // duas forma posso colocar a media ou o ultimo agendamento
+                foreach (var appointment in appointments)
+                {
+                    var customerAppointments = appointment.Customer.Appointments
+                    .OrderByDescending(a => a.Date)
+                    .Take(5) // Pegar os dois últimos agendamentos
+                    .ToList();
 
-                        if (referenceDateOfWeek.DayOfWeek == DayOfWeek.Sunday)
+                    if (customerAppointments.Count >= 5)
+                    {
+                        var intervalCounts = new Dictionary<int, int>();
+
+                        for (int i = 0; i < customerAppointments.Count - 1; i++)
                         {
-                            referenceDateOfWeek.AddDays(1);
-                        }
+                            var currentAppointment = customerAppointments[i];
+                            var nextAppointment = customerAppointments[i + 1];
 
-                        if (referenceDateOfWeek.DayOfWeek != mostFrequentDay.Last().DayOfWeek)
-                        {
-                            // Se a diferença for de 1 dia, tenta ajustar diretamente
-                            int difference = (int)referenceDateOfWeek.DayOfWeek - (int)mostFrequentDay.Last().DayOfWeek;
+                            var interval = (int)Math.Round((currentAppointment.Date - nextAppointment.Date).TotalDays);
 
-                            if (Math.Abs(difference) >= 1)
+                            if (intervalCounts.ContainsKey(interval))
                             {
-                                if ((int)referenceDateOfWeek.DayOfWeek > (int)mostFrequentDay.Last().DayOfWeek)
-                                {
-                                    
-                                    referenceDateOfWeek = referenceDateOfWeek.AddDays(-difference);
-                                    if (referenceDateOfWeek <= referenceDate)
-                                        referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference*2));
-
-                                }
-                                else
-                                {
-                                   
-                                    referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference));
-                                }
+                                intervalCounts[interval]++;
+                            }
+                            else
+                            {
+                                intervalCounts[interval] = 1;
                             }
                         }
 
+                        var mostCustumerFrequentInterval = intervalCounts
+                        .OrderByDescending(kvp => kvp.Value)
+                        .ThenByDescending(kvp => kvp.Key)
+                        .First();
 
+                        var averageInterval = Math.Round(intervalCounts
+                        .Select(kvp => kvp.Key)
+                        .Average());
 
-                        var topBarberAppointments = appointment.Customer.Appointments
-                        .GroupBy(a => a.AcceptedUser) // Agrupar por barbeiro
-                        .Select(group => new
+                        var latestAppointment = customerAppointments[0];
+                        var intervalDataReference = Math.Round((referenceDate.Date - latestAppointment.Date).TotalDays);
+
+                        if (intervalDataReference >= averageInterval || intervalDataReference >= mostCustumerFrequentInterval.Key)
                         {
-                            Barber = group.Key,
-                            TotalAppointments = group.Count() // Contar agendamentos
-                        })
-                        .OrderByDescending(barber => barber.TotalAppointments) // Ordenar pelos mais agendados
-                        .FirstOrDefault(); 
+
+                            var allCustomerAppointments = appointment.Customer.Appointments
+                            .OrderBy(a => a.Date)
+                            .Select(a => new { a.Date, DayOfWeek = a.Date.DayOfWeek, a.Customer }) // Selecionar data e dia da semana
+                            .ToList();
+
+                            var allCustomerHourAppointments = appointment.Customer.Appointments
+                            .OrderBy(a => a.Date) // Ordenar por data
+                            .Select(a => new { a.Date, Hour = a.Date.Hour, Minute = a.Date.Minute }) // Selecionar hora e minuto de cada agendamento
+                            .ToList();
+
+                            var groupedDays = allCustomerAppointments
+                            .GroupBy(a => a.DayOfWeek)
+                            .OrderByDescending(g => g.Count()) // Ordenar pelo número de agendamentos (prioridade na frequência)
+                            .ThenByDescending(g => g.Max(a => a.Date))
+                            .ToList();
+
+                            var groupedByHourAndMinute = allCustomerHourAppointments
+                                .GroupBy(a => new { a.Hour })
+                                .Select(g => new {
+                                    Time = $"{g.Key.Hour}",
+                                    Count = g.Count(),
+                                    LatestDate = g.Max(a => a.Date)
+                                })
+                                .OrderByDescending(g => g.Count)
+                                .ThenByDescending(g => g.LatestDate)
+                                .ToList();
+
+                            var mostFrequentTime = groupedByHourAndMinute.FirstOrDefault();
+
+                            var mostFrequentDay = groupedDays.FirstOrDefault();
+
+                            var referenceDateOfWeek = referenceDate.AddDays(averageInterval); // duas forma posso colocar a media ou o ultimo agendamento
+
+                            if (referenceDateOfWeek.DayOfWeek == DayOfWeek.Sunday)
+                            {
+                                referenceDateOfWeek.AddDays(1);
+                            }
+
+                            if (referenceDateOfWeek.DayOfWeek != mostFrequentDay.Last().DayOfWeek)
+                            {
+                                // Se a diferença for de 1 dia, tenta ajustar diretamente
+                                int difference = (int)referenceDateOfWeek.DayOfWeek - (int)mostFrequentDay.Last().DayOfWeek;
+
+                                if (Math.Abs(difference) >= 1)
+                                {
+                                    if ((int)referenceDateOfWeek.DayOfWeek > (int)mostFrequentDay.Last().DayOfWeek)
+                                    {
+
+                                        referenceDateOfWeek = referenceDateOfWeek.AddDays(-difference);
+                                        if (referenceDateOfWeek <= referenceDate)
+                                            referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference * 2));
+
+                                    }
+                                    else
+                                    {
+
+                                        referenceDateOfWeek = referenceDateOfWeek.AddDays(Math.Abs(difference));
+                                    }
+                                }
+                            }
+
+                            var adjustedReferenceDate = (referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay);
+
+                            var topBarberAppointments = appointment.Customer.Appointments
+                            .GroupBy(a => a.AcceptedUser) // Agrupar por barbeiro
+                            .Select(group => new
+                            {
+                                Barber = group.Key,
+                                TotalAppointments = group.Count() // Contar agendamentos
+                            })
+                            .OrderByDescending(barber => barber.TotalAppointments) // Ordenar pelos mais agendados
+                            .FirstOrDefault();
 
 
-                        var topServiceAppointments = appointment.Customer.Appointments
-                        .SelectMany(a => a.Services) 
-                        .GroupBy(service => service) 
-                        .Select(group => new
-                        {
-                            Service = group.Key,
-                            TotalAppointments = group.Count()
-                        })
-                        .OrderByDescending(service => service.TotalAppointments)
-                        .FirstOrDefault();
+                            var topServiceAppointments = appointment.Customer.Appointments
+                            .SelectMany(a => a.Services)
+                            .GroupBy(service => service)
+                            .Select(group => new
+                            {
+                                Service = group.Key,
+                                TotalAppointments = group.Count()
+                            })
+                            .OrderByDescending(service => service.TotalAppointments)
+                            .FirstOrDefault();
+
+                            var availableSlotRequestDto = new AvailableSlotRequestDto
+                            {
+                                Duration = topServiceAppointments.Service.Service.Duration,
+                                IdUser = topBarberAppointments.Barber.Id,
+                                DateTimeSchedule = adjustedReferenceDate.Date
+                            };
 
 
-                        if (!topServiceAppointments.Service.Service.UserServices.Any(x => x.UserId == topBarberAppointments.Barber.Id))
-                        {
-                            topBarberAppointments = null;
+                            // Obtém os horários disponíveis para o barbeiro
+                            var availableSlots = await GetAvailableSlotsInternalSuggestedAsync(cancellationTokenSource.Token, availableSlotRequestDto);
+
+                            // Converte o horário formatado (10:30) em TimeSpan para cálculos
+                            var formtHour = adjustedReferenceDate.TimeOfDay;
+
+                            // Calcula o horário de término com base na duração do serviço
+                            var serviceDuration = TimeSpan.FromMinutes(topServiceAppointments.Service.Service.Duration);
+                            var endHour = formtHour + serviceDuration;
+
+                            // Verifica se há algum horário disponível em que o serviço pode ser encaixado
+                            var hasTime = availableSlots.Any(slot =>
+                            {
+                                var available = false;
+
+                                foreach (var slotTime in slot.Value)
+                                {
+
+                                    available = slotTime >= formtHour;
+
+                                    if (available)
+                                    {
+                                        available = endHour <= slotTime.Add(serviceDuration);
+
+                                        if (available)
+                                            break;
+                                    }
+                                }
+
+                                return available;
+                            });
+
+                            if (hasTime)
+                            {
+                                var createAppointmentDTO = new CreateAppointmentDTO
+                                {
+                                    Date = adjustedReferenceDate,
+                                    CustomerObservation = $"Horário sugerido automaticamente pelo sistema. O último agendamento registrado foi em: {DateTime.SpecifyKind(latestAppointment.Date, DateTimeKind.Utc):yyyy-MM-dd HH:mm:ss}.",
+                                    AcceptedUserObservation = string.Empty,
+                                    AcceptedUserId = topBarberAppointments.Barber.Id,
+                                    BusinessUnityId = topBarberAppointments.Barber.BusinessUnityId.Value,
+                                    Services = new List<long> { topServiceAppointments.Service.Service.Id },
+                                    Status = AppointmentStatus.Suggested,
+                                    Customer = mapper.Map<CustomerDTO>(appointment.Customer),
+                                };
+
+                                await appointmentAppService.CreateAsync(cancellationTokenSource.Token, createAppointmentDTO);
+
+                                return true;   // da maneira que esta no momento ao rodar o job ele vai fazer somente uma sugestão
+                                              // se caso tiver mais tem que esperar a proxima vez que rodar
+
+                            }
                         }
 
-                        
-                        if (topBarberAppointments == null)
-                        {
-                            var newUserByService = topServiceAppointments.Service.Service.UserServices.FirstOrDefault();
+                    }
+                }
 
-                            
-                        }
-
-
-
-                        var adjustedReferenceDate = new List<string>
-                        {
-                            $"Ultimo agendamento: {DateTime.SpecifyKind(latestAppointment.Date, DateTimeKind.Utc):yyyy-MM-dd HH:mm:ss}" + Environment.NewLine +
-                            $"Sugestão feita: {DateTime.SpecifyKind(referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay, DateTimeKind.Utc):yyyy-MM-dd HH:mm:ss}" + Environment.NewLine +
-                            $"Barbeiro: {topBarberAppointments.Barber.Name}" + Environment.NewLine +
-                            $"Serviço: {topServiceAppointments.Service.Service.Description}" + Environment.NewLine +
-                            $"Cliente: {appointment.Customer.Name}"
-                        };
-
-
-                        // var adjustedReferenceDate = (referenceDateOfWeek.Date + mostFrequentTime.LatestDate.TimeOfDay);
-                        var teste = customerAppointments
-                        .Select(x => x.Date.ToString("yyyy-MM-dd HH:mm:ss")) 
-                        .OrderBy(x => x) 
-                        .ToList();
-
-                        datesAppointments["dados que serão feita sugestão"].AddRange(teste);
-                        datesAppointments["sugestão"].AddRange(adjustedReferenceDate);
-
-                        return datesAppointments;
-                        // ja tenho a data e o horario
-                        // verificar agora se essa data que ele esta preparando é feriado se tem horario dando preferencia sempre pro dia e horario
-
-
-
-
-                    }  
-                       
-                }   
-
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
             }
 
-            return datesAppointments;
+
         }
 
 
@@ -480,7 +588,61 @@ namespace Dispo.Barber.Application.Service
                 
             return timeIntervals;
         }
-        
+
+
+        private List<DateTime> GetTimeIntervalsTwo(int duration, IList<UserSchedule> userSchedules, bool dayIsEqual)
+        {
+            var timeIntervals = new List<DateTime>();
+            foreach (var userSchedule in userSchedules)
+            {
+
+                if (userSchedule.DayOff)
+                {
+                    return timeIntervals;
+                }
+
+                TimeSpan startTime = TimeSpan.Parse(userSchedule.StartDate);
+                TimeSpan endTime = TimeSpan.Parse(userSchedule.EndDate);
+
+                TimeSpan currentTime = startTime;
+
+                DateTime currentDateTime = LocalTime.Now;
+                TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
+
+                while (currentTime < endTime)
+                {
+                    if (!userSchedule.IsRest)
+                    {
+                        DateTime intervalDateTime = DateTime.Today.Add(currentTime);
+
+                        if (dayIsEqual && !(currentTime >= currentTimeSpan))
+                        {
+                            currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                            continue;
+                        }
+                        else
+                        {
+                            timeIntervals.Add(intervalDateTime);
+                        }
+
+
+                    }
+                    else
+                    {
+                        DateTime restStartTime = DateTime.Today.Add(startTime);
+                        DateTime restEndTime = DateTime.Today.Add(endTime);
+
+                        timeIntervals.RemoveAll(slot => slot >= restStartTime && slot < restEndTime);
+                        break;
+
+                    }
+
+                    currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                }
+            }
+
+            return timeIntervals;
+        }
         private int SumDurationService(List<ServiceAppointment> serviceAppointments)
         {
             int duration = 0;

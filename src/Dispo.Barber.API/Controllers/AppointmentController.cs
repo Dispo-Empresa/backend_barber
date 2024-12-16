@@ -69,9 +69,10 @@ namespace Dispo.Barber.API.Controllers
         [HttpPost("generate-suggestions")]
         public async Task<IActionResult> GenerateSuggestions()
         {
-            var retorno = await informationChatService.GetSuggestionAppointment();
-            return Ok(retorno);
+            if (await informationChatService.GetSuggestionAppointmentAsync())
+                return Ok("Sugestões geradas com sucesso."); 
+            else return BadRequest();
         }
-    
+
     }
 }
