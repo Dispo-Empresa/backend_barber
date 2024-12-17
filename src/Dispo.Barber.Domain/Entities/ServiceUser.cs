@@ -7,5 +7,7 @@
 
         public required long ServiceId { get; set; }
         public Service Service { get; set; }
+
+        public DateTime? ProvidesUntil { get; set; }
     }
 }

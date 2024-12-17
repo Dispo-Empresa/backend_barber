@@ -193,5 +193,19 @@ namespace Dispo.Barber.API.Controllers
             await userAppService.CancelAllByDateAsync(cancellationToken, id, date);
             return Ok();
         }
+
+        [HttpPatch("{id}/services/{serviceId}/stop-providing")]
+        public async Task<IActionResult> StopProvidingService(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
+        {
+            await userAppService.StopProvidingServiceAsync(cancellationToken, id, serviceId);
+            return Ok();
+        }
+
+        [HttpPatch("{id}/services/{serviceId}/start-providing")]
+        public async Task<IActionResult> StartProvidingServiceAsync(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
+        {
+            await userAppService.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+            return Ok();
+        }
     }
 }

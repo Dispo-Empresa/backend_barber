@@ -223,5 +223,31 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.StopProvidingServiceAsync(cancellationToken, id, serviceId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
+        public async Task StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.StartProvidingServiceAsync(cancellationToken, id, serviceId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
     }
 }

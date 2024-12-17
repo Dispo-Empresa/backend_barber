@@ -3,6 +3,8 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -113,7 +115,7 @@ namespace Dispo.Barber.Infrastructure.Repository
         public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
         {
             return await context.UserServices
-                            .Where(w => w.UserId == id)
+                            .Where(w => w.UserId == id && w.ProvidesUntil == null || w.ProvidesUntil >= LocalTime.Now)
                             .Select(s => new ServiceInformationDTO
                             {
                                 Id = s.Service.Id,
@@ -121,6 +123,20 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 Duration = s.Service.Duration,
                                 Price = s.Service.Price
                             }).ToListAsync();
+        }
+
+        public async Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            return await context.UserServices
+                            .Where(w => w.UserId == id && w.ServiceId == serviceId)
+                            .ExecuteUpdateAsync(set => set.SetProperty(a => a.ProvidesUntil, LocalTime.Now), cancellationToken) > 0;
+        }
+
+        public async Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            return await context.UserServices
+                            .Where(w => w.UserId == id && w.ServiceId == serviceId)
+                            .ExecuteUpdateAsync(set => set.SetProperty(a => a.ProvidesUntil, (DateTime?)null), cancellationToken) > 0;
         }
     }
 }

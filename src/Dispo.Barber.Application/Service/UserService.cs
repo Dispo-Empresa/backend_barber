@@ -174,6 +174,16 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            return await repository.StopProvidingServiceAsync(cancellationToken, id, serviceId);
+        }
+
+        public async Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
+        {
+            return await repository.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+        }
+
         private List<UserSchedule> BuildNormalDays() => [
             new(DayOfWeek.Monday, "08:00", "18:00", false, false),
             new(DayOfWeek.Monday, "12:00", "13:30", true, false),

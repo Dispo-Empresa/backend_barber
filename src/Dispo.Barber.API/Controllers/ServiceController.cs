@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +54,14 @@ namespace Dispo.Barber.API.Controllers
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateServiceDTO updateServiceDTO)
         {
             await serviceAppService.UpdateAsync(cancellationToken, id, updateServiceDTO);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> ChangeStatus(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangeServiceStatusDTO changeServiceStatusDTO)
+        {
+            await serviceAppService.ChangeStatusAsync(cancellationToken, id, changeServiceStatusDTO.Status);
             return Ok();
         }
     }

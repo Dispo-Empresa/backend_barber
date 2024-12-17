@@ -2,6 +2,7 @@
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.Service
@@ -46,6 +47,14 @@ namespace Dispo.Barber.Application.Service
                 service.Duration = updateServiceDTO.Duration;
             }
 
+            repository.Update(service);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ServiceStatus status)
+        {
+            var service = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Serviço não encontrado.");
+            service.Status = status;
             repository.Update(service);
             await repository.SaveChangesAsync(cancellationToken);
         }
