@@ -1,6 +1,4 @@
-﻿using Dispo.Barber.Domain.Enum;
-
-namespace Dispo.Barber.Domain.DTO.User
+﻿namespace Dispo.Barber.Domain.DTO.User
 {
     public class UpdateUserDTO
     {

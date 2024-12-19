@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System.Threading;
-using Dispo.Barber.Application.AppService;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.User;
