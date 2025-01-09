@@ -249,5 +249,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.ChangeDeviceToken(cancellationToken, id, deviceToken));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
     }
 }

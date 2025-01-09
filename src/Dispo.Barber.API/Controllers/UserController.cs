@@ -204,5 +204,12 @@ namespace Dispo.Barber.API.Controllers
             await userAppService.StartProvidingServiceAsync(cancellationToken, id, serviceId);
             return Ok();
         }
+
+        [HttpPatch("{id}/device-token/{deviceToken}")]
+        public async Task<IActionResult> ChangeDeviceToken(CancellationToken cancellationToken, [FromRoute] long id, string deviceToken)
+        {
+            await userAppService.ChangeDeviceToken(cancellationToken, id, deviceToken);
+            return Ok();
+        }
     }
 }

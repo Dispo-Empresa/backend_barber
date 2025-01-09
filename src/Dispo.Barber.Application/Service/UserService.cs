@@ -122,6 +122,11 @@ namespace Dispo.Barber.Application.Service
                 user.Password = PasswordEncryptor.HashPassword(updateUserDTO.Password);
             }
 
+            if (!string.IsNullOrEmpty(updateUserDTO.DeviceToken))
+            {
+                user.DeviceToken = updateUserDTO.DeviceToken;
+            }
+
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
         }
@@ -182,6 +187,14 @@ namespace Dispo.Barber.Application.Service
         public async Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
         {
             return await repository.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+        }
+
+        public async Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken)
+        {
+            var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+            user.DeviceToken = deviceToken;
+            repository.Update(user);
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private List<UserSchedule> BuildNormalDays() => [

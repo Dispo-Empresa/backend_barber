@@ -14,6 +14,7 @@
             Name = user.Name;
             Slug = user.EntireSlug();
             Photo = user.Photo;
+            DeviceToken = user.DeviceToken;
         }
 
         public AuthenticationResult()
@@ -30,5 +31,6 @@
         public string Name { get; set; }
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
+        public string DeviceToken { get; set; }
     }
 }

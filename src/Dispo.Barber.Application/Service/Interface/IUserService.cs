@@ -35,5 +35,6 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
 
         Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
+        Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken);
     }
 }
