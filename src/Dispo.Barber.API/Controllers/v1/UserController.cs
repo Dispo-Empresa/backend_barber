@@ -5,7 +5,7 @@ using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/users")]
     [ApiController]
@@ -183,7 +183,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("{id}/appointments/cancel-by-date")]
         public async Task<IActionResult> CancelAllByDate(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] DateTime date)
         {
@@ -191,6 +191,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPatch("{id}/services/{serviceId}/stop-providing")]
         public async Task<IActionResult> StopProvidingService(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
         {
@@ -198,10 +199,19 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPatch("{id}/services/{serviceId}/start-providing")]
         public async Task<IActionResult> StartProvidingServiceAsync(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
         {
             await userAppService.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("{id}/appointments/cancel-scheduled")]
+        public async Task<IActionResult> CancelAllScheduledAsync(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await userAppService.CancelAllScheduledAsync(cancellationToken, id);
             return Ok();
         }
     }

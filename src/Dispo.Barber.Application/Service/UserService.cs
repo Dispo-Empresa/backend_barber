@@ -4,6 +4,7 @@ using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
@@ -182,6 +183,11 @@ namespace Dispo.Barber.Application.Service
         public async Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId)
         {
             return await repository.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
+        {
+            return await repository.GetAppointmentsAsyncV2(cancellationToken, id, getUserAppointmentsDTO);
         }
 
         private List<UserSchedule> BuildNormalDays() => [

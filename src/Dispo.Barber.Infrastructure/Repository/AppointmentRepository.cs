@@ -4,7 +4,6 @@ using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using Twilio.Rest.Verify.V2;
 
 namespace Dispo.Barber.Infrastructure.Repository
 {
@@ -69,6 +68,13 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .OrderBy(o => o.Date)
                 .Take(10)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<bool> CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
+        {
+            return await context.Appointments
+                .Where(w => w.AcceptedUserId == userId && w.Status == AppointmentStatus.Scheduled)
+                .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Dispo.Barber.Domain.Enum;
+﻿using System.Text.Json.Serialization;
+using Dispo.Barber.Domain.Enum;
+using Newtonsoft.Json.Converters;
 
 namespace Dispo.Barber.Domain.DTO.User
 {
@@ -6,5 +8,8 @@ namespace Dispo.Barber.Domain.DTO.User
     {
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AppointmentStatus? Status { get; set; }
     }
 }

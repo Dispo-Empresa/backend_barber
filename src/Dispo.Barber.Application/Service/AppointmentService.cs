@@ -6,6 +6,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dispo.Barber.Application.Service
 {
@@ -80,5 +81,11 @@ namespace Dispo.Barber.Application.Service
         //{
         //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
         //}
+
+        public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
+        {
+            await repository.CancelAllScheduledAsync(cancellationToken, userId);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
     }
 }
