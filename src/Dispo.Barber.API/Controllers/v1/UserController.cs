@@ -207,6 +207,13 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
+        [HttpPatch("{id}/device-token/{deviceToken}")]
+        public async Task<IActionResult> ChangeDeviceToken(CancellationToken cancellationToken, [FromRoute] long id, string deviceToken)
+        {
+            await userAppService.ChangeDeviceToken(cancellationToken, id, deviceToken);
+            return Ok();
+        }
+
         [Authorize]
         [HttpPost("{id}/appointments/cancel-scheduled")]
         public async Task<IActionResult> CancelAllScheduledAsync(CancellationToken cancellationToken, [FromRoute] long id)

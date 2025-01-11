@@ -42,6 +42,8 @@ namespace Dispo.Barber.Application.AppService.Interface
 
         Task StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
 
+        Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken);
+
         Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task CancelAllScheduledAsync(CancellationToken cancellationToken, long id);

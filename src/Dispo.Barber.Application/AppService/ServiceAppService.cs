@@ -22,7 +22,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<IList<ServiceListDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
+        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<IList<ServiceListDTO>> GetAllServicesList(CancellationToken cancellationToken)
+        public async Task<IList<ServiceInformationDTO>> GetAllServicesList(CancellationToken cancellationToken)
         {
             try
             {

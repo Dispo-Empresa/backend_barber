@@ -1,11 +1,7 @@
 ﻿using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using System.Text;
-using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.API.Hubs
 {

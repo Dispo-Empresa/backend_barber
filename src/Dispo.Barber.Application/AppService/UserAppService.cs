@@ -252,6 +252,19 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
+        public async Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.ChangeDeviceToken(cancellationToken, id, deviceToken));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
         public async Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
             try
