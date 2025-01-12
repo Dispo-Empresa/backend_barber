@@ -49,7 +49,7 @@ namespace Dispo.Barber.Application.AppService
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var appointments = await service.GetUserAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
-                    foreach (var appointment in appointments.Where(w => w.Date <= LocalTime.Now && w.Status == AppointmentStatus.Scheduled))
+                    foreach (var appointment in appointments.Where(w => w.Date <= LocalTime.Now && w.Status == AppointmentStatus.Scheduled).ToList())
                     {
                         var duration = appointment.Services.Select(w => w.Service).Sum(w => w.Duration);
                         if (appointment.Date.AddMinutes(duration) >= LocalTime.Now)
