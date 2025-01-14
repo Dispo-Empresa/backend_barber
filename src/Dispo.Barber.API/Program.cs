@@ -138,6 +138,7 @@ var config = new MapperConfiguration(cfg =>
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<AppointmentProfile>();
     cfg.AddProfile<CustomerProfile>();
+    cfg.AddProfile<ScheduleProfile>();
 });
 
 IMapper mapper = config.CreateMapper();
