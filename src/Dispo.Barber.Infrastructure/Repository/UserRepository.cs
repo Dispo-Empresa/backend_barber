@@ -54,7 +54,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest)
+            return await context.UserSchedules.Where(x => x.UserId == id)
                                               .ToListAsync();
         }
 
