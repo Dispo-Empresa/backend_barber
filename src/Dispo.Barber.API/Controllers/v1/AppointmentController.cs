@@ -72,5 +72,11 @@ namespace Dispo.Barber.API.Controllers.v1
             else return BadRequest();
         }
 
+        [HttpGet("schedules/conflicts")]
+        public async Task<IActionResult> GetScheduleConflictsAsync(CancellationToken cancellationToken, [FromQuery] long userId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var appointments = await appointmentAppService.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
+            return Ok(appointments);
+        }
     }
 }

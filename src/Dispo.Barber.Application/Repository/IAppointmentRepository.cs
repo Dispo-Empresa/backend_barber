@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.Entities;
+﻿using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.Entities;
 
 namespace Dispo.Barber.Application.Repository
 {
@@ -13,5 +14,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId);
 
         Task<bool> CancelAllScheduledAsync(CancellationToken cancellationToken, long userId);
+
+        Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate);
     }
 }

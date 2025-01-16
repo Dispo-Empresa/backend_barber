@@ -1,4 +1,6 @@
 ﻿using Dispo.Barber.Application.Repository;
+using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Utils;
@@ -75,6 +77,25 @@ namespace Dispo.Barber.Infrastructure.Repository
             return await context.Appointments
                 .Where(w => w.AcceptedUserId == userId && w.Status == AppointmentStatus.Scheduled)
                 .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            return await context.Appointments
+                .Where(w => w.AcceptedUserId == userId && w.Date >= startDate && w.Date <= endDate && w.Status == AppointmentStatus.Scheduled)
+                .Select(s => new AppointmentDetailDTO
+                {
+                    Id = s.Id,
+                    Date = s.Date,
+                    Status = s.Status,
+                    Customer = s.Customer.Name,
+                    Services = s.Services.Select(s => s.Service).Select(s => new ServiceDetailDTO
+                    {
+                        Id = s.Id,
+                        Description = s.Description,
+                    }).ToList()
+                })
+                .ToListAsync(cancellationToken);
         }
     }
 }

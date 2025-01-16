@@ -6,7 +6,6 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dispo.Barber.Application.Service
 {
@@ -86,6 +85,11 @@ namespace Dispo.Barber.Application.Service
         {
             await repository.CancelAllScheduledAsync(cancellationToken, userId);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
         }
     }
 }
