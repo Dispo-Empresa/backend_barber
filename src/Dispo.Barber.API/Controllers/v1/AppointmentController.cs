@@ -1,13 +1,11 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
-using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/appointments")]
     [ApiController]
@@ -70,10 +68,16 @@ namespace Dispo.Barber.API.Controllers
         public async Task<IActionResult> GenerateSuggestions()
         {
             if (await informationChatService.GetSuggestionAppointmentAsync())
-                return Ok("Sugestões geradas com sucesso."); 
+                return Ok("Sugestões geradas com sucesso.");
             else return BadRequest();
         }
 
+        [HttpGet("schedules/conflicts")]
+        public async Task<IActionResult> GetScheduleConflictsAsync(CancellationToken cancellationToken, [FromQuery] long userId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var appointments = await appointmentAppService.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
+            return Ok(appointments);
+        }
         [AllowAnonymous]
         [HttpGet("{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationByAppointmentId(CancellationToken cancellationToken, [FromRoute] long idAppointment)

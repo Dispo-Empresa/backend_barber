@@ -16,5 +16,9 @@ namespace Dispo.Barber.Application.Service.Interface
         Task CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date);
 
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId);
+
+        Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId);
+
+        Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate);
     }
 }

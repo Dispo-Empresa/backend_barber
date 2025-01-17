@@ -1,10 +1,23 @@
-﻿namespace Dispo.Barber.Domain.DTO.Schedule
+﻿using System.ComponentModel;
+
+namespace Dispo.Barber.Domain.DTO.Schedule
 {
     public class CreateScheduleDTO
     {
         public required DayOfWeek DayOfWeek { get; set; }
-        public required DateTime StartDate { get; set; }
-        public required DateTime EndDate { get; set; }
+
+        [DefaultValue("08:00 | null")]
+        public string? StartDate { get; set; }
+
+        [DefaultValue("18:00 | null")]
+        public string? EndDate { get; set; }
+
+        //[DefaultValue("14/01/2025 | null")]
+        public DateOnly StartDay { get; set; }
+
+        //[DefaultValue("25/01/2025 | null")]
+        public DateOnly EndDay { get; set; }
+
         public required bool IsRest { get; set; }
         public required bool DayOff { get; set; }
         public required long UserId { get; set; }

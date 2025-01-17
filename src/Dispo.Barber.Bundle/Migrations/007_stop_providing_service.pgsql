@@ -1,0 +1,2 @@
+ALTER TABLE public."UserServices" ADD COLUMN IF NOT EXISTS "ProvidesUntil" timestampt NULL;
+ALTER TABLE public."Services" ADD COLUMN IF NOT EXISTS "Status" INTEGER NOT NULL DEFAULT 0;

@@ -1,14 +1,11 @@
-﻿using System.Numerics;
-using System.Threading;
-using Dispo.Barber.Application.AppService;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/users")]
     [ApiController]
@@ -186,11 +183,42 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("{id}/appointments/cancel-by-date")]
         public async Task<IActionResult> CancelAllByDate(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] DateTime date)
         {
             await userAppService.CancelAllByDateAsync(cancellationToken, id, date);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPatch("{id}/services/{serviceId}/stop-providing")]
+        public async Task<IActionResult> StopProvidingService(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
+        {
+            await userAppService.StopProvidingServiceAsync(cancellationToken, id, serviceId);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPatch("{id}/services/{serviceId}/start-providing")]
+        public async Task<IActionResult> StartProvidingServiceAsync(CancellationToken cancellationToken, [FromRoute] long id, long serviceId)
+        {
+            await userAppService.StartProvidingServiceAsync(cancellationToken, id, serviceId);
+            return Ok();
+        }
+
+        [HttpPatch("{id}/device-token/{deviceToken}")]
+        public async Task<IActionResult> ChangeDeviceToken(CancellationToken cancellationToken, [FromRoute] long id, string deviceToken)
+        {
+            await userAppService.ChangeDeviceToken(cancellationToken, id, deviceToken);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("{id}/appointments/cancel-scheduled")]
+        public async Task<IActionResult> CancelAllScheduledAsync(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await userAppService.CancelAllScheduledAsync(cancellationToken, id);
             return Ok();
         }
     }

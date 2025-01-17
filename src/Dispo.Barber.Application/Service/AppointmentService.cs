@@ -80,5 +80,16 @@ namespace Dispo.Barber.Application.Service
         //{
         //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
         //}
+
+        public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
+        {
+            await repository.CancelAllScheduledAsync(cancellationToken, userId);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
+        }
     }
 }

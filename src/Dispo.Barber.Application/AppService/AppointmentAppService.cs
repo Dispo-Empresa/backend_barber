@@ -60,5 +60,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting appointments.");
+                throw;
+            }
+        }
     }
 }

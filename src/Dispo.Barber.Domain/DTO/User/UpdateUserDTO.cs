@@ -1,6 +1,4 @@
-﻿using Dispo.Barber.Domain.Enum;
-
-namespace Dispo.Barber.Domain.DTO.User
+﻿namespace Dispo.Barber.Domain.DTO.User
 {
     public class UpdateUserDTO
     {
@@ -8,5 +6,6 @@ namespace Dispo.Barber.Domain.DTO.User
         public string? Surname { get; set; }
         public string Phone { get; set; }
         public string? Password { get; set; }
+        public string? DeviceToken { get; set; }
     }
 }

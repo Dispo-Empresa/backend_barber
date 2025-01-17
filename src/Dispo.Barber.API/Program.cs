@@ -20,13 +20,22 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        //options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    }
 );
+
+builder.Services.AddSwaggerGenNewtonsoftSupport();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -107,6 +116,7 @@ builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 
@@ -128,6 +138,7 @@ var config = new MapperConfiguration(cfg =>
     cfg.AddProfile<UserProfile>();
     cfg.AddProfile<AppointmentProfile>();
     cfg.AddProfile<CustomerProfile>();
+    cfg.AddProfile<ScheduleProfile>();
 });
 
 IMapper mapper = config.CreateMapper();
@@ -167,6 +178,12 @@ using (var scope = app.Services.CreateScope())
     var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
     migrationManager.Migrate();
 }
+
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile(Environment.GetEnvironmentVariable("BARBER_FIREBASE_ACCOUNT"))
+});
 
 app.UseHttpsRedirection();
 

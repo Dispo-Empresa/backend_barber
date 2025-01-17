@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
-using Microsoft.AspNetCore.Mvc;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
@@ -23,7 +22,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<IList<ServiceListDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
+        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
         {
             try
             {
@@ -36,7 +35,7 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<IList<ServiceListDTO>> GetAllServicesList(CancellationToken cancellationToken)
+        public async Task<IList<ServiceInformationDTO>> GetAllServicesList(CancellationToken cancellationToken)
         {
             try
             {
@@ -57,9 +56,23 @@ namespace Dispo.Barber.Application.AppService
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Error getting services.");
+                logger.LogError(e, "Error updating service.");
                 throw;
             }
         }
+
+        public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ServiceStatus status)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.ChangeStatusAsync(cancellationToken, id, status));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error inactivating service.");
+                throw;
+            }
+        }
+
     }
 }

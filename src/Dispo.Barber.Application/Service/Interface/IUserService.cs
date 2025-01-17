@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.Service;
+﻿using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 
@@ -31,5 +32,13 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
 
         Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
+
+        Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
+
+        Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
+
+        Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken);
+
+        Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
     }
 }

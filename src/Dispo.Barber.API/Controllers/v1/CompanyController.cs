@@ -5,7 +5,7 @@ using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/companies")]
     [ApiController]

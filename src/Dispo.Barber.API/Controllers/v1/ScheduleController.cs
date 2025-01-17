@@ -3,13 +3,13 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/schedules")]
     [ApiController]
     public class ScheduleController(IScheduleAppService scheduleAppService) : ControllerBase
     {
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateScheduleDTO createScheduleDTO)
         {
@@ -17,7 +17,7 @@ namespace Dispo.Barber.API.Controllers
             return Ok();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(CancellationToken cancellationToken, [FromRoute] long id)
         {

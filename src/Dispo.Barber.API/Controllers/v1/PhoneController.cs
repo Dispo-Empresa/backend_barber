@@ -2,11 +2,11 @@
 using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/phone")]
     [ApiController]
-    public class PhoneController(ISmsService smsService): ControllerBase
+    public class PhoneController(ISmsService smsService) : ControllerBase
     {
         [HttpPost("{phone}")]
         public async Task<IActionResult> PostPhoneNumber(string phone)

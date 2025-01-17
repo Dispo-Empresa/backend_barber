@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTO.Customer;
+﻿using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.DTO.Customer;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
@@ -36,5 +37,15 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task CancelAllByDateAsync(CancellationToken cancellationToken, long id, DateTime date);
 
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long id);
+
+        Task StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
+
+        Task StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
+
+        Task ChangeDeviceToken(CancellationToken cancellationToken, long id, string deviceToken);
+
+        Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
+
+        Task CancelAllScheduledAsync(CancellationToken cancellationToken, long id);
     }
 }
