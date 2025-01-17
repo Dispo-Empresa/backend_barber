@@ -149,7 +149,7 @@ namespace Dispo.Barber.Application.Service
             }
             catch (Exception ex)
             {
-                throw new Exception("Ocorreu um erro ao obter os agendamentos do usuário.", ex);
+                throw new Exception($"Ocorreu um erro ao obter os agendamentos do usuário: {ex.Message}", ex);
             }
         }
 

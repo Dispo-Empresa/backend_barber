@@ -79,7 +79,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok(appointments);
         }
         [AllowAnonymous]
-        [HttpGet("{idAppointment}/information-appointment")]
+        [HttpPatch("{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationByAppointmentId(CancellationToken cancellationToken, [FromRoute] long idAppointment)
         {
             try
