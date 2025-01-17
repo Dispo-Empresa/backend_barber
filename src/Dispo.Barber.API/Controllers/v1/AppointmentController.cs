@@ -56,7 +56,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {
