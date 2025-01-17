@@ -672,6 +672,60 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
+        public async Task<InformationAppointmentChatDTO> GetInformationAppointmentChatByIdAppointment(CancellationToken cancellationToken, long idAppointment)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment);
 
+                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId);
+
+                    if (businessUnity == null)
+                    {
+                        throw new Exception($"Unidade de negocio não encontrada para esse agendamento {idAppointment}.");
+                    }
+
+                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId);
+
+                    if (customer == null)
+                    {
+                        throw new Exception($"Cliente não encontrada para esse agendamento {idAppointment}.");
+                    }
+
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId);
+
+                    if (company == null)
+                    {
+                        throw new Exception($"Empresa não encontrada para esse agendamento {idAppointment}.");
+                    }
+
+                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId);
+
+                    if (user == null)
+                    {
+                        throw new Exception($"Empresa não encontrada para esse agendamento {idAppointment}.");
+                    }
+
+                    var informationChat = new InformationAppointmentChatDTO
+                    {
+                        NameCompany = company.Name,
+                        IdUser = user.Id,
+                        NameUser = user.Name,
+                        NameCustomer  = customer.Name,
+                        DateAppointment = appointment.Date
+                    };
+
+                    return informationChat;
+
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao obter informações do chat para o agendamento com ID {idAppointment}.", ex);
+            }
+        }
     }
 }

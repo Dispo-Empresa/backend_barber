@@ -39,34 +39,25 @@ namespace Dispo.Barber.Application.Service
         }
 
 
-        public async Task<string> SendMessageAsync(string phoneNumber, string messageBody, string messageType)
+        public async void SendMessageAsync(string phoneNumberDestiny, string messageBody)
         {
             try
             {
-                phoneNumber = StringUtils.FormatPhoneNumber(phoneNumber);
+                phoneNumberDestiny = StringUtils.FormatPhoneNumber(phoneNumberDestiny);
 
                 TwilioClient.Init(_accountSid, _authToken);
 
-                var verificationCode = new Random().Next(1000, 9999).ToString();
+                string numberTwilio = _twilioPhoneNumber;
 
-                var fullMessageBody = string.IsNullOrEmpty(messageBody)
-                    ? $"Seu código de verificação é: {verificationCode}"
-                    : messageBody.Replace("{code}", verificationCode);
-
-                string typeMsg = messageType == MessageType.WhatsApp ? _twilioPhoneNumberWhats : _twilioPhoneNumber;
-                string toPhoneNumber = MessageType.ToPrefix(messageType) + phoneNumber;
-
-                var message = await MessageResource.CreateAsync(
-                    to: new PhoneNumber(toPhoneNumber),
-                    from: new PhoneNumber(typeMsg),
-                    body: fullMessageBody
+                await MessageResource.CreateAsync(
+                    to: new PhoneNumber(phoneNumberDestiny),
+                    from: new PhoneNumber(numberTwilio),
+                    body: messageBody
                 );
-
-                return verificationCode;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Erro ao enviar {messageType}.", ex);
+                throw new ApplicationException($"Erro ao enviar {messageBody}. Para o numero {phoneNumberDestiny}", ex);
             }
         }
 

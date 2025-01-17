@@ -74,5 +74,20 @@ namespace Dispo.Barber.API.Controllers
             else return BadRequest();
         }
 
+        [AllowAnonymous]
+        [HttpGet("{idAppointment}/information-appointment")]
+        public async Task<IActionResult> GetInformationByAppointmentId(CancellationToken cancellationToken, [FromRoute] long idAppointment)
+        {
+            try
+            {
+                var result = await informationChatService.GetInformationAppointmentChatByIdAppointment(cancellationToken, idAppointment);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro ao processar sua solicitação: {ex.Message}");
+            }
+        }
+
     }
 }
