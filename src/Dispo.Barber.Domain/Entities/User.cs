@@ -60,10 +60,10 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            var restingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && w.IsRest).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
+            var restingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && w.IsRest && (w.EndDate != null && w.StartDate != null)).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
             var summedRestingHours = BulkSumDates(restingHours);
 
-            var workingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && !w.IsRest).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
+            var workingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && !w.IsRest && (w.EndDate != null && w.StartDate != null)).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
             var summedWorkingHours = BulkSumDates(workingHours);
 
             var totalAppointmentDuration = Appointments.Where(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Select(s => s.Services.Sum(s => s.Service.Duration)).Sum();
