@@ -54,8 +54,20 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id)
-                                              .ToListAsync();
+            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest) // vamos fazer 3 metodos, um para obter os horarios da agenda, outro para folgas e outro para intervalos
+                                              .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<UserSchedule>> GetBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek)
+        {
+            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && !x.DayOff && x.DayOfWeek == dayOfWeek)
+                                              .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= DateOnly.FromDateTime(LocalTime.Now))
+                                              .ToListAsync(cancellationToken);
         }
 
         public async Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id)

@@ -15,6 +15,8 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task<List<Appointment>> GetUserAppointmentsAsync(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task<List<UserSchedule>> GetUserSchedulesAsync(CancellationToken cancellationToken, long id);
+        Task<List<UserSchedule>> GetUserBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek);
+        Task<List<UserSchedule>> GetUserDaysOffAsync(CancellationToken cancellationToken, long id);
 
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO);
 
