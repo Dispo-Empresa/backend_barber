@@ -66,7 +66,7 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= DateOnly.FromDateTime(LocalTime.Now))
+            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
                                               .ToListAsync(cancellationToken);
         }
 
