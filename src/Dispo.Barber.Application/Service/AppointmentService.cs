@@ -87,6 +87,12 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            await repository.CancelAllUserScheduledByDateAsync(cancellationToken, userId, startDate, endDate);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
         {
             return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);

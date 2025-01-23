@@ -234,5 +234,13 @@ namespace Dispo.Barber.API.Controllers.v1
             await userAppService.CancelAllScheduledAsync(cancellationToken, id);
             return Ok();
         }
+
+        [Authorize]
+        [HttpPost("{id}/appointments/cancel-scheduled-by-range-date")]
+        public async Task<IActionResult> CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] GetUserAppointmentsDTO request)
+        {
+            await userAppService.CancelAllUserScheduledByDateAsync(cancellationToken, id, request.StartDate ?? DateTime.Now, request.EndDate ?? DateTime.Now);
+            return Ok();
+        }
     }
 }

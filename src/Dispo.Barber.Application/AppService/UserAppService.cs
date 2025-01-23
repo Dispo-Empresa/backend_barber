@@ -316,5 +316,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long id, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllUserScheduledByDateAsync(cancellationToken, id, startDate, endDate));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error cancelling scheduled appointments.");
+                throw;
+            }
+        }
     }
 }

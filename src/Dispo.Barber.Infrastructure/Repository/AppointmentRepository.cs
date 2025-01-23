@@ -79,6 +79,13 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
         }
 
+        public async Task<bool> CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            return await context.Appointments
+                .Where(w => w.AcceptedUserId == userId && w.Date >= startDate && w.Date <= endDate && w.Status == AppointmentStatus.Scheduled)
+                .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
+        }
+
         public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
         {
             return await context.Appointments

@@ -49,5 +49,6 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task CancelAllScheduledAsync(CancellationToken cancellationToken, long id);
+        Task CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long id, DateTime startDate, DateTime endDate);
     }
 }
