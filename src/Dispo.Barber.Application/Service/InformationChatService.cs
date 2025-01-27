@@ -715,6 +715,7 @@ namespace Dispo.Barber.Application.Service
                         IdUser = user.Id,
                         NameUser = user.Name,
                         NameCustomer  = customer.Name,
+                        Phone = customer.Phone,
                         DateAppointment = appointment.Date
                     };
 

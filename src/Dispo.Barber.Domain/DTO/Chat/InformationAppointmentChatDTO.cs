@@ -13,6 +13,7 @@ namespace Dispo.Barber.Domain.DTO.Chat
         public long? IdUser { get; set; }
         public string NameUser { get; set; }
         public string NameCustomer { get; set; }
+        public string Phone { get; set; }
         public DateTime DateAppointment { get; set; }
     }
 }

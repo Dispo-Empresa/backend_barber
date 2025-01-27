@@ -1,5 +1,4 @@
 ﻿using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.API.Controllers.v1
@@ -20,7 +19,7 @@ namespace Dispo.Barber.API.Controllers.v1
 
                 smsService.SendMessageAsync(phone, fullMessageBody);
 
-                return Ok(new { message = "Código enviado com sucesso.", code = codeRandom });
+                return Ok(new { message = "Código enviado com sucesso." });
             }
             catch (Exception ex)
             {
