@@ -95,6 +95,16 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetValidDaysSchedulesAsync(cancellationToken, id);
         }
 
+        public async Task<List<UserSchedule>> GetUserBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek)
+        {
+            return await repository.GetBreaksAsync(cancellationToken, id, dayOfWeek);
+        }
+
+        public async Task<List<UserSchedule>> GetUserDaysOffAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetDaysOffAsync(cancellationToken, id);
+        }
+
         public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO)
         {
             var user = await repository.GetAsync(cancellationToken, id);

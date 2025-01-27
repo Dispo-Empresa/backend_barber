@@ -83,6 +83,32 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
+        public async Task<List<UserSchedule>> GetUserBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserBreaksAsync(cancellationToken, id, dayOfWeek));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user breaks.");
+                throw;
+            }
+        }
+
+        public async Task<List<UserSchedule>> GetUserDaysOffAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserDaysOffAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting user breaks.");
+                throw;
+            }
+        }
+
         public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO)
         {
             try
@@ -283,6 +309,19 @@ namespace Dispo.Barber.Application.AppService
             try
             {
                 await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllScheduledAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error cancelling scheduled appointments.");
+                throw;
+            }
+        }
+
+        public async Task CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long id, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await appointmentService.CancelAllUserScheduledByDateAsync(cancellationToken, id, startDate, endDate));
             }
             catch (Exception e)
             {

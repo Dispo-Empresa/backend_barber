@@ -79,23 +79,22 @@ namespace Dispo.Barber.Infrastructure.Repository
                 .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
         }
 
-        public async Task<List<AppointmentDetailDTO>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        public async Task<bool> CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
         {
             return await context.Appointments
                 .Where(w => w.AcceptedUserId == userId && w.Date >= startDate && w.Date <= endDate && w.Status == AppointmentStatus.Scheduled)
-                .Select(s => new AppointmentDetailDTO
-                {
-                    Id = s.Id,
-                    Date = s.Date,
-                    Status = s.Status,
-                    Customer = s.Customer.Name,
-                    Services = s.Services.Select(s => s.Service).Select(s => new ServiceDetailDTO
-                    {
-                        Id = s.Id,
-                        Description = s.Description,
-                    }).ToList()
-                })
-                .ToListAsync(cancellationToken);
+                .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
+        }
+
+        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
+        {
+            return await context.Appointments
+                                .Include(a => a.AcceptedUser)
+                                .Include("Services.Service.UserServices")
+                                .Include(a => a.Customer) // Incluímos os dados dos clientes
+                                .Where(w => w.AcceptedUserId == userId && w.Date >= startDate && w.Date <= endDate && w.Status == AppointmentStatus.Scheduled)
+                                .OrderBy(o => o.Date)
+                                .ToListAsync(cancellationToken);
         }
     }
 }

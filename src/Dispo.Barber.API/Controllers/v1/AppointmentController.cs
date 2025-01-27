@@ -78,6 +78,7 @@ namespace Dispo.Barber.API.Controllers.v1
             var appointments = await appointmentAppService.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
             return Ok(appointments);
         }
+
         [AllowAnonymous]
         [HttpPatch("{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationByAppointmentId(CancellationToken cancellationToken, [FromRoute] long idAppointment)

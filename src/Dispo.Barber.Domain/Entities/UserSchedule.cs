@@ -18,10 +18,10 @@ namespace Dispo.Barber.Domain.Entities
         }
 
         public DayOfWeek DayOfWeek { get; set; }
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
-        public DateOnly? StartDay { get; set; }
-        public DateOnly? EndDay { get; set; }
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+        public DateTime? StartDay { get; set; }
+        public DateTime? EndDay { get; set; }
         public bool IsRest { get; set; }
         public bool DayOff { get; set; }
 

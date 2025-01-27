@@ -12,6 +12,8 @@ namespace Dispo.Barber.Application.Repository
         Task<User> GetWithAppointmentsAsync(CancellationToken cancellationToken, long id);
 
         Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id);
+        Task<List<UserSchedule>> GetBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek);
+        Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id);
 
         Task<List<User>> GetUserByBusinessAsync(long businessId);
 

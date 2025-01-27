@@ -57,6 +57,19 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok(result);
         }
 
+        [HttpGet("{id}/breaks/{dayOfWeek}")]
+        public async Task<IActionResult> GetUserBreaks(CancellationToken cancellationToken, [FromRoute] long id, DayOfWeek dayOfWeek)
+        {
+            var result = await userAppService.GetUserBreaksAsync(cancellationToken, id, dayOfWeek);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/days-off")]
+        public async Task<IActionResult> GetUserDaysOff(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            var result = await userAppService.GetUserDaysOffAsync(cancellationToken, id);
+            return Ok(result);
+        }
 
         [Authorize]
         [HttpPatch("{id}/status")]
@@ -219,6 +232,14 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> CancelAllScheduledAsync(CancellationToken cancellationToken, [FromRoute] long id)
         {
             await userAppService.CancelAllScheduledAsync(cancellationToken, id);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("{id}/appointments/cancel-scheduled-by-range-date")]
+        public async Task<IActionResult> CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] GetUserAppointmentsDTO request)
+        {
+            await userAppService.CancelAllUserScheduledByDateAsync(cancellationToken, id, request.StartDate ?? DateTime.Now, request.EndDate ?? DateTime.Now);
             return Ok();
         }
     }
