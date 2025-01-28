@@ -23,6 +23,8 @@ using Serilog;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json.Converters;
+using Dispo.Barber.Domain.Utils.interfaces;
+using Dispo.Barber.Domain.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +85,8 @@ builder.Services.AddTransient<ISmsService, SmsService>(provider =>
     return new SmsService(twilioSettings.AccountSid, twilioSettings.AuthToken, twilioSettings.PhoneNumber, twilioSettings.PhoneNumberWhats);
 });
 
+builder.Services.AddMemoryCache();
+
 // Register repositories
 builder.Services.AddTransient<DbContext, ApplicationContext>();
 builder.Services.AddTransient<IAppointmentRepository, AppointmentRepository>();
@@ -94,6 +98,7 @@ builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
 builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
+builder.Services.AddTransient<ICacheManager, CacheManager>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();

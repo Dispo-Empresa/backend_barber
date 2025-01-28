@@ -38,8 +38,7 @@ namespace Dispo.Barber.Application.Service
             }
         }
 
-
-        public async void SendMessageAsync(string phoneNumberDestiny, string messageBody)
+        public async Task SendMessageAsync(string phoneNumberDestiny, string messageBody)
         {
             try
             {
@@ -57,7 +56,7 @@ namespace Dispo.Barber.Application.Service
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Erro ao enviar {messageBody}. Para o numero {phoneNumberDestiny}", ex);
+                throw new Exception($"Erro ao enviar {messageBody}. Para o numero {phoneNumberDestiny}. {ex.Message}");
             }
         }
 
