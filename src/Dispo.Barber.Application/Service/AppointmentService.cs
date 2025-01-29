@@ -97,5 +97,10 @@ namespace Dispo.Barber.Application.Service
         {
             return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
         }
+
+        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, TimeSpan startTime, TimeSpan endTime, DayOfWeek dayOfWeek)
+        {
+            return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek);
+        }
     }
 }
