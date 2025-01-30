@@ -102,7 +102,7 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("id-by-phone")]
         public async Task<IActionResult> GetUserIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
         {

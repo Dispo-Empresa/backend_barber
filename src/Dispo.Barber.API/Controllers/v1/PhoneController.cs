@@ -8,8 +8,8 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class PhoneController(ISmsService smsService, ICacheManager cache) : ControllerBase
     {
-        [HttpPost("{phone}")]
-        public async Task<IActionResult> GenerateSmsCode(string phone)
+        [HttpPost]
+        public async Task<IActionResult> GenerateSmsCode([FromBody] string phone)
         {
             try
             {
@@ -30,11 +30,13 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSmsCode(string phone, string sms)
+        public async Task<IActionResult> GetSmsCode([FromQuery] string phone, [FromQuery] string sms)
         {
             try
             {
                 var smsInCache = cache.Get(phone);
+
+                // Excluir o token do cache caso já está válido
 
                 if (smsInCache == null)
                 {
