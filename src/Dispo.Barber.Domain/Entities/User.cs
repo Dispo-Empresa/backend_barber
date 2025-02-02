@@ -60,7 +60,7 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            var restingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && w.IsRest && (w.EndDate != null && w.StartDate != null)).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
+            var restingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && w.IsRest && (!string.IsNullOrEmpty(w.EndDate) && !string.IsNullOrEmpty(w.StartDate))).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
             var summedRestingHours = BulkSumDates(restingHours);
 
             var workingHours = Schedules.Where(w => w.DayOfWeek == DateTime.Today.DayOfWeek && !w.IsRest && (w.EndDate != null && w.StartDate != null)).Select(s => GetDifference(s.EndDate, s.StartDate)).ToList();
