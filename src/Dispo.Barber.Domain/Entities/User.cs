@@ -15,6 +15,7 @@ namespace Dispo.Barber.Domain.Entities
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }
