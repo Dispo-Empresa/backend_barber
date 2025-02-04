@@ -21,11 +21,24 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task DeleteAsync(CancellationToken cancellationToken, long scheduleId)
+        public async Task DeleteAsync(CancellationToken cancellationToken, long id)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.DeleteAsync(cancellationToken, scheduleId));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.DeleteAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error deleting schedule.");
+                throw;
+            }
+        }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateScheduleDTO updateScheduleDTO)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UpdateAsync(cancellationToken, id, updateScheduleDTO));
             }
             catch (Exception e)
             {

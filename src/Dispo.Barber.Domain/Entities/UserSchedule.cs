@@ -24,6 +24,7 @@ namespace Dispo.Barber.Domain.Entities
         public DateTime? EndDay { get; set; }
         public bool IsRest { get; set; }
         public bool DayOff { get; set; }
+        public bool Enabled { get; set; }
 
         public long UserId { get; set; }
         public User User { get; set; }
