@@ -25,11 +25,11 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id)
+        public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateScheduleDTO updateScheduleDTO)
         {
-            await scheduleAppService.DeleteAsync(cancellationToken, id);
+            await scheduleAppService.UpdateAsync(cancellationToken, id, updateScheduleDTO);
             return Ok();
         }
     }

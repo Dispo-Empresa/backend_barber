@@ -7,5 +7,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task CreateAsync(CancellationToken cancellationToken, CreateScheduleDTO createScheduleDTO);
 
         Task DeleteAsync(CancellationToken cancellationToken, long scheduleId);
+
+        Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateScheduleDTO updateScheduleDTO);
     }
 }
