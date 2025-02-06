@@ -54,7 +54,8 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest) // vamos fazer 3 metodos, um para obter os horarios da agenda, outro para folgas e outro para intervalos
+            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest)
+                                              .OrderBy(o => o.DayOfWeek)
                                               .ToListAsync(cancellationToken);
         }
 
