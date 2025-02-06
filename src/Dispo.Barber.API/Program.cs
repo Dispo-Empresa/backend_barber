@@ -1,9 +1,9 @@
-using System.Globalization;
-using System;
+using System.Diagnostics;
 using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
+using Dispo.Barber.API.Middleware;
 using Dispo.Barber.API.Profiles;
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
@@ -14,11 +14,15 @@ using Dispo.Barber.Bundle.Entities;
 using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Repository;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -98,6 +102,7 @@ builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
 builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
+builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 
 // Register services
@@ -167,7 +172,41 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracerProviderBuilder =>
+    {
+        tracerProviderBuilder
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Dispo.Barber"))
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true)
+            .AddOtlpExporter(opts =>
+            {
+                opts.Endpoint = new Uri("http://172.19.234.142:4317"); // OTLP gRPC endpoint
+            });
+    });
+
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
+
+app.UseMiddleware<AuthorizationMiddleware>();
+
+app.Use(async (context, next) =>
+{
+    var activity = Activity.Current;
+
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        activity?.SetTag("error.message", ex.Message);
+        activity?.SetTag("error.stacktrace", ex.StackTrace);
+        activity?.SetTag("error.type", ex.GetType().Name);
+        throw;
+    }
+});
 
 app.UseSerilogRequestLogging();
 

@@ -2,9 +2,10 @@
 {
     public class AuthenticationResult
     {
-        public AuthenticationResult(string token, Entities.User user)
+        public AuthenticationResult(string token, string refreshToken, Entities.User user)
         {
             Token = token;
+            RefreshToken = refreshToken;
             UserId = user.Id;
             CompanyId = user.BusinessUnity?.CompanyId;
             BusinessUnityId = user.BusinessUnityId;
@@ -22,6 +23,7 @@
         }
 
         public string Token { get; set; }
+        public string RefreshToken { get; set; }
         public long UserId { get; set; }
         public long? CompanyId { get; set; }
         public long? BusinessUnityId { get; set; }

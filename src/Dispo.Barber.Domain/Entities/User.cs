@@ -20,6 +20,8 @@ namespace Dispo.Barber.Domain.Entities
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }
 
+        public Token? RefreshToken { get; set; }
+
         public IList<ServiceUser> ServicesUser { get; set; } = new List<ServiceUser>();
         public IList<Appointment> Appointments { get; set; } = new List<Appointment>();
         public IList<UserSchedule> Schedules { get; set; } = new List<UserSchedule>();

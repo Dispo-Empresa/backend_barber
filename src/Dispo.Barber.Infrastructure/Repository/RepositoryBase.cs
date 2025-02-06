@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections.Generic;
+using System.Linq.Expressions;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Infrastructure.Context;
@@ -66,10 +67,14 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .FirstOrDefaultAsync(expression, cancellationToken);
         }
 
-        public async Task<T> GetFirstAsync(CancellationToken cancellationToken, long id, string include)
+        public async Task<T> GetFirstAsync(CancellationToken cancellationToken, long id, string include = "")
         {
-            return await context.Set<T>().Include(include)
-                                .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+            if (!string.IsNullOrEmpty(include))
+            {
+                return await context.Set<T>().Include(include).FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+            }
+
+            return await context.Set<T>().FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
         }
     }
 }
