@@ -3,6 +3,7 @@ using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
@@ -74,11 +75,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, TimeSpan startTime, TimeSpan endTime, DayOfWeek dayOfWeek)
+        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, TimeSpan startTime, TimeSpan endTime, DayOfWeek dayOfWeek, bool isBreak)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek, isBreak));
             }
             catch (Exception e)
             {

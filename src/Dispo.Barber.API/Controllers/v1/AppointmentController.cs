@@ -80,12 +80,12 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         [HttpGet("schedules/conflicts-by-time")]
-        public async Task<IActionResult> GetScheduleConflictsAsync(CancellationToken cancellationToken, [FromQuery] long userId, [FromQuery] string startTime, [FromQuery] string endTime, [FromQuery] DayOfWeek dayOfWeek)
+        public async Task<IActionResult> GetScheduleConflictsAsync(CancellationToken cancellationToken, [FromQuery] long userId, [FromQuery] string startTime, [FromQuery] string endTime, [FromQuery] DayOfWeek dayOfWeek, [FromQuery] bool isBreak = false)
         {
             var start = TimeSpan.Parse(startTime);
             var end = TimeSpan.Parse(endTime);
 
-            var appointments = await appointmentAppService.GetScheduleConflictsAsync(cancellationToken, userId, start, end, dayOfWeek);
+            var appointments = await appointmentAppService.GetScheduleConflictsAsync(cancellationToken, userId, start, end, dayOfWeek, isBreak);
             return Ok(appointments);
         }
 

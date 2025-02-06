@@ -6,6 +6,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.Application.Service
 {
@@ -98,9 +99,10 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startDate, endDate);
         }
 
-        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, TimeSpan startTime, TimeSpan endTime, DayOfWeek dayOfWeek)
+        public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, TimeSpan startTime, TimeSpan endTime, DayOfWeek dayOfWeek, bool isBreak)
         {
-            return await repository.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek);
+            return isBreak ? await repository.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek)
+                           : await repository.GetScheduleConflictsByWeeklyPlanningAsync(cancellationToken, userId, startTime, endTime, dayOfWeek);
         }
     }
 }
