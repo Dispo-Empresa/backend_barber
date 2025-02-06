@@ -2,6 +2,7 @@
 using Dispo.Barber.Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Twilio.Http;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
@@ -14,6 +15,14 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> Get(CancellationToken cancellationToken, string phone, string password)
         {
             var jwt = await authAppService.AuthenticateAsync(cancellationToken, phone, password);
+            return Ok(jwt);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("refresh/{refreshToken}")]
+        public async Task<IActionResult> Get(CancellationToken cancellationToken, string refreshToken)
+        {
+            var jwt = await authAppService.RefreshAuthenticationToken(cancellationToken, refreshToken, Request.Headers.Authorization);
             return Ok(jwt);
         }
 

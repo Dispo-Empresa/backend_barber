@@ -121,7 +121,7 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
         }
     }
 
-    public async Task<T> QueryUnderTransactionAsync<T>(CancellationToken cancellationToken, Func<Task<T>> action, bool commit = false)
+    public async Task<T> QueryUnderTransactionAsync<T>(CancellationToken cancellationToken, Func<Task<T>> action, bool commit = false, bool ignoreRollback = false)
     {
         try
         {
@@ -132,14 +132,22 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
             {
                 await CommitAsync(cancellationToken);
             }
+
             return result;
         }
         catch
         {
+            if (commit && ignoreRollback)
+            {
+                await CommitAsync(cancellationToken);
+                throw;
+            }
+
             if (commit)
             {
                 await RollbackAsync(cancellationToken);
             }
+
             throw;
         }
         finally

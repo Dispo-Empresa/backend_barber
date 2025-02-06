@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
+﻿using System.Numerics;
+using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Authentication;
@@ -12,13 +13,26 @@ namespace Dispo.Barber.Application.AppService
         {
 			try
 			{
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.AuthenticateAsync(cancellationToken, phone, password));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.AuthenticateAsync(cancellationToken, phone, password), true);
             }
             catch (Exception e)
 			{
                 logger.LogError(e, "Error authenticating.");
                 throw;
 			}
+        }
+
+        public async Task<AuthenticationResult> RefreshAuthenticationToken(CancellationToken cancellationToken, string refreshToken, string currentJwt)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.RefreshAuthenticationToken(cancellationToken, refreshToken, currentJwt), true, true);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error refreshing token.");
+                throw;
+            }
         }
     }
 }

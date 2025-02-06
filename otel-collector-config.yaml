@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"  # Listen on all interfaces
+      http:
+        endpoint: "0.0.0.0:4318"  # Listen on all interfaces
+
+exporters:
+  otlphttp:
+    endpoint: "http://jaeger:4318"  # Jaeger's OTLP HTTP endpoint
+    tls:
+      insecure: true
+
+processors:
+  batch:
+
+extensions:
+  health_check:
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp]

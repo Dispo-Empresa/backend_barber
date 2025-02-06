@@ -34,5 +34,7 @@ namespace Dispo.Barber.Application.Repository
         Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
 
         Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
+
+        Task<User> GetByIdWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id);
     }
 }
