@@ -43,7 +43,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok(result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("{id}/appointments/next")]
         public async Task<IActionResult> GetUserAppointments(CancellationToken cancellationToken, [FromRoute] long id)
         {
