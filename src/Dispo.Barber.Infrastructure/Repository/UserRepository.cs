@@ -113,7 +113,8 @@ namespace Dispo.Barber.Infrastructure.Repository
                                           Name = s.Name,
                                           Phone = s.Phone,
                                           Photo = s.Photo,
-                                          Status = s.Status
+                                          Status = s.Status,
+                                          Link = s.Slug
                                       })
                                       .ToListAsync(cancellationToken);
         }

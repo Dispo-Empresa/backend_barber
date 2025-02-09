@@ -9,5 +9,6 @@ namespace Dispo.Barber.Domain.DTO.User
         public string Name { get; set; }
         public string Phone { get; set; }
         public UserStatus Status { get; set; }
+        public string Link { get; set; }
     }
 }
