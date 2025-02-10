@@ -219,8 +219,10 @@ if (app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
+#if DEBUG
     var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
     migrationManager.Migrate();
+#endif
 }
 
 
