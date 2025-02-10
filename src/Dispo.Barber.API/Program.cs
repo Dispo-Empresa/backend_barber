@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
@@ -12,6 +13,8 @@ using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Bundle.Entities;
 using Dispo.Barber.Bundle.Services;
+using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Repository;
 using FirebaseAdmin;
@@ -24,11 +27,6 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using Newtonsoft.Json.Converters;
-using Dispo.Barber.Domain.Utils.interfaces;
-using Dispo.Barber.Domain.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -198,6 +196,14 @@ app.Use(async (context, next) =>
     try
     {
         await next();
+    }
+    catch(UnauthorizedAccessException ex)
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+        activity?.SetTag("error.message", ex.Message);
+        activity?.SetTag("error.stacktrace", ex.StackTrace);
+        activity?.SetTag("error.type", ex.GetType().Name);
+        throw;
     }
     catch (Exception ex)
     {
