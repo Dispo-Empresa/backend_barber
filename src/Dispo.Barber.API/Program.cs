@@ -217,13 +217,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-#if DEBUG
-    var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
-    migrationManager.Migrate();
-#endif
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
+//    migrationManager.Migrate();
+//}
 
 
 FirebaseApp.Create(new AppOptions()
