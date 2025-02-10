@@ -16,14 +16,12 @@ jobs:
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login docker.pkg.github.com -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    - name: Build the Docker image
-      run: |
-        IMAGE_NAME="artu0s/barber_api"
-        TAG="latest"
-        docker build -t $IMAGE_NAME:$TAG -f src/Dockerfile .
-
-    - name: Push the Docker image
-      run: |
-        IMAGE_NAME="artu0s/barber_api"
-        TAG="latest"
-        docker push $IMAGE_NAME:$TAG
+    - name: Build and Push Docker Image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+        registry: docker.io
+        image: artu0s/barber_api
+        tags: latest
+        dockerfile: ./src/Dockerfile
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }
