@@ -22,6 +22,7 @@ jobs:
         registry: docker.io
         image: artu0s/barber_api
         tags: latest
+        directory: ./src
         dockerfile: ./src/Dockerfile
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
