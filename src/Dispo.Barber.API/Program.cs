@@ -179,7 +179,7 @@ builder.Services.AddOpenTelemetry()
             .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true)
             .AddOtlpExporter(opts =>
             {
-                opts.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTLP_ENDPOINT") ?? "");
+                opts.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTLP_ENDPOINT") ?? "http://172.19.234.142:4317");
             });
     });
 
