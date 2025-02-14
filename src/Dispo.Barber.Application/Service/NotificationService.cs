@@ -1,5 +1,6 @@
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.Service.Interface;
+using Dispo.Barber.Domain.Entities;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 
@@ -37,5 +38,36 @@ namespace Dispo.Barber.Application.Service
 
             logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
         }
+
+        public string GenerateCreateAppointmentMessageApp(Appointment appointment)
+        {
+            try
+            {
+                var clientName = appointment.Customer?.Name ?? "Cliente";
+                var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
+
+                return $"Olá! Um novo agendamento foi confirmado para o cliente {clientName} no dia {appointmentDate}. Consulte os detalhes no sistema.";
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Ocorreu um erro ao gerar a mensagem de confirmação de agendamento.", ex);
+            }
+        }
+
+        public string GenerateCancelAppointmentMessageApp(Appointment appointment)
+        {
+            try
+            {
+                var clientName = appointment.Customer?.Name ?? "Cliente";
+                var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
+
+                return $"Atenção! O agendamento do cliente {clientName}, marcado para o dia {appointmentDate}, foi cancelado. Consulte os detalhes no sistema.";
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Ocorreu um erro ao gerar a mensagem de cancelamento de agendamento.", ex);
+            }
+        }
+
     }
 }

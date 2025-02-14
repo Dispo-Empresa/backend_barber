@@ -6,6 +6,7 @@ namespace Dispo.Barber.Application.Service.Interface
     public interface ISmsService
     {
         Task SendMessageAsync(string phoneNumberDestiny, string messageBody);
-        string GenerateAppointmentMessage(Appointment appointment);
+        string GenerateCreateAppointmentMessageSms(Appointment appointment);
+        string GenerateCancelAppointmentMessageSms(Appointment appointment);
     }
 }

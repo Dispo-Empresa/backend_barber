@@ -22,7 +22,7 @@ namespace Dispo.Barber.Application.Service
             _twilioPhoneNumber = twilioPhoneNumber;
             _twilioPhoneNumberWhats = twilioPhoneNumberWhats;
         }
-        public string GenerateAppointmentMessage(Appointment appointment)
+        public string GenerateCreateAppointmentMessageSms(Appointment appointment)
         {
             try
             {
@@ -35,6 +35,22 @@ namespace Dispo.Barber.Application.Service
             catch (Exception ex)
             {
                 throw new Exception("Ocorreu um erro ao gerar a mensagem de confirmação de agendamento.", ex);
+            }
+        }
+
+        public string GenerateCancelAppointmentMessageSms(Appointment appointment)
+        {
+            try
+            {
+                var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
+
+                return $"Olá, {appointment.Customer.Name}. Seu agendamento para o dia {appointmentDate} foi cancelado. " +
+                       "Se isso foi um engano ou deseja reagendar, entre em contato conosco. " +
+                       "Estamos à disposição para ajudá-lo!";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao gerar a mensagem de cancelamento de agendamento.", ex);
             }
         }
 
