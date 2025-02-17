@@ -50,7 +50,7 @@ namespace Dispo.Barber.Application.Service
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Ocorreu um erro ao gerar a mensagem de confirmação de agendamento.", ex);
+                throw new Exception("Ocorreu um erro ao gerar a mensagem de confirmação de agendamento.");
             }
         }
 
@@ -65,7 +65,7 @@ namespace Dispo.Barber.Application.Service
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Ocorreu um erro ao gerar a mensagem de cancelamento de agendamento.", ex);
+                throw new Exception("Ocorreu um erro ao gerar a mensagem de cancelamento de agendamento.");
             }
         }
 

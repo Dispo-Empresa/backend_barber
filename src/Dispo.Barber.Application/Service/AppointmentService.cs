@@ -7,6 +7,7 @@ using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading;
 
 namespace Dispo.Barber.Application.Service
@@ -74,6 +75,17 @@ namespace Dispo.Barber.Application.Service
         {
             // TODO: Notificar clientes que tiveram os agendamentos cancelados.
             await repository.CancelAllByDateAsync(cancellationToken, userId, date);
+            var appointmentList = await repository.GetAppointmentByUserAndDateIdSync(cancellationToken, userId, date);
+            var notifiedCustomers = new HashSet<long>(); 
+
+            foreach (var appointment in appointmentList)
+            {
+                if (!notifiedCustomers.Contains(appointment.CustomerId)) 
+                {
+                    //await SendNotificationBySMS(appointment);
+                    notifiedCustomers.Add(appointment.CustomerId); 
+                }
+            }
             await repository.SaveChangesAsync(cancellationToken);
         }
 
@@ -82,15 +94,17 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetNextAppointmentsAsync(cancellationToken, userId);
         }
 
-        //private async Task SendNotificationBySMS(Appointment appointment)
-        //{
-        //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
-        //}
+        /*
+        private async Task SendNotificationBySMS(Appointment appointment)
+        {
+            smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
+        }
 
-        //private async Task SendNotificationByApp(CancellationToken cancellationToken,Appointment appointment, string tittle, string body)
-        //{
-        //    notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body);
-        //}
+        private async Task SendNotificationByApp(CancellationToken cancellationToken,Appointment appointment, string tittle, string body)
+        {
+            notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body);
+        }
+        */
 
         public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
         {

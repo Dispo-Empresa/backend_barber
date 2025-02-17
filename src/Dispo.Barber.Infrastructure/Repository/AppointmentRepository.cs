@@ -44,6 +44,7 @@ namespace Dispo.Barber.Infrastructure.Repository
             dateTimeSchedule = DateTime.SpecifyKind(dateTimeSchedule, DateTimeKind.Utc);
 
             var appointment = await context.Appointments
+                .Include(a => a.Customer)
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Service)
                 .Where(w => w.AcceptedUserId == userId
