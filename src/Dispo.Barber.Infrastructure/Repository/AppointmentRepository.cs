@@ -44,6 +44,7 @@ namespace Dispo.Barber.Infrastructure.Repository
             dateTimeSchedule = DateTime.SpecifyKind(dateTimeSchedule, DateTimeKind.Utc);
 
             var appointment = await context.Appointments
+                .Include(a => a.Customer)
                 .Include(a => a.Services)
                 .ThenInclude(s => s.Service)
                 .Where(w => w.AcceptedUserId == userId
@@ -127,6 +128,16 @@ namespace Dispo.Barber.Infrastructure.Repository
                                             w.Status == AppointmentStatus.Scheduled)
                                 .OrderBy(o => o.Date)
                                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Appointment> GetAppointmentByIdAsync(CancellationToken cancellationToken, long appointmentId)
+        {
+            return await context.Appointments
+                                .Include(a => a.AcceptedUser)
+                                .Include("Services.Service.UserServices")
+                                .Include(a => a.Customer)
+                                .Where(w => w.Id == appointmentId)
+                                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }
