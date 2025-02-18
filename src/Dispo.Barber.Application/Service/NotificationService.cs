@@ -1,6 +1,7 @@
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +25,7 @@ namespace Dispo.Barber.Application.Service
             logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
         }
 
-        public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body)
+        public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, NotificationType notificationType)
         {
             var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
             {
@@ -33,6 +34,10 @@ namespace Dispo.Barber.Application.Service
                 {
                     Title = title,
                     Body = body
+                },
+                Data = new Dictionary<string, string>()
+                {
+                    ["NotificationType"] = notificationType.ToString("d")
                 },
             }, cancellationToken);
 
@@ -46,7 +51,7 @@ namespace Dispo.Barber.Application.Service
                 var clientName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
-                return $"Olá! Um novo agendamento foi confirmado para o cliente {clientName} no dia {appointmentDate}. Consulte os detalhes no sistema.";
+                return $"Novo agendamento confirmado para o cliente {clientName} no dia {appointmentDate}.";
             }
             catch (Exception ex)
             {
@@ -61,7 +66,7 @@ namespace Dispo.Barber.Application.Service
                 var clientName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
-                return $"Atenção! O agendamento do cliente {clientName}, marcado para o dia {appointmentDate}, foi cancelado. Consulte os detalhes no sistema.";
+                return $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
             }
             catch (Exception ex)
             {

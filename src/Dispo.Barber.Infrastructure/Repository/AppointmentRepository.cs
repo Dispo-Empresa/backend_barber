@@ -129,5 +129,15 @@ namespace Dispo.Barber.Infrastructure.Repository
                                 .OrderBy(o => o.Date)
                                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<Appointment> GetAppointmentByIdAsync(CancellationToken cancellationToken, long appointmentId)
+        {
+            return await context.Appointments
+                                .Include(a => a.AcceptedUser)
+                                .Include("Services.Service.UserServices")
+                                .Include(a => a.Customer)
+                                .Where(w => w.Id == appointmentId)
+                                .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

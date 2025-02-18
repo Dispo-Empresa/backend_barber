@@ -12,11 +12,11 @@ using System.Threading;
 
 namespace Dispo.Barber.Application.Service
 {
-    public class AppointmentService(IMapper mapper, IAppointmentRepository repository, ICustomerRepository customerRepository, INotificationService notificationService) : IAppointmentService
+    public class AppointmentService(IMapper mapper, IAppointmentRepository repository, ICustomerRepository customerRepository, INotificationService notificationService, IUserRepository userRepository) : IAppointmentService
     {
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
         {
-            var appointment = await repository.GetAsync(cancellationToken, id);
+            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id);
 
             if (appointment is null)
             {
@@ -27,7 +27,7 @@ namespace Dispo.Barber.Application.Service
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCancelAppointmentMessageSms(appointment), MessageType.Sms);
-            //await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment));
+            await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
         }
 
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
@@ -41,15 +41,19 @@ namespace Dispo.Barber.Application.Service
             }
             else
             {
+                appointment.Customer.Name = appointment.Customer.Name;
                 appointment.Customer.Phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
             }
 
             appointment.Status = AppointmentStatus.Scheduled;
             await repository.AddAsync(cancellationToken, appointment);
             await repository.SaveChangesAsync(cancellationToken);
-            //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCreateAppointmentMessageSms(appointment), MessageType.Sms);
-            //await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment));
 
+            //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCreateAppointmentMessageSms(appointment), MessageType.Sms);
+
+            appointment.AcceptedUser = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
+            appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
+            await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
         }
 
         public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
@@ -94,17 +98,17 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetNextAppointmentsAsync(cancellationToken, userId);
         }
 
-        /*
-        private async Task SendNotificationBySMS(Appointment appointment)
-        {
-            smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
-        }
+        
+        //private async Task SendNotificationBySMS(Appointment appointment)
+        //{
+        //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
+        //}
 
-        private async Task SendNotificationByApp(CancellationToken cancellationToken,Appointment appointment, string tittle, string body)
+        private async Task SendNotificationByApp(CancellationToken cancellationToken,Appointment appointment, string tittle, string body, NotificationType notificationType)
         {
-            notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body);
+            await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
         }
-        */
+        
 
         public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
         {
