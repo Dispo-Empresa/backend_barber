@@ -49,11 +49,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
+        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool commit = true)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CancelAppointmentAsync(cancellationToken, id));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CancelAppointmentAsync(cancellationToken, id), commit);
             }
             catch (Exception e)
             {
