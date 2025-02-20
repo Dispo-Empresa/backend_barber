@@ -122,6 +122,19 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
+        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateOwnerUserAsync(cancellationToken, createUserDTO));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating owner user.");
+                throw;
+            }
+        }
+
         public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO)
         {
             try

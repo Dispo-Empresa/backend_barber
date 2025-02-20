@@ -27,6 +27,15 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
+        // MELHORAR
+
+        [HttpPost("create-owner-user")]
+        public async Task<IActionResult> CreateOwnerUser(CancellationToken cancellationToken, [FromBody] CreateUserDTO createUserDTO)
+        {
+            await userAppService.CreateOwnerUserAsync(cancellationToken, createUserDTO);
+            return Ok();
+        }
+
         [Authorize]
         [HttpPost("{id}/services")]
         public async Task<IActionResult> AddServiceToUser(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] AddServiceToUserDTO addServiceToUserDTO)

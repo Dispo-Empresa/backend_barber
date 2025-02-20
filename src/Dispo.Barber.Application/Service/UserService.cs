@@ -8,6 +8,7 @@ using Dispo.Barber.Domain.DTO.Appointment;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
 
@@ -140,6 +141,25 @@ namespace Dispo.Barber.Application.Service
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
+        {
+            var user = mapper.Map<User>(createUserDTO);
+
+            if (!string.IsNullOrEmpty(createUserDTO.Password))
+                user.Password = PasswordEncryptor.HashPassword(createUserDTO.Password);
+            
+            user.Schedules.AddRange(BuildNormalDays());
+            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+            user.Status = UserStatus.Active;
+            user.Role = UserRole.Manager;
+
+            await repository.AddAsync(cancellationToken, user);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            if (createUserDTO.Services != null && createUserDTO.Services.Any())
+                await AddServiceToUserAsync(cancellationToken, user.Id, createUserDTO.Services);
         }
 
         public async Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug)
