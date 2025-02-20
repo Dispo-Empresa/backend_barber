@@ -19,7 +19,7 @@ namespace Dispo.Barber.API.Middleware
             {
                 if (cache.Get<bool>(string.Format(BlacklistedJwtKey, context.Request.Headers.Authorization)))
                 {
-                    throw new UnauthorizedAccessException("Token expirado.");
+                    //throw new UnauthorizedAccessException("Token expirado.");
                 }
             }
 
