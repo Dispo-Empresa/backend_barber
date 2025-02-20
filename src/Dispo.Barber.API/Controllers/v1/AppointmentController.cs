@@ -104,5 +104,21 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost("reschedule")]
+        public async Task<IActionResult> Reschedule(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
+        {
+            try
+            {
+                await appointmentAppService.CancelAppointmentAsync(cancellationToken, 1, false);
+                createAppointmentDTO.Id = 0L;
+                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = $"Ocorreu um erro ao reagendar: {e.Message}"  });
+            }                 
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Dispo.Barber.API.Middleware
 {
@@ -19,7 +20,9 @@ namespace Dispo.Barber.API.Middleware
             {
                 if (cache.Get<bool>(string.Format(BlacklistedJwtKey, context.Request.Headers.Authorization)))
                 {
-                    //throw new UnauthorizedAccessException("Token expirado.");
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    await context.Response.CompleteAsync();
+                    return;
                 }
             }
 

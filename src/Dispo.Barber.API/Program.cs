@@ -197,14 +197,6 @@ app.Use(async (context, next) =>
     {
         await next();
     }
-    catch(UnauthorizedAccessException ex)
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-        activity?.SetTag("error.message", ex.Message);
-        activity?.SetTag("error.stacktrace", ex.StackTrace);
-        activity?.SetTag("error.type", ex.GetType().Name);
-        throw;
-    }
     catch (Exception ex)
     {
         activity?.SetTag("error.message", ex.Message);
