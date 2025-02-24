@@ -5,6 +5,7 @@ namespace Dispo.Barber.Domain.DTO.Appointment
 {
     public class CreateAppointmentDTO
     {
+        public long Id { get; set; }
         public DateTime Date { get; set; }
         public string? CustomerObservation { get; set; }
         public string? AcceptedUserObservation { get; set; }

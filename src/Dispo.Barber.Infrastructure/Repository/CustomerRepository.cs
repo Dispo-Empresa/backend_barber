@@ -45,17 +45,23 @@ namespace Dispo.Barber.Infrastructure.Repository
 
         public async Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId)
         {
-            return await context.Appointments.Include(i => i.AcceptedUser)
-                                      .Include(i => i.Customer)
-                                      .Where(w => w.AcceptedUserId == userId)
-                                      .Select(s => new CustomerDetailDTO
-                                      {
-                                          Id = s.Customer.Id,
-                                          Name = s.Customer.Name,
-                                          Phone = s.Customer.Phone,
-                                          LastAppointment = s.Date,
-                                      })
-                                      .ToListAsync();
+            return await context.Customers.GroupJoin(
+                                              context.Appointments.Where(a => a.AcceptedUserId == userId),
+                                              c => c.Id,
+                                              a => a.CustomerId,
+                                              (customer, appointments) => new
+                                              {
+                                                  Customer = customer,
+                                                  Appointments = appointments
+                                              })
+                                          .Select(s => new CustomerDetailDTO
+                                          {
+                                              Id = s.Customer.Id,
+                                              Name = s.Customer.Name,
+                                              Phone = s.Customer.Phone,
+                                              LastAppointment = s.Appointments.Any() ? s.Appointments.Max(m => m.Date) : (DateTime?)null
+                                          })
+                                          .ToListAsync();
         }
 
         public async Task<List<AppointmentDetailDTO>> GetCustomerAppointmentsAsync(CancellationToken cancellationToken, long id)

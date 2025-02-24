@@ -18,6 +18,7 @@ namespace Dispo.Barber.Application.Service.Interface
         Task<List<UserSchedule>> GetUserDaysOffAsync(CancellationToken cancellationToken, long id);
 
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO);
+        Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO);
 
         Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO);
 

@@ -2,7 +2,7 @@
 {
     public interface IUnitOfWork
     {
-        Task ExecuteUnderTransactionAsync(CancellationToken cancellationToken, Func<Task> action);
+        Task ExecuteUnderTransactionAsync(CancellationToken cancellationToken, Func<Task> action, bool commit = true);
         Task BeginTransactionAsync(CancellationToken cancellationToken);
         Task CommitAsync(CancellationToken cancellationToken);
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

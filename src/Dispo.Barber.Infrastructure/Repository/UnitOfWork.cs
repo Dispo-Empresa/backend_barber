@@ -100,7 +100,7 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
         _disposed = true;
     }
 
-    public async Task ExecuteUnderTransactionAsync(CancellationToken cancellationToken, Func<Task> action)
+    public async Task ExecuteUnderTransactionAsync(CancellationToken cancellationToken, Func<Task> action, bool commit = true)
     {
         try
         {
@@ -108,7 +108,8 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
 
             await action();
 
-            await CommitAsync(cancellationToken);
+            if (commit)
+                await CommitAsync(cancellationToken);
         }
         catch
         {
@@ -117,7 +118,8 @@ public class UnitOfWork(ApplicationContext context, IServiceProvider serviceProv
         }
         finally
         {
-            await DisposeTransactionAsync();
+            if (commit)
+                await DisposeTransactionAsync();
         }
     }
 

@@ -1,30 +1,15 @@
-﻿using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
+using Dispo.Barber.Domain.DTO.Customer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
+    [Authorize]
     [Route("api/v1/customers")]
     [ApiController]
-    public class CustomerController(ICustomerAppService customerAppService, ICustomerService customerService) : ControllerBase
+    public class CustomerController(ICustomerAppService customerAppService) : ControllerBase
     {
-
-        [AllowAnonymous]
-        [HttpGet("phone")]
-        public async Task<IActionResult> GetByPhone([FromQuery] string phone)
-        {
-            try
-            {
-                var result = await customerService.GetByPhoneAsync(phone);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Ocorreu um erro ao buscar o cliente.", error = ex.Message });
-            }
-
-        }
 
         [HttpGet("search/{search}")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] string search)
@@ -52,6 +37,13 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             var result = await customerAppService.GetCustomerAppointmentsAsync(cancellationToken, id);
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CustomerDTO customerDTO)
+        {
+            await customerAppService.CreateAsync(cancellationToken, customerDTO);
+            return Ok();
         }
     }
 }

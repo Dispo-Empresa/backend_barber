@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class CompanyController(ICompanyAppService companyAppService, IinformationChatService informationChatService) : ControllerBase
     {
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateCompanyDTO companyDTO)
         {

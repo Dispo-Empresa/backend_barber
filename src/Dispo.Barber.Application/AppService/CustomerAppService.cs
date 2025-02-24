@@ -61,5 +61,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task CreateAsync(CancellationToken cancellationToken, CustomerDTO customerDTO)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, customerDTO));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating customers.");
+                throw;
+            }
+        }
     }
 }
