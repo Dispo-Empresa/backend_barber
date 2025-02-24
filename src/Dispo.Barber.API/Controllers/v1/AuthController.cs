@@ -1,9 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Twilio.Http;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
