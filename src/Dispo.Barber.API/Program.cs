@@ -218,7 +218,6 @@ app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-#if DEBUG
 using (var scope = app.Services.CreateScope())
 {
     var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
@@ -230,7 +229,6 @@ FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile(Environment.GetEnvironmentVariable("BARBER_FIREBASE_ACCOUNT"))
 });
-#endif
 
 app.UseHttpsRedirection();
 
