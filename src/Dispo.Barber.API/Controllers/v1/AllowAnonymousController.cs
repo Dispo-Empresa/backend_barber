@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
-    [Route("api/v1/allowanonymous")]
+    [Route("api/v1/chat")]
     [ApiController]
     public class AllowAnonymousController(IinformationChatService informationChatService, ICustomerService customerService, ISmsService smsService, ICacheManager cache, IAppointmentAppService appointmentAppService) : ControllerBase
     {
