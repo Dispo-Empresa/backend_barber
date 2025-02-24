@@ -218,11 +218,13 @@ app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+# if DEBUG
 using (var scope = app.Services.CreateScope())
 {
     var migrationManager = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
     migrationManager.Migrate();
 }
+# endif
 
 
 FirebaseApp.Create(new AppOptions()
