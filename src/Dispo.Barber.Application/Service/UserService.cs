@@ -1,20 +1,23 @@
-﻿using System.ComponentModel.Design;
-using System.Data;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
+using Dispo.Barber.Domain.DTO.BusinessUnity;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
+using System.Data;
 
 namespace Dispo.Barber.Application.Service
 {
-    public class UserService(IMapper mapper, IUserRepository repository) : IUserService
+    public class UserService(IMapper mapper,
+                             IUserRepository repository,
+                             ICompanyService companyService,
+                             IBusinessUnityService businessUnityService,
+                             IServiceService serviceService) : IUserService
     {
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
@@ -143,25 +146,6 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
-        {
-            var user = mapper.Map<User>(createUserDTO);
-
-            if (!string.IsNullOrEmpty(createUserDTO.Password))
-                user.Password = PasswordEncryptor.HashPassword(createUserDTO.Password);
-            
-            user.Schedules.AddRange(BuildNormalDays());
-            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
-            user.Status = UserStatus.Active;
-            user.Role = UserRole.Manager;
-
-            await repository.AddAsync(cancellationToken, user);
-            await repository.SaveChangesAsync(cancellationToken);
-
-            if (createUserDTO.Services != null && createUserDTO.Services.Any())
-                await AddServiceToUserAsync(cancellationToken, user.Id, createUserDTO.Services);
-        }
-
         public async Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug)
         {
             return await repository.GetByCompanyAndUserSlugAsync(cancellationToken, companySlug, userSlug);
@@ -231,6 +215,87 @@ namespace Dispo.Barber.Application.Service
         public async Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO)
         {
             return await repository.GetAppointmentsAsyncV2(cancellationToken, id, getUserAppointmentsDTO);
+        }
+
+        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateOwnerUserDTO createOwnerUserDto)
+        {
+            var user = mapper.Map<User>(createOwnerUserDto);
+
+            if (!string.IsNullOrEmpty(createOwnerUserDto.Password))
+                user.Password = PasswordEncryptor.HashPassword(createOwnerUserDto.Password);
+
+            user.Schedules.AddRange(BuildNormalDays());
+            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+            user.Status = UserStatus.Active;
+            user.Role = UserRole.Manager;
+
+            await repository.AddAsync(cancellationToken, user);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task CreateEmployeeUserAsync(CancellationToken cancellationToken, CreateEmployeeUserDTO createEmployeeUser)
+        {
+            var user = mapper.Map<User>(createEmployeeUser);
+            user.Schedules.AddRange(BuildNormalDays());
+
+            await repository.AddAsync(cancellationToken, user);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            if (createEmployeeUser.Services != null && createEmployeeUser.Services.Any())
+                await AddServiceToUserAsync(cancellationToken, user.Id, createEmployeeUser.Services);
+        }
+
+        public async Task FinalizeEmployeeUserRegistrationAsync(CancellationToken cancellationToken, long id, FinalizeEmployeeUserDTO finalizeEmployeeUserDto)
+        {
+            var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+
+            if (!string.IsNullOrEmpty(finalizeEmployeeUserDto.Password))
+                user.Password = PasswordEncryptor.HashPassword(finalizeEmployeeUserDto.Password);
+
+            user.Name = finalizeEmployeeUserDto.Name;
+            user.Photo = finalizeEmployeeUserDto.Photo;
+            user.DeviceToken = finalizeEmployeeUserDto.DeviceToken;
+
+            repository.Update(user);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task CreateBarbershopSchemeAsync(CancellationToken cancellationToken, CreateBarbershopSchemeDto createBarbershopSchemeDto)
+        {
+            var createdCompanyId = await companyService.CreateAsync(cancellationToken, createBarbershopSchemeDto.Company);
+            var createdBusinessUnityId = await businessUnityService.CreateAsync(cancellationToken, new CreateBusinessUnityDTO
+            {
+                CompanyId = createdCompanyId,
+                Country = "",
+                City = "",
+                District = "",
+                CEP = "",
+                Street = ""
+            });
+
+            var user = mapper.Map<User>(createBarbershopSchemeDto.OwnerUser);
+
+            if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
+                user.Password = PasswordEncryptor.HashPassword(createBarbershopSchemeDto.OwnerUser.Password);
+
+            user.Schedules.AddRange(BuildNormalDays());
+            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+            user.Status = UserStatus.Active;
+            user.Role = UserRole.Manager;
+            user.BusinessUnityId = createdBusinessUnityId;
+
+            if (createBarbershopSchemeDto.Company.Services != null && createBarbershopSchemeDto.Company.Services.Count != 0)
+            {
+                var servicesList = await serviceService.GetServicesList(cancellationToken, createdCompanyId);
+                user.ServicesUser.AddRange(servicesList.Select(s => new ServiceUser
+                {
+                    UserId = user.Id,
+                    ServiceId = s.Id
+                }).ToList());
+            }
+
+            await repository.AddAsync(cancellationToken, user);
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private List<UserSchedule> BuildNormalDays() => [

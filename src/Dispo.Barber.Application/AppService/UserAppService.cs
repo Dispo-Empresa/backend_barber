@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Dispo.Barber.Application.AppService.Interface;
+﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Appointment;
@@ -14,7 +13,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppService
 {
-    public class UserAppService(ILogger<UserAppService> logger, IUnitOfWork unitOfWork, IUserService service, ICustomerService customerService, IAppointmentService appointmentService) : IUserAppService
+    public class UserAppService(ILogger<UserAppService> logger,
+                               IUnitOfWork unitOfWork,
+                               IUserService service,
+                               ICustomerService customerService,
+                               IAppointmentService appointmentService) : IUserAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
@@ -118,19 +121,6 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error updating user.");
-                throw;
-            }
-        }
-
-        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
-        {
-            try
-            {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateOwnerUserAsync(cancellationToken, createUserDTO));
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Error creating owner user.");
                 throw;
             }
         }
@@ -339,6 +329,58 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error cancelling scheduled appointments.");
+                throw;
+            }
+        }
+
+        public async Task CreateOwnerUserAsync(CancellationToken cancellationToken, CreateOwnerUserDTO createOwnerUserDto)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateOwnerUserAsync(cancellationToken, createOwnerUserDto));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating owner user.");
+                throw;
+            }
+        }
+
+        public async Task CreateEmployeeUserAsync(CancellationToken cancellationToken, CreateEmployeeUserDTO createEmployeeUser)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateEmployeeUserAsync(cancellationToken, createEmployeeUser));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating employee user.");
+                throw;
+            }
+        }
+
+        public async Task FinalizeEmployeeUserRegistrationAsync(CancellationToken cancellationToken, long id, FinalizeEmployeeUserDTO finalizeEmployeeUserDto)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.FinalizeEmployeeUserRegistrationAsync(cancellationToken, id, finalizeEmployeeUserDto));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error finalizing employee user.");
+                throw;
+            }
+        }
+
+        public async Task CreateBarbershopSchemeAsync(CancellationToken cancellationToken, CreateBarbershopSchemeDto createBarbershopSchemeDto)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateBarbershopSchemeAsync(cancellationToken, createBarbershopSchemeDto));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error creating owner user.");
                 throw;
             }
         }

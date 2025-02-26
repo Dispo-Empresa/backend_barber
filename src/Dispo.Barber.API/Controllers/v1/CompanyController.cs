@@ -1,7 +1,6 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Company;
-using Dispo.Barber.Domain.DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +10,7 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class CompanyController(ICompanyAppService companyAppService, IinformationChatService informationChatService) : ControllerBase
     {
-        //[Authorize]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateCompanyDTO companyDTO)
         {

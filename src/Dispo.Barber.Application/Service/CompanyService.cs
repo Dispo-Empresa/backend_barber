@@ -7,7 +7,11 @@ using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.Service
 {
-    public class CompanyService(IMapper mapper, ICompanyRepository repository, IServiceRepository serviceRepository, IBusinessUnityRepository businessUnityRepository) : ICompanyService
+    public class CompanyService(IMapper mapper,
+                                ICompanyRepository repository,
+                                IServiceRepository serviceRepository,
+                                IBusinessUnityRepository businessUnityRepository,
+                                IBusinessUnityService businessUnityService) : ICompanyService
     {
         public async Task<long> CreateAsync(CancellationToken cancellationToken, CreateCompanyDTO companyDTO)
         {
@@ -21,17 +25,6 @@ namespace Dispo.Barber.Application.Service
 
             await repository.AddAsync(cancellationToken, company);
             await repository.SaveChangesAsync(cancellationToken);
-
-            var businessUnity = new BusinessUnity();
-            businessUnity.Country = "";
-            businessUnity.City = "";
-            businessUnity.District = "";
-            businessUnity.CEP = "";
-            businessUnity.Street = "";
-            businessUnity.CompanyId = company.Id;
-
-            await businessUnityRepository.AddAsync(cancellationToken, businessUnity);
-            await businessUnityRepository.SaveChangesAsync(cancellationToken);
 
             return company.Id;
         }
