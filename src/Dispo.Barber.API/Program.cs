@@ -238,7 +238,7 @@ app.UseAuthorization();
 
 app.UseCors(x => x.AllowAnyHeader()
       .AllowAnyMethod()
-      .WithOrigins("http://localhost:7173", "http://localhost:3001", "http://localhost:3000", "http://localhost", "http://192.168.3.21:3000", "http://192.168.3.21"));
+      .WithOrigins("http://localhost:7173", "http://localhost:3001", "http://localhost:3000", "http://localhost", "http://192.168.3.21:3000", "http://192.168.3.21", "https://chat.dispo-api.online"));
 
 app.MapControllers();
 
