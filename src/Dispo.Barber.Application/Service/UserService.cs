@@ -9,6 +9,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Exception;
 using Dispo.Barber.Domain.Extension;
+using Dispo.Barber.Domain.Utils;
 using System.Data;
 
 namespace Dispo.Barber.Application.Service
@@ -75,7 +76,7 @@ namespace Dispo.Barber.Application.Service
                 // TODO: Completar.
             }
 
-            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+            //user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
 
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
@@ -89,9 +90,9 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
         }
 
-        public async Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone)
+        public async Task<long> GetUserPendingIdByPhoneAsync(CancellationToken cancellationToken, string phone)
         {
-            return await repository.GetIdByPhone(cancellationToken, phone);
+            return await repository.GetIdPendingByPhoneAsync(cancellationToken, phone);
         }
 
         public async Task<List<UserSchedule>> GetUserSchedulesAsync(CancellationToken cancellationToken, long id)
@@ -236,13 +237,26 @@ namespace Dispo.Barber.Application.Service
         public async Task CreateEmployeeUserAsync(CancellationToken cancellationToken, CreateEmployeeUserDTO createEmployeeUser)
         {
             var user = mapper.Map<User>(createEmployeeUser);
+            user.CreatedAt = LocalTime.Now;
             user.Schedules.AddRange(BuildNormalDays());
+            user.Name = "";
+            user.BusinessUnityId = createEmployeeUser.BusinessUnityId;
+            user.Role = createEmployeeUser.Role;
+            user.Status = UserStatus.Pending;
+            user.Slug = "";
+            user.DeviceToken = "";
+
+            if (createEmployeeUser.Services != null && createEmployeeUser.Services.Any())
+            {
+                user.ServicesUser.AddRange(createEmployeeUser.Services.Select(s => new ServiceUser
+                {
+                    UserId = user.Id,
+                    ServiceId = s
+                }).ToList());
+            }
 
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
-
-            if (createEmployeeUser.Services != null && createEmployeeUser.Services.Any())
-                await AddServiceToUserAsync(cancellationToken, user.Id, createEmployeeUser.Services);
         }
 
         public async Task FinalizeEmployeeUserRegistrationAsync(CancellationToken cancellationToken, long id, FinalizeEmployeeUserDTO finalizeEmployeeUserDto)
@@ -255,6 +269,8 @@ namespace Dispo.Barber.Application.Service
             user.Name = finalizeEmployeeUserDto.Name;
             user.Photo = finalizeEmployeeUserDto.Photo;
             user.DeviceToken = finalizeEmployeeUserDto.DeviceToken;
+            user.Status = UserStatus.Active;
+            user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
@@ -278,6 +294,7 @@ namespace Dispo.Barber.Application.Service
             if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
                 user.Password = PasswordEncryptor.HashPassword(createBarbershopSchemeDto.OwnerUser.Password);
 
+            user.CreatedAt = LocalTime.Now;
             user.Schedules.AddRange(BuildNormalDays());
             user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
             user.Status = UserStatus.Active;

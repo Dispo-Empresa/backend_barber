@@ -4,6 +4,7 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -78,9 +79,9 @@ namespace Dispo.Barber.Infrastructure.Repository
                                       .FirstOrDefaultAsync(w => w.Id == id);
         }
 
-        public async Task<long> GetIdByPhone(CancellationToken cancellationToken, string phone)
+        public async Task<long> GetIdPendingByPhoneAsync(CancellationToken cancellationToken, string phone)
         {
-            return await context.Users.Where(x => x.Phone == phone)
+            return await context.Users.Where(x => x.Phone == phone && x.Status == UserStatus.Pending)
                                       .Select(s => s.Id)
                                       .FirstOrDefaultAsync();
         }
@@ -210,6 +211,14 @@ namespace Dispo.Barber.Infrastructure.Repository
                 }).ToList()
             }).OrderBy(x => x.Date)
               .ToListAsync(cancellationToken);
+        }
+
+        public async Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Include(i => i.BusinessUnity)
+                                      .Where(x => x.Id == id)
+                                      .Select(s => s.BusinessUnity.CompanyId)
+                                      .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

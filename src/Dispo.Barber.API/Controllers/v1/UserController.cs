@@ -103,10 +103,10 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         //[Authorize]
-        [HttpGet("id-by-phone")]
-        public async Task<IActionResult> GetUserIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
+        [HttpGet("id-pending-by-phone")]
+        public async Task<IActionResult> GetUserPendingIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
         {
-            var result = await userAppService.GetUserIdByPhone(cancellationToken, phone);
+            var result = await userAppService.GetUserPendingIdByPhoneAsync(cancellationToken, phone);
             return Ok(result);
         }
 
@@ -241,6 +241,13 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             await userAppService.CancelAllUserScheduledByDateAsync(cancellationToken, id, request.StartDate ?? DateTime.Now, request.EndDate ?? DateTime.Now);
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}/company")]
+        public async Task<IActionResult> GetCompanyIdByIdAsync(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetCompanyIdByIdAsync(cancellationToken, id));
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Dispo.Barber.Application.Repository
 
         Task<List<User>> GetUserByBusinessAsync(long businessId);
 
-        Task<long> GetIdByPhone(CancellationToken cancellationToken, string phone);
+        Task<long> GetIdPendingByPhoneAsync(CancellationToken cancellationToken, string phone);
 
         Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone);
 
@@ -36,5 +36,7 @@ namespace Dispo.Barber.Application.Repository
         Task<List<AppointmentDetailDTO>> GetAppointmentsAsyncV2(CancellationToken cancellationToken, long id, GetUserAppointmentsDTO getUserAppointmentsDTO);
 
         Task<User> GetByIdWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id);
+
+        Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id);
     }
 }

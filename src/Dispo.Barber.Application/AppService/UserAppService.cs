@@ -17,7 +17,8 @@ namespace Dispo.Barber.Application.AppService
                                IUnitOfWork unitOfWork,
                                IUserService service,
                                ICustomerService customerService,
-                               IAppointmentService appointmentService) : IUserAppService
+                               IAppointmentService appointmentService,
+                               IUserRepository userRepository) : IUserAppService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
         {
@@ -151,11 +152,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<long> GetUserIdByPhone(CancellationToken cancellationToken, string phone)
+        public async Task<long> GetUserPendingIdByPhoneAsync(CancellationToken cancellationToken, string phone)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserIdByPhone(cancellationToken, phone));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserPendingIdByPhoneAsync(cancellationToken, phone));
             }
             catch (Exception e)
             {
@@ -381,6 +382,19 @@ namespace Dispo.Barber.Application.AppService
             catch (Exception e)
             {
                 logger.LogError(e, "Error creating owner user.");
+                throw;
+            }
+        }
+
+        public async Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await userRepository.GetCompanyIdByIdAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting companyId");
                 throw;
             }
         }

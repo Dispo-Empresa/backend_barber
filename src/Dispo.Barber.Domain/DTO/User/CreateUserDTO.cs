@@ -12,7 +12,7 @@ namespace Dispo.Barber.Domain.DTO.User
         public UserRole? Role { get; set; }
         public UserStatus? Status { get; set; }
         public bool? Active { get; set; } = true;
-        public string DeviceToken { get; set; }
+        public string? DeviceToken { get; set; }
         public List<long>? Services { get; set; }
     }
 }

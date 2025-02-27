@@ -13,13 +13,13 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             try
             {
-                var codeRandom = new Random().Next(1000, 9999).ToString();
-
-                var fullMessageBody = $"Seu código de verificação é: {codeRandom}";
-
-                await smsService.SendMessageAsync(phone, fullMessageBody);
-
-                cache.Add(phone, codeRandom);
+                // var codeRandom = new Random().Next(1000, 9999).ToString();
+                // 
+                // var fullMessageBody = $"Seu código de verificação é: {codeRandom}";
+                // 
+                // await smsService.SendMessageAsync(phone, fullMessageBody);
+                // 
+                // cache.Add(phone, codeRandom);
 
                 return Ok(new { message = "Código enviado com sucesso." });
             }
