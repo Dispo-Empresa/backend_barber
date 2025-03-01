@@ -2,6 +2,7 @@
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Chat;
 using Dispo.Barber.Domain.DTO.User;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -79,7 +80,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPatch("{id}/password")]
         public async Task<IActionResult> ChangePassword(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangePasswordDTO changePasswordDTO)
         {
@@ -103,10 +104,10 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         //[Authorize]
-        [HttpGet("id-pending-by-phone")]
-        public async Task<IActionResult> GetUserInfoPendingByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
+        [HttpGet("info-by-phone")]
+        public async Task<IActionResult> GetUserInfoPendingByPhone(CancellationToken cancellationToken, [FromQuery] string phone, [FromQuery] UserStatus status = UserStatus.Active)
         {
-            var result = await userAppService.GetUserInfoPendingByPhone(cancellationToken, phone);
+            var result = await userAppService.GetUserInfoByPhone(cancellationToken, phone, status);
             return Ok(result);
         }
 

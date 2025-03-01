@@ -90,9 +90,9 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
         }
 
-        public async Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone)
+        public async Task<UserDTO?> GetUserInfoByPhone(CancellationToken cancellationToken, string phone, UserStatus status = UserStatus.Active)
         {
-            return await repository.GetUserInfoPendingByPhone(cancellationToken, phone);
+            return await repository.GetUserInfoByPhone(cancellationToken, phone, status);
         }
 
         public async Task<List<UserSchedule>> GetUserSchedulesAsync(CancellationToken cancellationToken, long id)

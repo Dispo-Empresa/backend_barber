@@ -152,11 +152,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone)
+        public async Task<UserDTO?> GetUserInfoByPhone(CancellationToken cancellationToken, string phone, UserStatus status = UserStatus.Active)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserInfoPendingByPhone(cancellationToken, phone));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetUserInfoByPhone(cancellationToken, phone, status));
             }
             catch (Exception e)
             {

@@ -55,7 +55,7 @@ namespace Dispo.Barber.Application.Service
 
             if (company.BusinessUnities.Any())
             {
-                if (!string.IsNullOrEmpty(updateCompanyDTO.Name))
+                if (!string.IsNullOrEmpty(updateCompanyDTO.Phone))
                 {
                     var businessUnity = company.BusinessUnities.First();
                     businessUnity.Phone = updateCompanyDTO.Phone;

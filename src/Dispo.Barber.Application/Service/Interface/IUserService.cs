@@ -2,6 +2,7 @@
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 
 namespace Dispo.Barber.Application.Service.Interface
 {
@@ -16,7 +17,7 @@ namespace Dispo.Barber.Application.Service.Interface
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO);
         Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO);
         Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO);
-        Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone);
+        Task<UserDTO?> GetUserInfoByPhone(CancellationToken cancellationToken, string phone, UserStatus status = UserStatus.Active);
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
