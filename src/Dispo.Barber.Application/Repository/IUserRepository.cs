@@ -17,7 +17,7 @@ namespace Dispo.Barber.Application.Repository
 
         Task<List<User>> GetUserByBusinessAsync(long businessId);
 
-        Task<long> GetIdPendingByPhoneAsync(CancellationToken cancellationToken, string phone);
+        Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone);
 
         Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone);
 

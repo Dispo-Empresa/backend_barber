@@ -79,10 +79,17 @@ namespace Dispo.Barber.Infrastructure.Repository
                                       .FirstOrDefaultAsync(w => w.Id == id);
         }
 
-        public async Task<long> GetIdPendingByPhoneAsync(CancellationToken cancellationToken, string phone)
+        public async Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone)
         {
-            return await context.Users.Where(x => x.Phone == phone && x.Status == UserStatus.Pending)
-                                      .Select(s => s.Id)
+            return await context.Users.Include(i => i.BusinessUnity)
+                                      .ThenInclude(i => i.Company)
+                                      .Where(x => x.Phone == phone && x.Status == UserStatus.Pending)
+                                      .Select(s => new UserDTO
+                                      {
+                                          Id = s.Id,
+                                          CompanyId = s.BusinessUnity.CompanyId,
+                                          Role = s.Role,
+                                      })
                                       .FirstOrDefaultAsync();
         }
 

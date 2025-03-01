@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppService.Interface;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
+using Dispo.Barber.Domain.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,9 +36,9 @@ namespace Dispo.Barber.API.Controllers.v1
 
         //[Authorize] // VALIDAR
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromRoute] long id, [FromQuery] bool? activated, CancellationToken cancellationToken)
         {
-            var result = await serviceAppService.GetServicesList(cancellationToken, id);
+            var result = await serviceAppService.GetServicesList(cancellationToken, id, activated);
             return Ok(result);
         }
 

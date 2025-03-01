@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enum;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,12 +29,12 @@ namespace Dispo.Barber.Infrastructure.Repository
             return services; 
         }
 
-        public async Task<IList<Service>> GetServicesByCompanyAsync(long id, CancellationToken cancellationToken)
+        public async Task<IList<Service>> GetServicesByCompanyAsync(long id, bool? activated, CancellationToken cancellationToken)
         {
             return await context.CompanyServices
                                 .Include(i => i.Company)
                                 .Include(i => i.Service)
-                                .Where(x => x.CompanyId == id)
+                                .Where(x => x.CompanyId == id && (activated == null || x.Service.Status == ServiceStatus.Active))
                                 .Select(s => s.Service)
                                 .ToListAsync(cancellationToken);
         }

@@ -6,5 +6,6 @@
         public string Password { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public List<long>? EnabledServicesId { get; set; }
     }
 }

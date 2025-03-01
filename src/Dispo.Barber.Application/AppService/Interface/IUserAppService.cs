@@ -17,7 +17,7 @@ namespace Dispo.Barber.Application.AppService.Interface
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateUserDTO updateUserDTO);
         Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ChangeStatusDTO changeStatusDTO);
         Task ChangePasswordAsync(CancellationToken cancellationToken, long id, ChangePasswordDTO changePasswordDTO);
-        Task<long> GetUserPendingIdByPhoneAsync(CancellationToken cancellationToken, string phone);
+        Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone);
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
         Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId);

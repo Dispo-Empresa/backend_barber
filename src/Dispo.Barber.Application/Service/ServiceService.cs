@@ -16,9 +16,9 @@ namespace Dispo.Barber.Application.Service
             await repository.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
+        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId, bool? activated)
         {
-            var services = await repository.GetServicesByCompanyAsync(companyId, cancellationToken);
+            var services = await repository.GetServicesByCompanyAsync(companyId, activated, cancellationToken);
             return mapper.Map<IList<ServiceInformationDTO>>(services);
         }
 

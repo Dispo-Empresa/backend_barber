@@ -90,9 +90,9 @@ namespace Dispo.Barber.Application.Service
             return await repository.GetAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
         }
 
-        public async Task<long> GetUserPendingIdByPhoneAsync(CancellationToken cancellationToken, string phone)
+        public async Task<UserDTO?> GetUserInfoPendingByPhone(CancellationToken cancellationToken, string phone)
         {
-            return await repository.GetIdPendingByPhoneAsync(cancellationToken, phone);
+            return await repository.GetUserInfoPendingByPhone(cancellationToken, phone);
         }
 
         public async Task<List<UserSchedule>> GetUserSchedulesAsync(CancellationToken cancellationToken, long id)
@@ -237,8 +237,7 @@ namespace Dispo.Barber.Application.Service
         public async Task CreateEmployeeUserAsync(CancellationToken cancellationToken, CreateEmployeeUserDTO createEmployeeUser)
         {
             var user = mapper.Map<User>(createEmployeeUser);
-            user.CreatedAt = LocalTime.Now;
-            user.Schedules.AddRange(BuildNormalDays());
+            
             user.Name = "";
             user.BusinessUnityId = createEmployeeUser.BusinessUnityId;
             user.Role = createEmployeeUser.Role;
@@ -246,31 +245,33 @@ namespace Dispo.Barber.Application.Service
             user.Slug = "";
             user.DeviceToken = "";
 
-            if (createEmployeeUser.Services != null && createEmployeeUser.Services.Any())
-            {
-                user.ServicesUser.AddRange(createEmployeeUser.Services.Select(s => new ServiceUser
-                {
-                    UserId = user.Id,
-                    ServiceId = s
-                }).ToList());
-            }
-
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
         }
 
         public async Task FinalizeEmployeeUserRegistrationAsync(CancellationToken cancellationToken, long id, FinalizeEmployeeUserDTO finalizeEmployeeUserDto)
         {
-            var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+            var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
 
             if (!string.IsNullOrEmpty(finalizeEmployeeUserDto.Password))
                 user.Password = PasswordEncryptor.HashPassword(finalizeEmployeeUserDto.Password);
 
+            user.CreatedAt = LocalTime.Now;
+            user.Schedules.AddRange(BuildNormalDays());
             user.Name = finalizeEmployeeUserDto.Name;
             user.Photo = finalizeEmployeeUserDto.Photo;
             user.DeviceToken = finalizeEmployeeUserDto.DeviceToken;
             user.Status = UserStatus.Active;
             user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
+
+            if (finalizeEmployeeUserDto.EnabledServicesId != null && finalizeEmployeeUserDto.EnabledServicesId.Any())
+            {
+                user.ServicesUser.AddRange(finalizeEmployeeUserDto.EnabledServicesId.Select(serviceId => new ServiceUser
+                {
+                    UserId = id,
+                    ServiceId = serviceId
+                }).ToList());
+            }
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
@@ -303,7 +304,7 @@ namespace Dispo.Barber.Application.Service
 
             if (createBarbershopSchemeDto.Company.Services != null && createBarbershopSchemeDto.Company.Services.Count != 0)
             {
-                var servicesList = await serviceService.GetServicesList(cancellationToken, createdCompanyId);
+                var servicesList = await serviceService.GetServicesList(cancellationToken, createdCompanyId, null);
                 user.ServicesUser.AddRange(servicesList.Select(s => new ServiceUser
                 {
                     UserId = user.Id,

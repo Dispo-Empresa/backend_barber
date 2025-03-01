@@ -22,11 +22,11 @@ namespace Dispo.Barber.Application.AppService
             }
         }
 
-        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId)
+        public async Task<IList<ServiceInformationDTO>> GetServicesList(CancellationToken cancellationToken, long companyId, bool? activated)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetServicesList(cancellationToken, companyId));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetServicesList(cancellationToken, companyId, activated));
             }
             catch (Exception e)
             {

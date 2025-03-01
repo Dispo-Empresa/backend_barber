@@ -104,9 +104,9 @@ namespace Dispo.Barber.API.Controllers.v1
 
         //[Authorize]
         [HttpGet("id-pending-by-phone")]
-        public async Task<IActionResult> GetUserPendingIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
+        public async Task<IActionResult> GetUserInfoPendingByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
         {
-            var result = await userAppService.GetUserPendingIdByPhoneAsync(cancellationToken, phone);
+            var result = await userAppService.GetUserInfoPendingByPhone(cancellationToken, phone);
             return Ok(result);
         }
 

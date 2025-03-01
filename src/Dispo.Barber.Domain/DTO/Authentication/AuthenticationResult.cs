@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.DTO.Authentication
+﻿using Dispo.Barber.Domain.Enum;
+
+namespace Dispo.Barber.Domain.DTO.Authentication
 {
     public class AuthenticationResult
     {
@@ -16,6 +18,7 @@
             Slug = user.EntireSlug();
             Photo = user.Photo;
             DeviceToken = user.DeviceToken;
+            Role = user.Role;
         }
 
         public AuthenticationResult()
@@ -34,5 +37,6 @@
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public UserRole Role { get; set; }
     }
 }
