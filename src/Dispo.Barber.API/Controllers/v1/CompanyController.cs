@@ -1,6 +1,6 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.Company;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.Company;
+using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

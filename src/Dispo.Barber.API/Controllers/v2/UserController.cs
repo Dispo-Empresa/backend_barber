@@ -1,10 +1,9 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dispo.Barber.API.Controllers
+namespace Dispo.Barber.API.Controllers.v2
 {
     [Route("api/v2/users")]
     [ApiController]

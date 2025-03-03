@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using Dispo.Barber.Bundle.Services;
+using Dispo.Barber.Bundle.Entities;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dispo.Barber.Bundle.Entities
+namespace Dispo.Barber.Bundle.Services
 {
     public class MigrationFile
     {

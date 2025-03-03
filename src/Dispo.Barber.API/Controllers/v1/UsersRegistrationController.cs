@@ -1,5 +1,5 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +10,6 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class UsersRegistrationController(IUserAppService userAppService) : ControllerBase
     {
-        [AllowAnonymous]
-        [HttpPost("create-owner-user")]
-        public async Task<IActionResult> CreateOwnerUserAsync([FromBody] CreateOwnerUserDTO createOwnerUserDto, CancellationToken cancellationToken)
-        {
-            await userAppService.CreateOwnerUserAsync(cancellationToken, createOwnerUserDto);
-            return Ok();
-        }
-
         [HttpPost("create-employee-user")]
         public async Task<IActionResult> CreateEmployeeUserAsync([FromBody] CreateEmployeeUserDTO createEmployeeUser, CancellationToken cancellationToken)
         {

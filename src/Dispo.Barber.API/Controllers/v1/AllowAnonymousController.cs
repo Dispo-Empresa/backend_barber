@@ -1,9 +1,7 @@
-﻿using Dispo.Barber.Application.AppService;
-using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.Appointment;
-using Dispo.Barber.Domain.DTO.Chat;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.Appointment;
+using Dispo.Barber.Domain.DTOs.Chat;
+using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

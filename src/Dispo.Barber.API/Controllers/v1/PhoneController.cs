@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Application.Service.Interface;
+﻿using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Mvc;
 
