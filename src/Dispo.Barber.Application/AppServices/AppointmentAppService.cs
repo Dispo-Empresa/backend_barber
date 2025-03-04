@@ -22,11 +22,11 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers));
             }
             catch (Exception e)
             {
@@ -48,11 +48,11 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
-        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool commit = true)
+        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool commit = true, bool notifyUsers = false)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CancelAppointmentAsync(cancellationToken, id), commit);
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CancelAppointmentAsync(cancellationToken, id, notifyUsers), commit);
             }
             catch (Exception e)
             {

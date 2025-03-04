@@ -8,11 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
+    [AllowAnonymous]
     [Route("api/v1/chat")]
     [ApiController]
-    public class AllowAnonymousController(IinformationChatService informationChatService, ICustomerService customerService, ISmsService smsService, ICacheManager cache, IAppointmentAppService appointmentAppService) : ControllerBase
+    public class ChatController(IInformationChatService informationChatService, 
+                                ICustomerService customerService, 
+                                ISmsService smsService, 
+                                ICacheManager cache, 
+                                IAppointmentAppService appointmentAppService) : ControllerBase
     {
-        [AllowAnonymous]
         [HttpGet("companies/information/{id}")]
         public async Task<IActionResult> GetCompanyInformationById(CancellationToken cancellationToken, long id)
         {
@@ -27,7 +31,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("customers/phone")]
         public async Task<IActionResult> GetCustomerByPhone([FromQuery] string phone)
         {
@@ -42,7 +45,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("phone")]
         public async Task<IActionResult> GenerateSmsCode([FromBody] string phone)
         {
@@ -64,7 +66,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("phone")]
         public async Task<IActionResult> GetSmsCode([FromQuery] string phone, [FromQuery] string sms)
         {
@@ -87,7 +88,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("users/{id}/information")]
         public async Task<IActionResult> GetUserInformationById(CancellationToken cancellationToken, long id)
         {
@@ -102,7 +102,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("users/{idUser}/information-schedules")]
         public async Task<IActionResult> GetUserSchedulesInformationByUserId(CancellationToken cancellationToken, [FromRoute] long idUser)
         {
@@ -117,7 +116,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("users/information-get-available-slots")]
         public async Task<IActionResult> GetAvailableSlotsAsync(CancellationToken cancellationToken, [FromQuery] AvailableSlotRequestDto requestDto)
         {
@@ -148,23 +146,20 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("appointments")]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true);
             return Ok();
         }
 
-        [AllowAnonymous]
         [HttpPatch("appointments/{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {
-            await appointmentAppService.CancelAppointmentAsync(cancellationToken, id);
+            await appointmentAppService.CancelAppointmentAsync(cancellationToken, id, notifyUsers: true);
             return Ok();
         }
 
-        [AllowAnonymous]
         [HttpPatch("appointments/{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationAppointmentById(CancellationToken cancellationToken, [FromRoute] long idAppointment)
         {
@@ -179,7 +174,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("appointments/reschedule")]
         public async Task<IActionResult> Reschedule(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {

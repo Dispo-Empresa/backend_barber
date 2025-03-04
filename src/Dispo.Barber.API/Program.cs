@@ -112,7 +112,7 @@ builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
 builder.Services.AddScoped<IAuthAppService, AuthAppService>();
 
-builder.Services.AddScoped<IinformationChatService, InformationChatService>();
+builder.Services.AddScoped<IInformationChatService, InformationChatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();

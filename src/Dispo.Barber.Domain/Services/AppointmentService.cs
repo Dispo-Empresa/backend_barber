@@ -9,9 +9,13 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class AppointmentService(IMapper mapper, IAppointmentRepository repository, ICustomerRepository customerRepository, INotificationService notificationService, IUserRepository userRepository) : IAppointmentService
+    public class AppointmentService(IMapper mapper, 
+                                    IAppointmentRepository repository, 
+                                    ICustomerRepository customerRepository, 
+                                    INotificationService notificationService, 
+                                    IUserRepository userRepository) : IAppointmentService
     {
-        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id)
+        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
         {
             var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id);
 
@@ -24,10 +28,12 @@ namespace Dispo.Barber.Domain.Services
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCancelAppointmentMessageSms(appointment), MessageType.Sms);
-            await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
+
+            if (notifyUsers)
+                await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
         }
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
             var existingCustomer = await customerRepository.GetAsync(cancellationToken, createAppointmentDTO.Customer.Id.Value);
@@ -50,7 +56,9 @@ namespace Dispo.Barber.Domain.Services
 
             appointment.AcceptedUser = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
-            await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
+
+            if (notifyUsers)
+                await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
         }
 
         public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)

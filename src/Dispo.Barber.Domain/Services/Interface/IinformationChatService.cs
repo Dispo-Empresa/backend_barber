@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dispo.Barber.Domain.Services.Interface
 {
-    public interface IinformationChatService
+    public interface IInformationChatService
     {
         Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken, long idCompany);
         Task<InformationChatDTO> GetInformationChatByIdUser(CancellationToken cancellationToken, long idUser);

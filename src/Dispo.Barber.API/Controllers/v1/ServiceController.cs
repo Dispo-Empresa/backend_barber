@@ -8,7 +8,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/services")]
     [ApiController]
-    public class ServiceController(IServiceAppService serviceAppService, IinformationChatService informationChatService) : ControllerBase
+    public class ServiceController(IServiceAppService serviceAppService, IInformationChatService informationChatService) : ControllerBase
     {
         [Authorize]
         [HttpPost]

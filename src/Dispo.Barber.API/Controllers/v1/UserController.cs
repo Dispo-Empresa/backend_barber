@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/users")]
     [ApiController]
-    public class UserController(IUserAppService userAppService, IinformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
+    public class UserController(IUserAppService userAppService, IInformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
     {
         [Authorize]
         [HttpPost]

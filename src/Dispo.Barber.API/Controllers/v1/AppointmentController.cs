@@ -9,7 +9,8 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/appointments")]
     [ApiController]
-    public class AppointmentController(IAppointmentAppService appointmentAppService, IinformationChatService informationChatService) : ControllerBase
+    public class AppointmentController(IAppointmentAppService appointmentAppService, 
+                                       IInformationChatService informationChatService) : ControllerBase
     {
         [Authorize]
         [HttpGet("{id}")]

@@ -8,7 +8,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/companies")]
     [ApiController]
-    public class CompanyController(ICompanyAppService companyAppService, IinformationChatService informationChatService) : ControllerBase
+    public class CompanyController(ICompanyAppService companyAppService, IInformationChatService informationChatService) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost]

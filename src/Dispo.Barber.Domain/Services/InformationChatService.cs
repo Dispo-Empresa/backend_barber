@@ -14,7 +14,7 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper) : IinformationChatService
+    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper) : IInformationChatService
     {
         public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken, long companyId)
         {
