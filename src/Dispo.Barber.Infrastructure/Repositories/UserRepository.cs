@@ -140,6 +140,8 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                           Photo = s.Photo,
                                           Status = s.Status,
                                           Link = s.Slug,
+                                          CompanyId = s.BusinessUnity.CompanyId,
+                                          Role = s.Role,
                                           Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
                                           {
                                               StartDate = s.StartDate,

@@ -12,6 +12,8 @@ namespace Dispo.Barber.Domain.DTOs.User
         public string Phone { get; set; }
         public UserStatus Status { get; set; }
         public string Link { get; set; }
+        public long CompanyId { get; set; }
+        public UserRole Role { get; set; }
         public List<ScheduleDTO> Schedules { get; set; }
         public List<ServiceDetailDTO> Services { get; set; }
     }
