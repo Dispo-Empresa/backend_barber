@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Infrastructure.Context;
 
 namespace Dispo.Barber.Infrastructure.Repositories

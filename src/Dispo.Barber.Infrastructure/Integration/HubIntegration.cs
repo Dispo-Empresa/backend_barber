@@ -1,6 +1,6 @@
-﻿using Dispo.Barber.Application.Integration;
-using Dispo.Barber.Domain.DTO.Hub;
+﻿using Dispo.Barber.Domain.DTO.Hub;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Utils;
 using Newtonsoft.Json;
 using RestSharp;

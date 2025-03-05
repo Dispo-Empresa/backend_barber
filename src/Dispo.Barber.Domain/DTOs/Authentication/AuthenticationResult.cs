@@ -18,8 +18,8 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
             Slug = user.EntireSlug();
             Photo = user.Photo;
             DeviceToken = user.DeviceToken;
-            Role = user.Role;
             PlanType = planType;
+            Role = user.Role;
         }
 
         public AuthenticationResult()
@@ -38,7 +38,7 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
-        public UserRole Role { get; set; }
         public PlanType PlanType { get; set; }
+        public UserRole Role { get; set; }
     }
 }

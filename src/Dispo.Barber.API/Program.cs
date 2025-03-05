@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
@@ -5,14 +7,8 @@ using Dispo.Barber.API.Middleware;
 using Dispo.Barber.Application.AppServices;
 using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Application.Profiles;
-using Dispo.Barber.API.Profiles;
-using Dispo.Barber.Application.AppService;
-using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Integration;
-using Dispo.Barber.Application.Repository;
-using Dispo.Barber.Application.Service;
-using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Bundle.Services;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services;
 using Dispo.Barber.Domain.Services.Interface;
@@ -20,7 +16,6 @@ using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Integration;
-using Dispo.Barber.Infrastructure.Repository;
 using Dispo.Barber.Infrastructure.Repositories;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -32,8 +27,6 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
-using System.Diagnostics;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
