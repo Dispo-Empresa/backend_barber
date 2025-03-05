@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Domain.Enum;
+﻿using Dispo.Barber.Domain.Enums;
 
 namespace Dispo.Barber.Domain.DTO.User
 {

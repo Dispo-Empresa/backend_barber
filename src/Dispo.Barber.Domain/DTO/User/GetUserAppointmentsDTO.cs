@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using Newtonsoft.Json.Converters;
 
 namespace Dispo.Barber.Domain.DTO.User

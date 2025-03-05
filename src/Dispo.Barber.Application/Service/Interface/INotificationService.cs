@@ -1,5 +1,5 @@
 ﻿using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 
 namespace Dispo.Barber.Application.Service.Interface
 {

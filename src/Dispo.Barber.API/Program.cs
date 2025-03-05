@@ -8,14 +8,15 @@ using Dispo.Barber.API.Middleware;
 using Dispo.Barber.API.Profiles;
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
+using Dispo.Barber.Application.Integration;
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Bundle.Entities;
 using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
+using Dispo.Barber.Infrastructure.Integration;
 using Dispo.Barber.Infrastructure.Repository;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -102,6 +103,7 @@ builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
 builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
 builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
+builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();

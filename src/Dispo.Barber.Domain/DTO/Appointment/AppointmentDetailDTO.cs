@@ -1,5 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTO.Service;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 
 namespace Dispo.Barber.Domain.DTO.Appointment
 {

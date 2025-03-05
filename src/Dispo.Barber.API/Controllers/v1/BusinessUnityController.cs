@@ -23,5 +23,12 @@ namespace Dispo.Barber.API.Controllers.v1
             var result = await businessUnityAppService.GetPendingUsersAsync(cancellationToken, id);
             return Ok(result);
         }
+
+        [HttpGet("{id}/customers")]
+        public async Task<IActionResult> GetCustomers(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            var result = await businessUnityAppService.GetCustomersAsync(cancellationToken, id);
+            return Ok(result);
+        }
     }
 }

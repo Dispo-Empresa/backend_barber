@@ -1,5 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTO.Customer;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

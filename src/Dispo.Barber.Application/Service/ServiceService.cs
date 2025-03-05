@@ -2,7 +2,7 @@
 using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.DTO.Service;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exception;
 
 namespace Dispo.Barber.Application.Service

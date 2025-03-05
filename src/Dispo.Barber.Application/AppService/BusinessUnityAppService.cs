@@ -33,5 +33,18 @@ namespace Dispo.Barber.Application.AppService
                 throw;
             }
         }
+
+        public async Task<List<Customer>> GetCustomersAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetCustomersAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting pending users from business unity");
+                throw;
+            }
+        }
     }
 }

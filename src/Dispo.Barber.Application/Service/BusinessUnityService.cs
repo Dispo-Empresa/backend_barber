@@ -15,5 +15,10 @@ namespace Dispo.Barber.Application.Service
         {
             return await repository.GetUsersAsync(cancellationToken, id);
         }
+
+        public async Task<List<Customer>> GetCustomersAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetCustomersAsync(cancellationToken, id);
+        }
     }
 }

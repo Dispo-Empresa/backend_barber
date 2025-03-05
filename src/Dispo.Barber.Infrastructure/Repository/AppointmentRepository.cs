@@ -1,6 +1,6 @@
 ﻿using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;

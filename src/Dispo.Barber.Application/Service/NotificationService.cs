@@ -1,7 +1,7 @@
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 

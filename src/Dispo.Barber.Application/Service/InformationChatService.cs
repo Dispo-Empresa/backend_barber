@@ -10,7 +10,7 @@ using Dispo.Barber.Domain.DTO.Schedule;
 using Dispo.Barber.Domain.DTO.Service;
 using Dispo.Barber.Domain.DTO.User;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enum;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Utils;
 using System;

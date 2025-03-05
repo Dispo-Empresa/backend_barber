@@ -1,8 +1,10 @@
-﻿namespace Dispo.Barber.Domain.DTO.Authentication
+﻿using Dispo.Barber.Domain.Enums;
+
+namespace Dispo.Barber.Domain.DTO.Authentication
 {
     public class AuthenticationResult
     {
-        public AuthenticationResult(string token, string refreshToken, Entities.User user)
+        public AuthenticationResult(string token, string refreshToken, Entities.User user, PlanType planType)
         {
             Token = token;
             RefreshToken = refreshToken;
@@ -16,6 +18,7 @@
             Slug = user.EntireSlug();
             Photo = user.Photo;
             DeviceToken = user.DeviceToken;
+            PlanType = planType;
         }
 
         public AuthenticationResult()
@@ -34,5 +37,6 @@
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public PlanType PlanType { get; set; }
     }
 }

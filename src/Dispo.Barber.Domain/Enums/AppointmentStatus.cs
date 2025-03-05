@@ -1,4 +1,4 @@
-﻿namespace Dispo.Barber.Domain.Enum
+﻿namespace Dispo.Barber.Domain.Enums
 {
     public enum AppointmentStatus
     {
