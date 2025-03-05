@@ -1,7 +1,7 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.Appointment;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,8 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/appointments")]
     [ApiController]
-    public class AppointmentController(IAppointmentAppService appointmentAppService, IinformationChatService informationChatService) : ControllerBase
+    public class AppointmentController(IAppointmentAppService appointmentAppService, 
+                                       IInformationChatService informationChatService) : ControllerBase
     {
         [Authorize]
         [HttpGet("{id}")]

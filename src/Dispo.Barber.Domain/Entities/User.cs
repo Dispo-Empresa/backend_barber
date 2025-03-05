@@ -116,8 +116,7 @@ namespace Dispo.Barber.Domain.Entities
 
         public string EntireSlug()
         {
-            return Slug;
-            //return $"{BusinessUnity?.Company?.Slug}/{Slug}";
+            return $"{BusinessUnity?.Company?.Slug}/{Slug}";
         }
     }
 }

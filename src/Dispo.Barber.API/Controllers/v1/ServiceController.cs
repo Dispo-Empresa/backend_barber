@@ -1,6 +1,6 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.Service;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.Service;
+using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +8,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/services")]
     [ApiController]
-    public class ServiceController(IServiceAppService serviceAppService, IinformationChatService informationChatService) : ControllerBase
+    public class ServiceController(IServiceAppService serviceAppService, IInformationChatService informationChatService) : ControllerBase
     {
         [Authorize]
         [HttpPost]
@@ -35,9 +35,9 @@ namespace Dispo.Barber.API.Controllers.v1
 
         //[Authorize] // VALIDAR
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromRoute] long id, [FromQuery] bool? activated, CancellationToken cancellationToken)
         {
-            var result = await serviceAppService.GetServicesList(cancellationToken, id);
+            var result = await serviceAppService.GetServicesList(cancellationToken, id, activated);
             return Ok(result);
         }
 

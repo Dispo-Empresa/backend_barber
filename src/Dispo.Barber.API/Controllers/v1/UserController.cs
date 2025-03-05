@@ -1,7 +1,9 @@
-﻿using Dispo.Barber.Application.AppService.Interface;
-using Dispo.Barber.Application.Service.Interface;
-using Dispo.Barber.Domain.DTO.Chat;
-using Dispo.Barber.Domain.DTO.User;
+﻿using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Domain.DTOs.Chat;
+using Dispo.Barber.Domain.DTOs.User;
+using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Exceptions;
+using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +11,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/users")]
     [ApiController]
-    public class UserController(IUserAppService userAppService, IinformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
+    public class UserController(IUserAppService userAppService, IInformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
     {
         [Authorize]
         [HttpPost]
@@ -24,15 +26,6 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
             await userAppService.UpdateAsync(cancellationToken, id, updateUserDTO);
-            return Ok();
-        }
-
-        // MELHORAR
-
-        [HttpPost("create-owner-user")]
-        public async Task<IActionResult> CreateOwnerUser(CancellationToken cancellationToken, [FromBody] CreateUserDTO createUserDTO)
-        {
-            await userAppService.CreateOwnerUserAsync(cancellationToken, createUserDTO);
             return Ok();
         }
 
@@ -88,7 +81,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPatch("{id}/password")]
         public async Task<IActionResult> ChangePassword(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] ChangePasswordDTO changePasswordDTO)
         {
@@ -112,10 +105,10 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         //[Authorize]
-        [HttpGet("id-by-phone")]
-        public async Task<IActionResult> GetUserIdByPhone(CancellationToken cancellationToken, [FromQuery] string phone)
+        [HttpGet("info-by-phone")]
+        public async Task<IActionResult> GetUserInfoPendingByPhone(CancellationToken cancellationToken, [FromQuery] string phone, [FromQuery] UserStatus status = UserStatus.Active)
         {
-            var result = await userAppService.GetUserIdByPhone(cancellationToken, phone);
+            var result = await userAppService.GetUserInfoByPhone(cancellationToken, phone, status);
             return Ok(result);
         }
 
@@ -250,6 +243,13 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             await userAppService.CancelAllUserScheduledByDateAsync(cancellationToken, id, request.StartDate ?? DateTime.Now, request.EndDate ?? DateTime.Now);
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}/company")]
+        public async Task<IActionResult> GetCompanyIdByIdAsync(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetCompanyIdByIdAsync(cancellationToken, id));
         }
     }
 }

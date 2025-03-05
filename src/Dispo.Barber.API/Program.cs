@@ -1,10 +1,10 @@
-using System.Diagnostics;
-using System.Net;
-using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
 using Dispo.Barber.API.Middleware;
+using Dispo.Barber.Application.AppServices;
+using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Application.Profiles;
 using Dispo.Barber.API.Profiles;
 using Dispo.Barber.Application.AppService;
 using Dispo.Barber.Application.AppService.Interface;
@@ -13,11 +13,15 @@ using Dispo.Barber.Application.Repository;
 using Dispo.Barber.Application.Service;
 using Dispo.Barber.Application.Service.Interface;
 using Dispo.Barber.Bundle.Services;
+using Dispo.Barber.Domain.Repositories;
+using Dispo.Barber.Domain.Services;
+using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Integration;
 using Dispo.Barber.Infrastructure.Repository;
+using Dispo.Barber.Infrastructure.Repositories;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +32,8 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using System.Diagnostics;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,13 +117,13 @@ builder.Services.AddScoped<IUserAppService, UserAppService>();
 builder.Services.AddScoped<IAppointmentAppService, AppointmentAppService>();
 builder.Services.AddScoped<IDashboardAppService, DashboardAppService>();
 builder.Services.AddScoped<IServiceAppService, ServiceAppService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<IinformationChatService, InformationChatService>();
 builder.Services.AddScoped<ICustomerAppService, CustomerAppService>();
 builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
 builder.Services.AddScoped<IAuthAppService, AuthAppService>();
 
+builder.Services.AddScoped<IInformationChatService, InformationChatService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
@@ -240,7 +246,7 @@ app.UseAuthorization();
 
 app.UseCors(x => x.AllowAnyHeader()
       .AllowAnyMethod()
-      .WithOrigins("http://localhost:7173", "http://localhost:3001", "http://localhost:3000", "http://localhost", "http://192.168.3.21:3000", "http://192.168.3.21"));
+      .WithOrigins("http://localhost:7173", "http://localhost:3001", "http://localhost:3000", "http://localhost", "http://192.168.3.21:3000", "http://192.168.3.21", "https://chat.dispo-api.online", "https://aura.dispo-api.online"));
 
 app.MapControllers();
 
