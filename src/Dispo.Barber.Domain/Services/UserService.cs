@@ -19,7 +19,8 @@ namespace Dispo.Barber.Domain.Services
                              ICompanyService companyService,
                              IBusinessUnityService businessUnityService,
                              IServiceRepository serviceRepository,
-                             IBusinessUnityRepository businessUnityRepository) : IUserService
+                             IBusinessUnityRepository businessUnityRepository,
+                             ICompanyRepository companyRepository) : IUserService
     {
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
@@ -307,6 +308,11 @@ namespace Dispo.Barber.Domain.Services
             });
 
             var user = mapper.Map<User>(createBarbershopSchemeDto.OwnerUser);
+
+            if (await repository.ExistsAsync(cancellationToken, w => w.Phone == user.Phone))
+            {
+                throw new AlreadyExistsException("Usuário com o número já existe.");
+            }
 
             if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
                 user.Password = PasswordEncryptor.HashPassword(createBarbershopSchemeDto.OwnerUser.Password);

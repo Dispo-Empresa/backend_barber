@@ -22,5 +22,8 @@ namespace Dispo.Barber.Domain.Repositories
         Task<T> GetFirstAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
 
         Task<T> GetFirstAsync(CancellationToken cancellationToken, long id, string include = "");
+
+        Task<bool> ExistsAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
+
     }
 }

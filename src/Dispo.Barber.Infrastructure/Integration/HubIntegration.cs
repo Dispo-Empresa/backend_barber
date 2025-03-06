@@ -15,7 +15,7 @@ namespace Dispo.Barber.Infrastructure.Integration
             {
                 try
                 {
-                    return Convert.ToBoolean(Environment.GetEnvironmentVariable("OTLP_ENDPOINT"));
+                    return Convert.ToBoolean(Environment.GetEnvironmentVariable("HUB_INTEGRATION_ENABLED"));
                 }
                 catch (Exception)
                 {
