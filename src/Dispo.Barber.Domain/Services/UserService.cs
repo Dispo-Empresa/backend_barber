@@ -44,10 +44,9 @@ namespace Dispo.Barber.Domain.Services
         {
             var user = await repository.GetAsync(cancellationToken, id);
             if (user is null)
-            {
                 throw new NotFoundException("Usuário não encontrado.");
-            }
 
+            PasswordValidator.Validate(changePasswordDTO.Password);
             user.Password = PasswordEncryptor.HashPassword(changePasswordDTO.Password);
 
             repository.Update(user);
@@ -137,6 +136,7 @@ namespace Dispo.Barber.Domain.Services
 
             if (!string.IsNullOrEmpty(updateUserDTO.Password))
             {
+                PasswordValidator.Validate(updateUserDTO.Password);
                 user.Password = PasswordEncryptor.HashPassword(updateUserDTO.Password);
             }
 
@@ -225,7 +225,10 @@ namespace Dispo.Barber.Domain.Services
             var user = mapper.Map<User>(createOwnerUserDto);
 
             if (!string.IsNullOrEmpty(createOwnerUserDto.Password))
+            {
+                PasswordValidator.Validate(createOwnerUserDto.Password);
                 user.Password = PasswordEncryptor.HashPassword(createOwnerUserDto.Password);
+            }
 
             user.Schedules.AddRange(BuildNormalDays());
             user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
@@ -274,7 +277,10 @@ namespace Dispo.Barber.Domain.Services
             var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
 
             if (!string.IsNullOrEmpty(finalizeEmployeeUserDto.Password))
+            {
+                PasswordValidator.Validate(finalizeEmployeeUserDto.Password);
                 user.Password = PasswordEncryptor.HashPassword(finalizeEmployeeUserDto.Password);
+            }
 
             user.CreatedAt = LocalTime.Now;
             user.Schedules.AddRange(BuildNormalDays());
@@ -315,7 +321,10 @@ namespace Dispo.Barber.Domain.Services
             }
 
             if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
+            {
+                PasswordValidator.Validate(createBarbershopSchemeDto.OwnerUser.Password);
                 user.Password = PasswordEncryptor.HashPassword(createBarbershopSchemeDto.OwnerUser.Password);
+            }
 
             user.CreatedAt = LocalTime.Now;
             user.Schedules.AddRange(BuildNormalDays());
