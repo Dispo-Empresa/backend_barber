@@ -33,7 +33,8 @@ namespace Dispo.Barber.Infrastructure.Integration
                     return PlanType.BarberFree;
                 }
 
-                var options = new RestClientOptions($"https://localhost:7074/v1/licenses/{companyId}/plan");
+                var url = Environment.GetEnvironmentVariable("HUB_INTEGRATION_ENABLED");
+                var options = new RestClientOptions($"{url}/v1/licenses/{companyId}/plan");
                 var client = new RestClient(options);
                 var request = new RestRequest();
                 var response = await client.GetAsync(request, cancellationToken);
