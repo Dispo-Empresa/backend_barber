@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
@@ -6,12 +8,14 @@ using Dispo.Barber.Application.AppServices;
 using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Application.Profiles;
 using Dispo.Barber.Bundle.Services;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
+using Dispo.Barber.Infrastructure.Integration;
 using Dispo.Barber.Infrastructure.Repositories;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -23,8 +27,6 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
-using System.Diagnostics;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +102,7 @@ builder.Services.AddTransient<IServiceUserRepository, ServiceUserRepository>();
 builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentRepository>();
 builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
+builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();

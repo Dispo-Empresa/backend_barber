@@ -1,7 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTOs.Chat;
 using Dispo.Barber.Domain.DTOs.Schedule;
-using Dispo.Barber.Domain.Entities;
-using System.Threading.Tasks;
 
 namespace Dispo.Barber.Domain.Services.Interface
 {

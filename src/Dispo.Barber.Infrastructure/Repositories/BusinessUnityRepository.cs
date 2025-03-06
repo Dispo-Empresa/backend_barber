@@ -33,12 +33,21 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<long> GetIdByCompanyAsync(long companyId)
         {
-            var businessUnity = await context.BusinessUnities
+            return await context.BusinessUnities
                 .Where(w => w.CompanyId == companyId)
                 .Select(b => b.Id)
                 .FirstOrDefaultAsync();
+        }
 
-            return businessUnity;
+        public async Task<List<Customer>> GetCustomersAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.BusinessUnities
+                .Where(bu => bu.Id == id)
+                .SelectMany(bu => bu.Users)
+                    .SelectMany(u => u.Appointments)
+                        .Select(a => a.Customer)
+                            .Distinct()
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<long> GetCompanyIdAsync(CancellationToken cancellationToken, long id)
