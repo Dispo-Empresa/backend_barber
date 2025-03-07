@@ -4,6 +4,12 @@
     {
         public int Duration { get; set; }
         public long IdUser { get; set; }
-        public DateTime DateTimeSchedule { get; set; }
+        private DateTime _dateTimeSchedule;
+
+        public DateTime DateTimeSchedule
+        {
+            get => _dateTimeSchedule;
+            set => _dateTimeSchedule = DateTime.SpecifyKind(value, DateTimeKind.Utc).ToUniversalTime();
+        }
     }
 }
