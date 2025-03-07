@@ -4,13 +4,14 @@ namespace Dispo.Barber.Domain.Entities
 {
     public class UserSchedule : EntityBase
     {
-        public UserSchedule(DayOfWeek dayOfWeek, string start, string endDate, bool isRest, bool dayOff)
+        public UserSchedule(DayOfWeek dayOfWeek, string start, string endDate, bool isRest, bool dayOff, bool enabled)
         {
             DayOfWeek = dayOfWeek;
             StartDate = start;
             EndDate = endDate;
             IsRest = isRest;
             DayOff = dayOff;
+            Enabled = enabled;
         }
 
         public UserSchedule()

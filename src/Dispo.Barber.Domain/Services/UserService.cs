@@ -342,20 +342,26 @@ namespace Dispo.Barber.Domain.Services
         }
 
         private List<UserSchedule> BuildNormalDays() => [
-            new(DayOfWeek.Monday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Monday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Tuesday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Tuesday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Wednesday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Wednesday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Thursday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Thursday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Friday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Friday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Saturday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Saturday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Monday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Monday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Tuesday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Tuesday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Wednesday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Wednesday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Thursday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Thursday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Friday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Friday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Saturday, "08:00", "18:00", false, false, false),
+            new(DayOfWeek.Saturday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Sunday, "08:00", "18:00", false, false, false),
+            new(DayOfWeek.Sunday, "12:00", "13:30", true, false, true),
         ];
     }
 }

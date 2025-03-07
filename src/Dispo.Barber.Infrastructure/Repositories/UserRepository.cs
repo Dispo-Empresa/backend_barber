@@ -55,7 +55,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest)
+            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest && !x.DayOff)
                                               .OrderBy(o => o.DayOfWeek)
                                               .ToListAsync(cancellationToken);
         }
@@ -68,7 +68,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
+            return await context.UserSchedules.Where(x => x.UserId == id && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
                                               .ToListAsync(cancellationToken);
         }
 
