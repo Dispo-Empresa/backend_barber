@@ -138,13 +138,8 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpGet("information-get-available-slots")]
         public async Task<IActionResult> GetAvailableSlotsAsync(CancellationToken cancellationToken, [FromQuery] AvailableSlotRequestDto requestDto)
         {
-            return BadRequest($"DATA NORMAL: {requestDto.DateTimeSchedule} - DATA UTC: {requestDto.DateTimeSchedule.ToUniversalTime()}");
-
             try
             {
-                Console.WriteLine($"Raw Received DateTimeSchedule: {requestDto.DateTimeSchedule}");
-                Console.WriteLine($"Interpreted as UTC: {requestDto.DateTimeSchedule.ToUniversalTime()}");
-
                 var result = await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto);
 
                 return Ok(result);

@@ -164,7 +164,7 @@ namespace Dispo.Barber.Domain.Services
             var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
             DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
             var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
-            var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+            var dayIsEqual = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
             var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
             var availableSlots = InitializeAvailableSlots();
