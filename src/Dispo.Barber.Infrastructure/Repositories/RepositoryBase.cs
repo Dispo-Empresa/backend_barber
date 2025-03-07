@@ -75,5 +75,11 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
             return await context.Set<T>().FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
         }
+
+        public async Task<bool> ExistsAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression)
+        {
+            return await context.Set<T>()
+                .AnyAsync(expression, cancellationToken);
+        }
     }
 }
