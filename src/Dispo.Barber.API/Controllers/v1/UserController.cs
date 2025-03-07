@@ -140,6 +140,9 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             try
             {
+                Console.WriteLine($"Raw Received DateTimeSchedule: {requestDto.DateTimeSchedule}");
+                Console.WriteLine($"Interpreted as UTC: {requestDto.DateTimeSchedule.ToUniversalTime()}");
+
                 var result = await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto);
 
                 return Ok(result);
