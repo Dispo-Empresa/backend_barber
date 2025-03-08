@@ -3,6 +3,7 @@ using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Services.Interface;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -65,13 +66,16 @@ namespace Dispo.Barber.Domain.Services
                 var clientName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
-                return $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
+                string messageString = $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
+                byte[] messageBytes = Encoding.UTF8.GetBytes(messageString);
+                string mensagemUtf8 = Encoding.UTF8.GetString(messageBytes);
+
+                return mensagemUtf8;
             }
             catch (Exception ex)
             {
                 throw new Exception("Ocorreu um erro ao gerar a mensagem de cancelamento de agendamento.");
             }
         }
-
     }
 }
