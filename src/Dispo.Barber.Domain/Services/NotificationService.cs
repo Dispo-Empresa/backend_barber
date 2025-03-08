@@ -32,8 +32,8 @@ namespace Dispo.Barber.Domain.Services
                 Token = token,
                 Notification = new Notification()
                 {
-                    Title = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(title)),
-                    Body = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(body))
+                    Title = Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
+                    Body = Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
                 },
                 Data = new Dictionary<string, string>()
                 {
