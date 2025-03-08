@@ -4,7 +4,6 @@ using Dispo.Barber.Domain.Services.Interface;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.Domain.Services
 {
