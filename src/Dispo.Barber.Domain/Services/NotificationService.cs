@@ -63,7 +63,7 @@ namespace Dispo.Barber.Domain.Services
         {
             try
             {
-                var clientName = appointment.Customer?.Name ?? "Cliente";
+                var customerName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
                 return $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
