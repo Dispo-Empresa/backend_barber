@@ -4,6 +4,7 @@ using Dispo.Barber.Domain.Services.Interface;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -70,7 +71,7 @@ namespace Dispo.Barber.Domain.Services
                 byte[] messageBytes = Encoding.UTF8.GetBytes(messageString);
                 string mensagemUtf8 = Encoding.UTF8.GetString(messageBytes);
 
-                return mensagemUtf8;
+                return System.Text.Json.JsonSerializer.Serialize(mensagemUtf8);
             }
             catch (Exception ex)
             {
