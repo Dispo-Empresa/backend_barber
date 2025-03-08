@@ -32,8 +32,8 @@ namespace Dispo.Barber.Domain.Services
                 Token = token,
                 Notification = new Notification()
                 {
-                    Title = title,
-                    Body = body
+                    Title = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(title)),
+                    Body = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(body))
                 },
                 Data = new Dictionary<string, string>()
                 {
@@ -66,11 +66,7 @@ namespace Dispo.Barber.Domain.Services
                 var clientName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
-                string messageString = $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
-                byte[] messageBytes = Encoding.UTF8.GetBytes(messageString);
-                string mensagemUtf8 = Encoding.UTF8.GetString(messageBytes);
-
-                return System.Text.Json.JsonSerializer.Serialize(mensagemUtf8);
+                return $"Atenção! {clientName} cancelou o agendamento marcado para o dia {appointmentDate}.";
             }
             catch (Exception ex)
             {
