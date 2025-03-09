@@ -229,5 +229,12 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                       .Select(s => s.BusinessUnity.CompanyId)
                                       .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<long> GetBusinessUnityIdByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Where(x => x.Id == id)
+                                      .Select(s => s.BusinessUnityId.Value)
+                                      .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

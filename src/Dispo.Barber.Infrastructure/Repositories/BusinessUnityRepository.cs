@@ -23,13 +23,6 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<User>> GetPendingUsersAsync(CancellationToken cancellationToken, long id)
-        {
-            return await context.BusinessUnities.Where(w => w.Id == id)
-                                .Include(i => i.Users)
-                                .SelectMany(s => s.Users.Where(x => x.Status == UserStatus.Pending))
-                                .ToListAsync(cancellationToken);
-        }
 
         public async Task<long> GetIdByCompanyAsync(long companyId)
         {
