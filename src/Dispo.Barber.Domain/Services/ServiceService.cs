@@ -5,14 +5,23 @@ using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Utils;
+using Microsoft.AspNetCore.Http;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class ServiceService(IMapper mapper, IServiceRepository repository, ICompanyRepository companyRepository, IBusinessUnityRepository businessUnityRepository, IUserRepository userRepository) : IServiceService
+    public class ServiceService(IMapper mapper, 
+                                IServiceRepository repository, 
+                                ICompanyRepository companyRepository, 
+                                IBusinessUnityRepository businessUnityRepository, 
+                                IUserRepository userRepository,
+                                INotificationService notificationService,
+                                IHttpContextAccessor _httpContextAccessor) : IServiceService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO)
         {
             var service = mapper.Map<Service>(createServiceDTO);
+            var loggedUserId = long.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
             await repository.AddAsync(cancellationToken, service);
             await repository.SaveChangesAsync(cancellationToken);
 
@@ -37,11 +46,15 @@ namespace Dispo.Barber.Domain.Services
                     user.ServicesUser.Add(new ServiceUser
                     {
                         UserId = user.Id,
-                        ServiceId = service.Id
+                        ServiceId = service.Id,
+                        ProvidesUntil = createServiceDTO.AutoEnableToUsers ? null : LocalTime.Now
                     });
 
                     userRepository.Update(user);
                     await userRepository.SaveChangesAsync(cancellationToken);
+
+                    if (user.Id != loggedUserId)
+                        await notificationService.NotifyAsync(cancellationToken, user.DeviceToken, "Novo serviço!", $"O serviço {createServiceDTO.Description} foi adicionado na barbearia!", NotificationType.NewService);
                 }
             }
         }
