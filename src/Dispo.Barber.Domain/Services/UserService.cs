@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.BusinessUnity;
 using Dispo.Barber.Domain.DTOs.Service;
@@ -10,7 +11,6 @@ using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
-using System.Data;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -20,7 +20,7 @@ namespace Dispo.Barber.Domain.Services
                              IBusinessUnityService businessUnityService,
                              IServiceRepository serviceRepository,
                              IBusinessUnityRepository businessUnityRepository,
-                             ICompanyRepository companyRepository) : IUserService
+                             IBlacklistService blacklistService) : IUserService
     {
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
@@ -65,6 +65,11 @@ namespace Dispo.Barber.Domain.Services
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
+
+            if (user.Status == UserStatus.Inactive)
+            {
+                blacklistService.PutInBlacklist(id);
+            }
         }
 
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
