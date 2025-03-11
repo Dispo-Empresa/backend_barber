@@ -48,5 +48,10 @@ namespace Dispo.Barber.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<ServiceUser> GetByUserIdAndServiceId(CancellationToken cancellationToken, long userId, long serviceId)
+        {
+            return await context.UserServices.Where(w => w.UserId == userId && w.ServiceId == serviceId)
+                                             .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

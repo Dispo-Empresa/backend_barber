@@ -129,7 +129,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBlacklistService, BlacklistService>();
 
 builder.Services.AddScoped<IMigrationManager, MigrationManager>();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Database connection

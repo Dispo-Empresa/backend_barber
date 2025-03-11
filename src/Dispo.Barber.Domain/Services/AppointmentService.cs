@@ -114,7 +114,6 @@ namespace Dispo.Barber.Domain.Services
             await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
         }
 
-
         public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
         {
             await repository.CancelAllScheduledAsync(cancellationToken, userId);
