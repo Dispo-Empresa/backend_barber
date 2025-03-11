@@ -73,6 +73,11 @@ namespace Dispo.Barber.Domain.Services
             }
 
             var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId) ?? throw new NotFoundException("Usuário não encontrado.");
+            if (user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("Usuário não está ativo.");
+            }
+
             blacklistService.PutInBlacklist(currentJwt);
             var planType = await hubIntegration.GetPlanType(cancellationToken, user.BusinessUnity.CompanyId);
             return BuildAuthenticationResult(user, refreshToken, planType);
