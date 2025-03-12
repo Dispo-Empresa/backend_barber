@@ -49,7 +49,8 @@ namespace Dispo.Barber.Infrastructure.Repositories
                 .ThenInclude(s => s.Service)
                 .Where(w => w.AcceptedUserId == userId
                             && w.Date.Date == dateTimeSchedule.Date
-                            && w.Status != AppointmentStatus.Completed)
+                            && w.Status != AppointmentStatus.Completed
+                            && w.Status != AppointmentStatus.Canceled)
                 .ToListAsync(cancellationToken);
 
             return appointment;
