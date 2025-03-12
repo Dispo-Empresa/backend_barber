@@ -96,7 +96,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
         public async Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone)
         {
             return await context.Users.Include(i => i.BusinessUnity).ThenInclude(i => i.Company).Include(i => i.RefreshToken)
-                                      .FirstOrDefaultAsync(w => w.Phone == phone);
+                                      .FirstOrDefaultAsync(w => w.Phone == phone && w.Status == UserStatus.Active);
         }
 
         public async Task<User> GetByIdWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
