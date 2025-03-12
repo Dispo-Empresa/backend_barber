@@ -42,7 +42,7 @@ namespace Dispo.Barber.Domain.Services
                 throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
             }
 
-            var existingCustomer = await customerRepository.GetAsync(cancellationToken, createAppointmentDTO.Customer.Id.Value);
+            var existingCustomer = await customerRepository.GetFirstAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
             if (existingCustomer != null)
             {
                 appointment.Customer = null;
