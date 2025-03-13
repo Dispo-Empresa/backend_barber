@@ -5,14 +5,24 @@ using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Utils;
+using Microsoft.AspNetCore.Http;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class ServiceService(IMapper mapper, IServiceRepository repository, ICompanyRepository companyRepository, IBusinessUnityRepository businessUnityRepository, IUserRepository userRepository) : IServiceService
+    public class ServiceService(IMapper mapper,
+                                IHttpContextAccessor _httpContextAccessor,
+                                IServiceRepository repository, 
+                                ICompanyRepository companyRepository, 
+                                IBusinessUnityRepository businessUnityRepository, 
+                                IUserRepository userRepository,
+                                INotificationService notificationService,
+                                IServiceUserRepository serviceUserRepository) : IServiceService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO)
         {
             var service = mapper.Map<Service>(createServiceDTO);
+            var loggedUserId = long.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
             await repository.AddAsync(cancellationToken, service);
             await repository.SaveChangesAsync(cancellationToken);
 
@@ -37,11 +47,15 @@ namespace Dispo.Barber.Domain.Services
                     user.ServicesUser.Add(new ServiceUser
                     {
                         UserId = user.Id,
-                        ServiceId = service.Id
+                        ServiceId = service.Id,
+                        ProvidesUntil = createServiceDTO.AutoEnableToUsers ? null : LocalTime.Now
                     });
 
                     userRepository.Update(user);
                     await userRepository.SaveChangesAsync(cancellationToken);
+
+                    if (user.Id != loggedUserId)
+                        await notificationService.NotifyAsync(cancellationToken, user.DeviceToken, "Novo serviço!", $"O serviço {createServiceDTO.Description} foi adicionado na barbearia!", NotificationType.NewService);
                 }
             }
         }
@@ -84,6 +98,47 @@ namespace Dispo.Barber.Domain.Services
         public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ServiceStatus status)
         {
             var service = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Serviço não encontrado.");
+            var loggedUserId = long.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
+            var businessUnityId = await userRepository.GetBusinessUnityIdByIdAsync(cancellationToken, loggedUserId);
+            var users = await businessUnityRepository.GetUsersAsync(cancellationToken, businessUnityId);
+
+            // Regra discutível
+            foreach (var user in users)
+            {
+                if (status == ServiceStatus.Inactive)
+                {
+                    var serviceUser = await serviceUserRepository.GetByUserIdAndServiceId(cancellationToken, user.Id, service.Id);
+
+                    if (user.Role == UserRole.Manager)
+                    {
+                        //await userRepository.StopProvidingServiceAsync(cancellationToken, user.Id, service.Id);
+                    }
+                    else
+                    {
+                        serviceUserRepository.Delete(serviceUser);
+                        await serviceUserRepository.SaveChangesAsync(cancellationToken);
+                    }
+                }
+                else
+                {
+                    if (user.Role == UserRole.Manager)
+                    {
+                        //await userRepository.StartProvidingServiceAsync(cancellationToken, user.Id, service.Id);
+                    }
+                    else
+                    {
+                        user.ServicesUser.Add(new ServiceUser
+                        {
+                            UserId = user.Id,
+                            ServiceId = service.Id,
+                        });
+
+                        userRepository.Update(user);
+                        await userRepository.SaveChangesAsync(cancellationToken);
+                    }
+                }
+            }
+
             service.Status = status;
             repository.Update(service);
             await repository.SaveChangesAsync(cancellationToken);

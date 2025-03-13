@@ -9,10 +9,10 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class AppointmentService(IMapper mapper, 
-                                    IAppointmentRepository repository, 
-                                    ICustomerRepository customerRepository, 
-                                    INotificationService notificationService, 
+    public class AppointmentService(IMapper mapper,
+                                    IAppointmentRepository repository,
+                                    ICustomerRepository customerRepository,
+                                    INotificationService notificationService,
                                     IUserRepository userRepository) : IAppointmentService
     {
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
@@ -36,11 +36,13 @@ namespace Dispo.Barber.Domain.Services
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
+            var user = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
+            if (user is not null && user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
+            }
 
-            if (appointment.AcceptedUser.Status != UserStatus.Active)
-                throw new BusinessException("Usuário não está ativo.");
-
-            var existingCustomer = await customerRepository.GetAsync(cancellationToken, createAppointmentDTO.Customer.Id.Value);
+            var existingCustomer = await customerRepository.GetFirstAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
             if (existingCustomer != null)
             {
                 appointment.Customer = null;
@@ -58,7 +60,7 @@ namespace Dispo.Barber.Domain.Services
 
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCreateAppointmentMessageSms(appointment), MessageType.Sms);
 
-            appointment.AcceptedUser = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
+            appointment.AcceptedUser = user;
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
 
             if (notifyUsers)
@@ -117,7 +119,6 @@ namespace Dispo.Barber.Domain.Services
         {
             await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
         }
-
 
         public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
         {

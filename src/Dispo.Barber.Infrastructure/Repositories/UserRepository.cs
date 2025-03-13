@@ -55,7 +55,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<UserSchedule>> GetValidDaysSchedulesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest)
+            return await context.UserSchedules.Where(x => x.UserId == id && !x.IsRest && !x.DayOff)
                                               .OrderBy(o => o.DayOfWeek)
                                               .ToListAsync(cancellationToken);
         }
@@ -68,7 +68,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
+            return await context.UserSchedules.Where(x => x.UserId == id && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
                                               .ToListAsync(cancellationToken);
         }
 
@@ -96,7 +96,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
         public async Task<User> GetByPhoneWithBusinessUnitiesAsync(CancellationToken cancellationToken, string phone)
         {
             return await context.Users.Include(i => i.BusinessUnity).ThenInclude(i => i.Company).Include(i => i.RefreshToken)
-                                      .FirstOrDefaultAsync(w => w.Phone == phone);
+                                      .FirstOrDefaultAsync(w => w.Phone == phone && w.Status == UserStatus.Active);
         }
 
         public async Task<User> GetByIdWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
@@ -227,6 +227,13 @@ namespace Dispo.Barber.Infrastructure.Repositories
             return await context.Users.Include(i => i.BusinessUnity)
                                       .Where(x => x.Id == id)
                                       .Select(s => s.BusinessUnity.CompanyId)
+                                      .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<long> GetBusinessUnityIdByIdAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Where(x => x.Id == id)
+                                      .Select(s => s.BusinessUnityId.Value)
                                       .FirstOrDefaultAsync(cancellationToken);
         }
     }

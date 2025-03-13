@@ -9,5 +9,6 @@ namespace Dispo.Barber.Domain.DTOs.Service
         public double Price { get; set; }
         public int Duration { get; set; }
         public ServiceStatus Status { get; set; }
+        public bool AutoEnableToUsers { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using System.Threading;
+using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.BusinessUnity;
 using Dispo.Barber.Domain.DTOs.Service;
@@ -10,7 +12,6 @@ using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
-using System.Data;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -19,7 +20,8 @@ namespace Dispo.Barber.Domain.Services
                              ICompanyService companyService,
                              IBusinessUnityService businessUnityService,
                              IServiceRepository serviceRepository,
-                             IBusinessUnityRepository businessUnityRepository) : IUserService
+                             IBusinessUnityRepository businessUnityRepository,
+                             IBlacklistService blacklistService) : IUserService
     {
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
@@ -64,6 +66,11 @@ namespace Dispo.Barber.Domain.Services
 
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
+
+            if (user.Status == UserStatus.Inactive)
+            {
+                blacklistService.PutInBlacklist(id);
+            }
         }
 
         public async Task CreateAsync(CancellationToken cancellationToken, CreateUserDTO createUserDTO)
@@ -275,6 +282,11 @@ namespace Dispo.Barber.Domain.Services
         {
             var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
 
+            if (!await ExistsByPhone(cancellationToken, user.Phone))
+            {
+                throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
+            }
+
             if (!string.IsNullOrEmpty(finalizeEmployeeUserDto.Password))
             {
                 PasswordValidator.Validate(finalizeEmployeeUserDto.Password);
@@ -314,6 +326,11 @@ namespace Dispo.Barber.Domain.Services
 
             var user = mapper.Map<User>(createBarbershopSchemeDto.OwnerUser);
 
+            if (!await ExistsByPhone(cancellationToken, user.Phone))
+            {
+                throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
+            }
+
             if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
             {
                 PasswordValidator.Validate(createBarbershopSchemeDto.OwnerUser.Password);
@@ -341,21 +358,32 @@ namespace Dispo.Barber.Domain.Services
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        private async Task<bool> ExistsByPhone(CancellationToken cancellationToken, string phone)
+        {
+            return await repository.ExistsAsync(cancellationToken, w => w.Phone == phone && w.Status == UserStatus.Active);
+        }
+
         private List<UserSchedule> BuildNormalDays() => [
-            new(DayOfWeek.Monday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Monday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Tuesday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Tuesday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Wednesday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Wednesday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Thursday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Thursday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Friday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Friday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Saturday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Saturday, "12:00", "13:30", true, false),
-            new(DayOfWeek.Sunday, "08:00", "18:00", false, false),
-            new(DayOfWeek.Sunday, "12:00", "13:30", true, false),
+            new(DayOfWeek.Monday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Monday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Tuesday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Tuesday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Wednesday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Wednesday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Thursday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Thursday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Friday, "08:00", "18:00", false, false, true),
+            new(DayOfWeek.Friday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Saturday, "08:00", "18:00", false, false, false),
+            new(DayOfWeek.Saturday, "12:00", "13:30", true, false, true),
+
+            new(DayOfWeek.Sunday, "08:00", "18:00", false, false, false),
+            new(DayOfWeek.Sunday, "12:00", "13:30", true, false, true),
         ];
     }
 }

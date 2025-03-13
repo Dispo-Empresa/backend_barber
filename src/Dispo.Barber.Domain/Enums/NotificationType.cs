@@ -5,5 +5,6 @@
         NewAppointment,
         CanceledAppointment,
         RescheduleAppointment,
+        NewService
     }
 }

@@ -9,12 +9,11 @@ using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IMemoryCache cache, IHubIntegration hubIntegration) : IAuthService
+    public class AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IBlacklistService blacklistService, IHubIntegration hubIntegration) : IAuthService
     {
         private const string BlacklistedJwtKey = "blacklisted-{0}";
 
@@ -74,8 +73,12 @@ namespace Dispo.Barber.Domain.Services
             }
 
             var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId) ?? throw new NotFoundException("Usuário não encontrado.");
-            cache.Set(string.Format(BlacklistedJwtKey, currentJwt), true);
+            if (user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("Usuário não está ativo.");
+            }
 
+            blacklistService.PutInBlacklist(currentJwt);
             var planType = await hubIntegration.GetPlanType(cancellationToken, user.BusinessUnity.CompanyId);
             return BuildAuthenticationResult(user, refreshToken, planType);
         }

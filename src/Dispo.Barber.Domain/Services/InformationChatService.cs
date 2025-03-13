@@ -164,7 +164,7 @@ namespace Dispo.Barber.Domain.Services
             var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
             DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
             var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
-            var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+            var dayIsEqual = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
             var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
             var availableSlots = InitializeAvailableSlots();
@@ -530,9 +530,20 @@ namespace Dispo.Barber.Domain.Services
         private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules, bool dayIsEqual)
         {
             var timeIntervals = new List<DateTime>();
-            foreach (var userSchedule in userSchedules)
-            {
+            bool firstTime = true;
 
+            for (int i = 0; i < userSchedules.Count; i++)
+            {
+                if (userSchedules[i].IsRest && firstTime)
+                {
+                    (userSchedules[0], userSchedules[1]) = (userSchedules[1], userSchedules[0]);
+                    firstTime = false;
+                    break;
+                }
+            }
+
+            foreach (var userSchedule in userSchedules)
+            {             
                 if (userSchedule.DayOff)
                 {
                     return timeIntervals;
@@ -566,6 +577,11 @@ namespace Dispo.Barber.Domain.Services
                     }
                     else
                     {
+                        if (userSchedule.Enabled)
+                        {
+                            break;
+                        }
+
                         DateTime restStartTime = DateTime.Today.Add(startTime);
                         DateTime restEndTime = DateTime.Today.Add(endTime);
 
