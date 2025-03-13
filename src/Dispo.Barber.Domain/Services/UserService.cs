@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.BusinessUnity;
@@ -281,6 +282,11 @@ namespace Dispo.Barber.Domain.Services
         {
             var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
 
+            if (!await ExistsByPhone(cancellationToken, user.Phone))
+            {
+                throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
+            }
+
             if (!string.IsNullOrEmpty(finalizeEmployeeUserDto.Password))
             {
                 PasswordValidator.Validate(finalizeEmployeeUserDto.Password);
@@ -320,9 +326,9 @@ namespace Dispo.Barber.Domain.Services
 
             var user = mapper.Map<User>(createBarbershopSchemeDto.OwnerUser);
 
-            if (await repository.ExistsAsync(cancellationToken, w => w.Phone == user.Phone))
+            if (!await ExistsByPhone(cancellationToken, user.Phone))
             {
-                throw new AlreadyExistsException("Usuário com o número já existe.");
+                throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
             }
 
             if (!string.IsNullOrEmpty(createBarbershopSchemeDto.OwnerUser.Password))
@@ -350,6 +356,11 @@ namespace Dispo.Barber.Domain.Services
 
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task<bool> ExistsByPhone(CancellationToken cancellationToken, string phone)
+        {
+            return await repository.ExistsAsync(cancellationToken, w => w.Phone == phone && w.Status == UserStatus.Active);
         }
 
         private List<UserSchedule> BuildNormalDays() => [
