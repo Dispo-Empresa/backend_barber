@@ -36,6 +36,10 @@ namespace Dispo.Barber.Domain.Services
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
+
+            if (appointment.AcceptedUser.Status != UserStatus.Active)
+                throw new BusinessException("Usuário não está ativo.");
+
             var existingCustomer = await customerRepository.GetAsync(cancellationToken, createAppointmentDTO.Customer.Id.Value);
             if (existingCustomer != null)
             {
