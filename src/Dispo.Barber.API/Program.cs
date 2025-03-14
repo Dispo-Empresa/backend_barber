@@ -189,7 +189,8 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-app.UseMiddleware<AuthorizationMiddleware>();
+app.UseMiddleware<AuthorizationMiddleware>()
+   .UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Use(async (context, next) =>
 {

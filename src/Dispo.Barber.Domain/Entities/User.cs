@@ -119,7 +119,7 @@ namespace Dispo.Barber.Domain.Entities
 
         public string EntireSlug()
         {
-            return $"{BusinessUnity?.Company?.Slug}/{Slug}";
+            return $"https://chat.dispo-api.online/barbearia?barber={Id.ToString()}";
         }
     }
 }
