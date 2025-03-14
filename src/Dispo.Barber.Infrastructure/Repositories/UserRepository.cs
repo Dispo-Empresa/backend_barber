@@ -122,7 +122,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                           Phone = s.Phone,
                                           Photo = s.Photo,
                                           Status = s.Status,
-                                          Link = s.Slug
+                                          Link = s.EntireSlug()
                                       })
                                       .ToListAsync(cancellationToken);
         }
@@ -139,7 +139,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                           Phone = s.Phone,
                                           Photo = s.Photo,
                                           Status = s.Status,
-                                          Link = s.Slug,
+                                          Link = s.EntireSlug(),
                                           CompanyId = s.BusinessUnity.CompanyId,
                                           Role = s.Role,
                                           Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
