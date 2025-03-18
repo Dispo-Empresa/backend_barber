@@ -1,4 +1,4 @@
-﻿namespace Dispo.Barber.Domain.DTO.Hub
+﻿namespace Dispo.Barber.Domain.DTOs.Hub
 {
     public class PlanDTO
     {

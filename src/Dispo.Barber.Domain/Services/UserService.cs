@@ -3,12 +3,14 @@ using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.BusinessUnity;
+using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.DTOs.Service;
 using Dispo.Barber.Domain.DTOs.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Extension;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -21,7 +23,8 @@ namespace Dispo.Barber.Domain.Services
                              IBusinessUnityService businessUnityService,
                              IServiceRepository serviceRepository,
                              IBusinessUnityRepository businessUnityRepository,
-                             IBlacklistService blacklistService) : IUserService
+                             IBlacklistService blacklistService,
+                             IHubIntegration hubIntegration) : IUserService
     {
         public async Task AddServiceToUserAsync(CancellationToken cancellationToken, long id, List<long> services)
         {
@@ -326,7 +329,7 @@ namespace Dispo.Barber.Domain.Services
 
             var user = mapper.Map<User>(createBarbershopSchemeDto.OwnerUser);
 
-            if (!await ExistsByPhone(cancellationToken, user.Phone))
+            if (await ExistsByPhone(cancellationToken, user.Phone))
             {
                 throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
             }
@@ -356,6 +359,13 @@ namespace Dispo.Barber.Domain.Services
 
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
+
+            await hubIntegration.CreateHubLicence(new LicenceRequestDTO
+            {
+                CompanyId = createdCompanyId,
+                PlanType = createBarbershopSchemeDto.PlanType,
+                Expiration = createBarbershopSchemeDto.PlanType == PlanType.BarberPremiumTrial ? LocalTime.Now.AddDays(7) : null
+            }, cancellationToken);
         }
 
         private async Task<bool> ExistsByPhone(CancellationToken cancellationToken, string phone)

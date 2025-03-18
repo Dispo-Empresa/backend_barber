@@ -1,5 +1,6 @@
-﻿using Dispo.Barber.Domain.DTO.Hub;
+﻿using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Utils;
 using Newtonsoft.Json;
@@ -55,6 +56,28 @@ namespace Dispo.Barber.Infrastructure.Integration
             catch (Exception)
             {
                 return PlanType.BarberFree;
+            }
+        }
+
+        public async Task CreateHubLicence(LicenceRequestDTO licenceRequestDTO, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (!HubIntegrationEnabled)
+                    return;
+
+                var url = Environment.GetEnvironmentVariable("HUB_INTEGRATION_URL");
+                var options = new RestClientOptions($"{url}/v1/licenses");
+                var client = new RestClient(options);
+                var request = new RestRequest().AddJsonBody(licenceRequestDTO);
+                var response = await client.PostAsync(request, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                    throw new BusinessException("Erro ao criar a licença no HUB");
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("Erro ao conectar com a API do HUB");
             }
         }
     }

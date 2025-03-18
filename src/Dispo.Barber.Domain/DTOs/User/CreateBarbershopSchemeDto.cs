@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.DTOs.Company;
+using Dispo.Barber.Domain.Enums;
 
 namespace Dispo.Barber.Domain.DTOs.User
 {
@@ -6,5 +7,6 @@ namespace Dispo.Barber.Domain.DTOs.User
     {
         public CreateOwnerUserDTO OwnerUser { get; set; }
         public CreateCompanyDTO Company { get; set; }
+        public PlanType PlanType { get; set; }
     }
 }
