@@ -32,7 +32,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
             }
 
             var users = await context.UserServices
-                .Where(us => serviceIds.Contains(us.ServiceId))
+                .Where(us => serviceIds.Contains(us.ServiceId) && us.User.Status == Domain.Enums.UserStatus.Active)
                 .GroupBy(us => us.UserId)
                 .Select(g => new
                 {
