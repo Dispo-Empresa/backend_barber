@@ -28,6 +28,8 @@ namespace Dispo.Barber.Domain.Repositories
 
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
 
+        Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id);
+
         Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
 
         Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);

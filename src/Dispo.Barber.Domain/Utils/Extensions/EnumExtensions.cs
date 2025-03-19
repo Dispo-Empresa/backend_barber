@@ -1,6 +1,6 @@
-﻿namespace Dispo.Barber.Domain.Utils
+﻿namespace Dispo.Barber.Domain.Utils.Extensions
 {
-    public static class EnumUtils
+    public static class EnumExtensions
     {
         public static T ToEnum<T>(this string enumString)
         {

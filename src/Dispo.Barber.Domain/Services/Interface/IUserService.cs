@@ -21,7 +21,7 @@ namespace Dispo.Barber.Domain.Services.Interface
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
         Task<List<UserDTO>> GetByCompanyId(CancellationToken cancellationToken, long companyId);
-        Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
+        Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id);
         Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
         Task<bool> StopProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);
         Task<bool> StartProvidingServiceAsync(CancellationToken cancellationToken, long id, long serviceId);

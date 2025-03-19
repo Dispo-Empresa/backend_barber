@@ -23,6 +23,14 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<User>> GetActiveUsersAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.BusinessUnities.Where(w => w.Id == id)
+                                .Include(i => i.Users)
+                                .SelectMany(s => s.Users.Where(x => x.Status == UserStatus.Active))
+                                .ToListAsync(cancellationToken);
+        }
+
 
         public async Task<long> GetIdByCompanyAsync(long companyId)
         {

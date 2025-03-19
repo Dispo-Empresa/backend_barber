@@ -6,6 +6,8 @@ namespace Dispo.Barber.Domain.Repositories
     {
         Task<List<User>> GetUsersAsync(CancellationToken cancellationToken, long id);
 
+        Task<List<User>> GetActiveUsersAsync(CancellationToken cancellationToken, long id);
+
         Task<long> GetIdByCompanyAsync(long companyId);
 
         Task<long> GetCompanyIdAsync(CancellationToken cancellationToken, long id);

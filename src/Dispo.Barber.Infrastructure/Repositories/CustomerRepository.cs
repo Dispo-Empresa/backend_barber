@@ -22,12 +22,12 @@ namespace Dispo.Barber.Infrastructure.Repositories
                    .FirstOrDefaultAsync(w => w.Phone == phone);
         }
 
-        public async Task<long> GetCustomerIdByPhoneAsync(string phone)
+        public async Task<long> GetCustomerIdByPhoneAsync(string phone, CancellationToken cancellationToken)
         {
             return await context.Customers
                     .Where(w => w.Phone == phone)
                     .Select(w => w.Id)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken);
 
         }
 

@@ -22,6 +22,7 @@ namespace Dispo.Barber.Application.AppServices.Interface
         Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug);
         Task<UserDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
         Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId);
+        Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id);
         Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id);
         Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo);
         Task CancelAllByDateAsync(CancellationToken cancellationToken, long id, DateTime date);

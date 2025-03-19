@@ -204,11 +204,24 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
+        public async Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetEnabledServicesAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error adding service to user.");
+                throw;
+            }
+        }
+
         public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.GetServicesAsync(cancellationToken, id));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await userRepository.GetServicesAsync(cancellationToken, id));
             }
             catch (Exception e)
             {

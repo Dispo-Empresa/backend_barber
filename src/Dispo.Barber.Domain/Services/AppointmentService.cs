@@ -6,6 +6,8 @@ using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Utils.Extensions;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -37,10 +39,13 @@ namespace Dispo.Barber.Domain.Services
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
             var user = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
+
             if (user is not null && user.Status != UserStatus.Active)
             {
                 throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
             }
+
+            
 
             var existingCustomer = await customerRepository.GetFirstAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
             if (existingCustomer != null)
@@ -52,6 +57,10 @@ namespace Dispo.Barber.Domain.Services
             {
                 appointment.Customer.Name = appointment.Customer.Name;
                 appointment.Customer.Phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
+
+                var existingIdByPhone = await customerRepository.GetCustomerIdByPhoneAsync(appointment.Customer.Phone, cancellationToken);
+                if (existingIdByPhone.IsValid())
+                    throw new AlreadyExistsException("Este número já está cadastrado para um cliente da barbearia.");
             }
 
             appointment.Status = AppointmentStatus.Scheduled;

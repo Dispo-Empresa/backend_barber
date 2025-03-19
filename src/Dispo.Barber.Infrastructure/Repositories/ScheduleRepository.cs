@@ -15,8 +15,12 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<UserSchedule>> GetScheduleByUserDayOfWeek(long userId, DayOfWeek dayOfWeek)
         {
-            return await _context.UserSchedules.Where(x => x.UserId == userId && x.DayOff.Equals(false) && x.DayOfWeek.Equals(dayOfWeek))
-                                   .ToListAsync();
+            return await _context.UserSchedules.Where(x => x.UserId == userId && 
+                                                           x.DayOff.Equals(false) && 
+                                                           x.DayOfWeek.Equals(dayOfWeek) && 
+                                                           x.IsRest.Equals(false) &&
+                                                           x.Enabled.Equals(true))
+                                               .ToListAsync();
         }
 
         public async Task<List<UserSchedule>> GetScheduleByUserId(long userId)

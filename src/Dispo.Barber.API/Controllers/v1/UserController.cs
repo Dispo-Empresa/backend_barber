@@ -138,16 +138,7 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpGet("information-get-available-slots")]
         public async Task<IActionResult> GetAvailableSlotsAsync(CancellationToken cancellationToken, [FromQuery] AvailableSlotRequestDto requestDto)
         {
-            try
-            {
-                var result = await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto);
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while fetching available slots.", Details = ex.Message });
-            }
+            return Ok(await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto));
         }
 
         [Tags("Link")]
@@ -170,6 +161,13 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> GetUserCustomers(CancellationToken cancellationToken, [FromRoute] long id)
         {
             return Ok(await userAppService.GetUserCustomersAsync(cancellationToken, id));
+        }
+
+        [Authorize]
+        [HttpGet("{id}/enabled-services")]
+        public async Task<IActionResult> GetEnabledServices(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            return Ok(await userAppService.GetEnabledServicesAsync(cancellationToken, id));
         }
 
         [Authorize]

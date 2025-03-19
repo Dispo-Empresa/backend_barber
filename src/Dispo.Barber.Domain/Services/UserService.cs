@@ -193,9 +193,9 @@ namespace Dispo.Barber.Domain.Services
             return user;
         }
 
-        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        public async Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id)
         {
-            return await repository.GetServicesAsync(cancellationToken, id);
+            return await repository.GetEnabledServicesAsync(cancellationToken, id);
         }
 
         public async Task UploadImageAsync(CancellationToken cancellationToken, long id, byte[]? photo)

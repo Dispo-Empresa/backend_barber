@@ -158,7 +158,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                       .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        public async Task<List<ServiceInformationDTO>> GetEnabledServicesAsync(CancellationToken cancellationToken, long id)
         {
             return await context.UserServices
                             .Where(w => w.UserId == id && w.ProvidesUntil == null || w.ProvidesUntil >= LocalTime.Now)
@@ -168,6 +168,20 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 Description = s.Service.Description,
                                 Duration = s.Service.Duration,
                                 Price = s.Service.Price
+                            }).ToListAsync();
+        }
+
+        public async Task<List<ServiceInformationDTO>> GetServicesAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.UserServices
+                            .Where(w => w.UserId == id)
+                            .Select(s => new ServiceInformationDTO
+                            {
+                                Id = s.Service.Id,
+                                Description = s.Service.Description,
+                                Duration = s.Service.Duration,
+                                Price = s.Service.Price,
+                                Enabled = s.ProvidesUntil == null
                             }).ToListAsync();
         }
 

@@ -40,7 +40,7 @@ namespace Dispo.Barber.Domain.Services
 
             foreach (var businessUnity in businessUnities)
             {
-                var users = await businessUnityRepository.GetUsersAsync(cancellationToken, businessUnity.Id);
+                var users = await businessUnityRepository.GetActiveUsersAsync(cancellationToken, businessUnity.Id);
 
                 foreach (var user in users)
                 {

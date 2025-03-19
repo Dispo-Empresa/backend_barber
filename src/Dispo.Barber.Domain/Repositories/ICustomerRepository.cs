@@ -10,7 +10,7 @@ namespace Dispo.Barber.Domain.Repositories
 
         Task<Customer> GetCustomerByPhoneAsync(string phone);
 
-        Task<long> GetCustomerIdByPhoneAsync(string phone);
+        Task<long> GetCustomerIdByPhoneAsync(string phone, CancellationToken cancellationToken);
 
         Task<List<CustomerDetailDTO>> GetUserCustomersAsync(CancellationToken cancellationToken, long userId);
 
