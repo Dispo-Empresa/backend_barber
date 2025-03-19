@@ -2,7 +2,7 @@
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
-using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Utils.Extensions;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -22,6 +22,22 @@ namespace Dispo.Barber.Infrastructure.Integration
                 {
                     return false;
                 }
+            }
+        }
+
+        public LicenceDTO BasicLicence
+        {
+            get
+            {
+                return new LicenceDTO
+                {
+                    Key = "FREE",
+                    ExpirationDate = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
+                    Plan = new PlanDTO
+                    {
+                        Name = PlanType.BarberFree.ToString()
+                    }
+                };
             }
         }
 
@@ -56,6 +72,40 @@ namespace Dispo.Barber.Infrastructure.Integration
             catch (Exception)
             {
                 return PlanType.BarberFree;
+            }
+        }
+
+        public async Task<LicenceDTO> GetLicenceDetails(CancellationToken cancellationToken, long companyId)
+        {
+            try
+            {
+                if (!HubIntegrationEnabled)
+                {
+                    return BasicLicence;
+                }
+
+                var url = Environment.GetEnvironmentVariable("HUB_INTEGRATION_URL");
+                var options = new RestClientOptions($"{url}/v1/licenses/{companyId}/full");
+                var client = new RestClient(options);
+                var request = new RestRequest();
+                var response = await client.GetAsync(request, cancellationToken);
+
+                if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    return BasicLicence;
+                }
+
+                var licenceDetails = JsonConvert.DeserializeObject<LicenceDTO>(response.Content);
+                if (licenceDetails is null)
+                {
+                    return BasicLicence;
+                }
+
+                return licenceDetails;
+            }
+            catch (Exception)
+            {
+                return BasicLicence;
             }
         }
 

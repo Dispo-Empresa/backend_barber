@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Dispo.Barber.Domain.DTOs.Authentication;
+using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
@@ -30,9 +31,9 @@ namespace Dispo.Barber.Domain.Services
                 throw new BusinessException("Usuário não está ativo.");
             }
 
-            var planType = await hubIntegration.GetPlanType(cancellationToken, user.BusinessUnity.CompanyId);
+            var licenceDetails = await hubIntegration.GetLicenceDetails(cancellationToken, user.BusinessUnity.CompanyId);
             var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user);
-            return BuildAuthenticationResult(user, refreshToken, planType);
+            return BuildAuthenticationResult(user, refreshToken, licenceDetails);
         }
 
         public async Task<string> GetOrCreateRefreshToken(CancellationToken cancellationToken, User user)
@@ -79,11 +80,11 @@ namespace Dispo.Barber.Domain.Services
             }
 
             blacklistService.PutInBlacklist(currentJwt);
-            var planType = await hubIntegration.GetPlanType(cancellationToken, user.BusinessUnity.CompanyId);
-            return BuildAuthenticationResult(user, refreshToken, planType);
+            var licenceDetails = await hubIntegration.GetLicenceDetails(cancellationToken, user.BusinessUnity.CompanyId);
+            return BuildAuthenticationResult(user, refreshToken, licenceDetails);
         }
 
-        private AuthenticationResult BuildAuthenticationResult(User user, string refreshToken, PlanType planType)
+        private AuthenticationResult BuildAuthenticationResult(User user, string refreshToken, LicenceDTO licenceDetails)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -96,11 +97,11 @@ namespace Dispo.Barber.Domain.Services
                     new Claim("id", user.Id.ToString()),
                     new Claim("phone", user.Phone),
                     new Claim("link", user.EntireSlug() ?? string.Empty),
-                    new Claim("plan", planType.ToString()),
+                    new Claim("plan", licenceDetails.Plan.Id.ToString()),
                 ],
                 expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: credentials
-            )), refreshToken, user, planType);
+            )), refreshToken, user, licenceDetails);
         }
     }
 }
