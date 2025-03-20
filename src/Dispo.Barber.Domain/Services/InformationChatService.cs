@@ -81,7 +81,7 @@ namespace Dispo.Barber.Domain.Services
                     {
                         NameCompany = company.Name,
                         User = user.Status == UserStatus.Active ? new List<UserInformationDTO> { mapper.Map<UserInformationDTO>(user) } : [],
-                        Services = mapper.Map<List<ServiceInformationDTO>>(services),
+                        Services = mapper.Map<List<ServiceInformationDTO>>(services.Where(s => s.Status == ServiceStatus.Active).ToList()),
                         BusinessUnities = user.BusinessUnityId.Value
                     };
 
@@ -577,7 +577,7 @@ namespace Dispo.Barber.Domain.Services
                     }
                     else
                     {
-                        if (userSchedule.Enabled)
+                        if (!userSchedule.Enabled)
                         {
                             break;
                         }
@@ -720,7 +720,7 @@ namespace Dispo.Barber.Domain.Services
                     var informationChat = new InformationAppointmentChatDTO
                     {
                         NameCompany = company.Name,
-                        IdUser = user.Status == UserStatus.Active? user.Id : null,
+                        IdUser = user.Id,
                         NameUser = user.Name,
                         NameCustomer = customer.Name,
                         Phone = customer.Phone,
