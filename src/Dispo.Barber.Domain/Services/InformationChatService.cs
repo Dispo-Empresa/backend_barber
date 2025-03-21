@@ -720,7 +720,7 @@ namespace Dispo.Barber.Domain.Services
                     var informationChat = new InformationAppointmentChatDTO
                     {
                         NameCompany = company.Name,
-                        IdUser = user.Id,
+                        IdUser = user.Status == UserStatus.Active ? user.Id : null,
                         NameUser = user.Name,
                         NameCustomer = customer.Name,
                         Phone = customer.Phone,
