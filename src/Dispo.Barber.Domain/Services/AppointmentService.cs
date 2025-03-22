@@ -35,6 +35,21 @@ namespace Dispo.Barber.Domain.Services
                 await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
         }
 
+        public async Task CancelAppointmentsAsync(CancellationToken cancellationToken, List<long> appointmentIds)
+        {
+            foreach (var appointmentId in appointmentIds)
+            {
+                var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, appointmentId);
+
+                if (appointment is null)
+                    throw new NotFoundException("Agendamento não existe.");
+
+                appointment.Status = AppointmentStatus.Canceled;
+                repository.Update(appointment);
+                await repository.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
