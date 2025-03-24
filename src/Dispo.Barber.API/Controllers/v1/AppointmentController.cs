@@ -65,6 +65,13 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
+        [HttpPatch("cancel")]
+        public async Task<IActionResult> CancelAppointments(CancellationToken cancellationToken, [FromBody] List<long> appointmentIds)
+        {
+            await appointmentAppService.CancelAppointmentsAsync(cancellationToken, appointmentIds);
+            return Ok();
+        }
+
         [HttpPost("generate-suggestions")]
         public async Task<IActionResult> GenerateSuggestions()
         {

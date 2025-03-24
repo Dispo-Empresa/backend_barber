@@ -61,6 +61,19 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
+        public async Task CancelAppointmentsAsync(CancellationToken cancellationToken, List<long> appointmentIds, bool commit = true)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CancelAppointmentsAsync(cancellationToken, appointmentIds), commit);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error cancelling appointment.");
+                throw;
+            }
+        }
+
         public async Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate)
         {
             try

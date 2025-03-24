@@ -19,5 +19,6 @@ namespace Dispo.Barber.Domain.DTOs.Schedule
         public required bool IsRest { get; set; }
         public required bool DayOff { get; set; }
         public required long UserId { get; set; }
+        public bool Enabled { get; set; } = true;
     }
 }

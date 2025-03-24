@@ -3,6 +3,7 @@ using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.Extensions;
 using Newtonsoft.Json;
 using RestSharp;
@@ -32,7 +33,7 @@ namespace Dispo.Barber.Infrastructure.Integration
             {
                 return new LicenseDTO
                 {
-                    ExpirationDate = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
+                    ExpirationDate = LocalTime.Now.AddYears(1),
                     Plan = new PlanDTO
                     {
                         Name = PlanType.BarberFree.ToString()
