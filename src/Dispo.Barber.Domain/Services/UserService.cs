@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Threading;
 using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.BusinessUnity;
@@ -360,7 +359,7 @@ namespace Dispo.Barber.Domain.Services
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
 
-            await hubIntegration.CreateHubLicence(new LicenceRequestDTO
+            await hubIntegration.CreateHubLicense(new LicenseRequestDTO
             {
                 CompanyId = createdCompanyId,
                 PlanType = createBarbershopSchemeDto.PlanType,
@@ -371,6 +370,23 @@ namespace Dispo.Barber.Domain.Services
         private async Task<bool> ExistsByPhone(CancellationToken cancellationToken, string phone)
         {
             return await repository.ExistsAsync(cancellationToken, w => w.Phone == phone && w.Status == UserStatus.Active);
+        }
+
+        public async Task UpdateAllFromCompany(CancellationToken cancellationToken, long companyId, UserStatus status)
+        {
+            var users = await repository.GetAsync(cancellationToken, w => w.BusinessUnity != null && w.BusinessUnity.CompanyId == companyId && w.Status != status, "BusinessUnity.Company");
+            foreach (var user in users)
+            {
+                if (user.BusinessUnity?.Company.OwnerId == user.Id)
+                {
+                    continue;
+                }
+
+                user.Status = status;
+            }
+
+            repository.UpdateRange(users);
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private List<UserSchedule> BuildNormalDays() => [

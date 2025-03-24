@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.DTOs.Hub;
+﻿using System.Net;
+using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
@@ -25,13 +26,12 @@ namespace Dispo.Barber.Infrastructure.Integration
             }
         }
 
-        public LicenceDTO BasicLicence
+        public LicenseDTO BasicLicence
         {
             get
             {
-                return new LicenceDTO
+                return new LicenseDTO
                 {
-                    Key = "FREE",
                     ExpirationDate = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd"),
                     Plan = new PlanDTO
                     {
@@ -56,7 +56,7 @@ namespace Dispo.Barber.Infrastructure.Integration
                 var request = new RestRequest();
                 var response = await client.GetAsync(request, cancellationToken);
 
-                if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
                 {
                     return PlanType.BarberFree;
                 }
@@ -75,7 +75,7 @@ namespace Dispo.Barber.Infrastructure.Integration
             }
         }
 
-        public async Task<LicenceDTO> GetLicenceDetails(CancellationToken cancellationToken, long companyId)
+        public async Task<LicenseDTO?> GetLicenseDetails(CancellationToken cancellationToken, long companyId)
         {
             try
             {
@@ -89,13 +89,17 @@ namespace Dispo.Barber.Infrastructure.Integration
                 var client = new RestClient(options);
                 var request = new RestRequest();
                 var response = await client.GetAsync(request, cancellationToken);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
 
-                if (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+                if (response == null || response.StatusCode != HttpStatusCode.OK)
                 {
                     return BasicLicence;
                 }
 
-                var licenceDetails = JsonConvert.DeserializeObject<LicenceDTO>(response.Content);
+                var licenceDetails = JsonConvert.DeserializeObject<LicenseDTO>(response.Content);
                 if (licenceDetails is null)
                 {
                     return BasicLicence;
@@ -103,18 +107,18 @@ namespace Dispo.Barber.Infrastructure.Integration
 
                 return licenceDetails;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return BasicLicence;
             }
         }
 
-        public async Task CreateHubLicence(LicenceRequestDTO licenceRequestDTO, CancellationToken cancellationToken)
+        public async Task<LicenseDTO> CreateHubLicense(LicenseRequestDTO licenceRequestDTO, CancellationToken cancellationToken)
         {
             try
             {
                 if (!HubIntegrationEnabled)
-                    return;
+                    return BasicLicence;
 
                 var url = Environment.GetEnvironmentVariable("HUB_INTEGRATION_URL");
                 var options = new RestClientOptions($"{url}/v1/licenses");
@@ -124,6 +128,14 @@ namespace Dispo.Barber.Infrastructure.Integration
 
                 if (!response.IsSuccessStatusCode)
                     throw new BusinessException("Erro ao criar a licença no HUB");
+
+                var licenseDetails = JsonConvert.DeserializeObject<LicenseDTO>(response.Content);
+                if (licenseDetails is null)
+                {
+                    return BasicLicence;
+                }
+
+                return licenseDetails;
             }
             catch (Exception ex)
             {

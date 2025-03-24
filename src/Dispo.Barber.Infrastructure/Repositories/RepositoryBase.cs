@@ -26,6 +26,11 @@ namespace Dispo.Barber.Infrastructure.Repositories
             context.Update(entity);
         }
 
+        public void UpdateRange(List<T> entities)
+        {
+            context.UpdateRange(entities);
+        }
+
         public void Delete(T entity)
         {
             context.Remove(entity);
@@ -43,12 +48,20 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<T?> GetAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.Set<T>().AsNoTracking()
+            return await context.Set<T>()
                                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression)
+        public async Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression, string include = "")
         {
+            if (!string.IsNullOrEmpty(include))
+            {
+                return await context.Set<T>()
+                                .Include(include)
+                                .Where(expression)
+                                .ToListAsync(cancellationToken);
+            }
+
             return await context.Set<T>()
                                 .Where(expression)
                                 .ToListAsync(cancellationToken);

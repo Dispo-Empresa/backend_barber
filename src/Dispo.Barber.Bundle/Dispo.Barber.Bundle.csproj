@@ -10,4 +10,10 @@
     <ProjectReference Include="..\Dispo.Barber.Infrastructure\Dispo.Barber.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Migrations\013_owner_id_field.pgsql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Company;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;

@@ -9,13 +9,15 @@ namespace Dispo.Barber.Domain.Repositories
 
         void Update(T entity);
 
+        void UpdateRange(List<T> entities);
+
         void Delete(T entity);
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
         Task<T?> GetAsync(CancellationToken cancellationToken, long id);
 
-        Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression);
+        Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression, string include = "");
 
         Task<List<T>> GetAllAsync(CancellationToken cancellationToken);
 
