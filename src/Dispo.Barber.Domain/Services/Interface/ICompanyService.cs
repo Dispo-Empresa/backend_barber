@@ -14,5 +14,7 @@ namespace Dispo.Barber.Domain.Services.Interface
         Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateCompanyDTO updateCompanyDTO);
 
         Task<Company> GetAsync(CancellationToken cancellationToken, long id);
+
+        Task UpdateOwner(CancellationToken cancellationToken, long id, long ownerId);
     }
 }

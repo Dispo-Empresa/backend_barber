@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Dispo.Barber.Domain.DTOs.Company;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
@@ -68,6 +67,15 @@ namespace Dispo.Barber.Domain.Services
         public async Task<Company> GetAsync(CancellationToken cancellationToken, long id)
         {
             return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Empresa não existe.");
+        }
+
+        public async Task UpdateOwner(CancellationToken cancellationToken, long id, long ownerId)
+        {
+            var company = await GetAsync(cancellationToken, id);
+            company.OwnerId = ownerId;
+
+            repository.Update(company);
+            await repository.SaveChangesAsync(cancellationToken);
         }
     }
 }

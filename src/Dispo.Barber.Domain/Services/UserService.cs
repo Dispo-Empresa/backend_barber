@@ -359,6 +359,8 @@ namespace Dispo.Barber.Domain.Services
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
 
+            await companyService.UpdateOwner(cancellationToken, createdCompanyId, user.Id);
+
             await hubIntegration.CreateHubLicense(new LicenseRequestDTO
             {
                 CompanyId = createdCompanyId,

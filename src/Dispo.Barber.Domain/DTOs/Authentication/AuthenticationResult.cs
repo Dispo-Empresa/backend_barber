@@ -21,6 +21,7 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
             DeviceToken = user.DeviceToken;
             LicenceDetails = licenceDetails;
             Role = user.Role;
+            OwnerId = user.BusinessUnity.Company.OwnerId.GetValueOrDefault();
         }
 
         public AuthenticationResult()
@@ -39,6 +40,7 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
         public string Slug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public long OwnerId { get; set; }
         public LicenseDTO LicenceDetails { get; set; }
         public UserRole Role { get; set; }
     }
