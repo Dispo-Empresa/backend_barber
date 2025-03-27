@@ -5,6 +5,7 @@
         NewAppointment,
         CanceledAppointment,
         RescheduleAppointment,
-        NewService
+        NewService,
+        ExpiredLicense
     }
 }

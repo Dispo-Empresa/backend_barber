@@ -68,5 +68,14 @@ namespace Dispo.Barber.Domain.Services
         {
             return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Empresa não existe.");
         }
+
+        public async Task UpdateOwner(CancellationToken cancellationToken, long id, long ownerId)
+        {
+            var company = await GetAsync(cancellationToken, id);
+            company.OwnerId = ownerId;
+
+            repository.Update(company);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
     }
 }

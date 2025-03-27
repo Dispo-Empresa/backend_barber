@@ -2,7 +2,7 @@
 
 namespace Dispo.Barber.Domain.DTOs.Hub
 {
-    public class LicenceRequestDTO
+    public class LicenseRequestDTO
     {
         public long CompanyId { get; set; }
         public PlanType PlanType { get; set; }

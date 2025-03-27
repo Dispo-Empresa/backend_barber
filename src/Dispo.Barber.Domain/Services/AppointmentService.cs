@@ -7,7 +7,6 @@ using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.Extensions;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -59,8 +58,6 @@ namespace Dispo.Barber.Domain.Services
             {
                 throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
             }
-
-            
 
             var existingCustomer = await customerRepository.GetFirstAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
             if (existingCustomer != null)
