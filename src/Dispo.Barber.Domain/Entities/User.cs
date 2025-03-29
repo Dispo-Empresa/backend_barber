@@ -22,9 +22,9 @@ namespace Dispo.Barber.Domain.Entities
 
         public Token? RefreshToken { get; set; }
 
-        public IList<ServiceUser> ServicesUser { get; set; } = new List<ServiceUser>();
-        public IList<Appointment> Appointments { get; set; } = new List<Appointment>();
-        public IList<UserSchedule> Schedules { get; set; } = new List<UserSchedule>();
+        public IList<ServiceUser> ServicesUser { get; set; } = [];
+        public IList<Appointment> Appointments { get; set; } = [];
+        public IList<UserSchedule> Schedules { get; set; } = [];
 
         public string EstimatedGains()
         {
@@ -33,7 +33,7 @@ namespace Dispo.Barber.Domain.Entities
                 return "N/A";
             }
 
-            return $"R${Appointments.Where(w => w.Status == AppointmentStatus.Scheduled && w.Status == AppointmentStatus.Completed && w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Services.Select(s => s.Service).Sum(s => s.Price))}";
+            return $"R${Appointments.Where(w => w.Status == AppointmentStatus.Scheduled || w.Status == AppointmentStatus.Completed && w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Sum(s => s.Services.Select(s => s.Service).Sum(s => s.Price))}";
         }
 
         public string TodayAppointments()
@@ -44,7 +44,7 @@ namespace Dispo.Barber.Domain.Entities
             }
 
             return $"{Appointments.Where(x => x.Status == AppointmentStatus.Completed)
-                                  .Count(w => w.Date >= DateTime.Today && w.Date <= LocalTime.Now)}/{Appointments.Where(x => x.Status == AppointmentStatus.Scheduled)
+                                  .Count(w => w.Date >= DateTime.Today && w.Date <= LocalTime.Now)}/{Appointments.Where(x => (x.Status == AppointmentStatus.Scheduled || x.Status == AppointmentStatus.Completed))
                                                                                                                  .Count(w => w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1))}";
         }
 
@@ -74,7 +74,7 @@ namespace Dispo.Barber.Domain.Entities
 
             var summedWorkingHours = BulkSumDates(workingHours);
 
-            var totalAppointmentDuration = Appointments.Where(w => w.Status == AppointmentStatus.Scheduled && w.Status == AppointmentStatus.Completed && w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Select(s => s.Services.Sum(s => s.Service.Duration)).Sum();
+            var totalAppointmentDuration = Appointments.Where(w => w.Status == AppointmentStatus.Scheduled || w.Status == AppointmentStatus.Completed && w.Date >= DateTime.Today && w.Date <= DateTime.Today.AddDays(1).AddTicks(-1)).Select(s => s.Services.Sum(s => s.Service.Duration)).Sum();
             var durationTimeSpan = TimeSpan.FromMinutes(totalAppointmentDuration);
             var hourMinute = durationTimeSpan.ToString(@"hh\:mm");
             return $"{Convert.ToInt32(hourMinute.Replace(":", "")) * 100 / Convert.ToInt32(GetDifference(summedWorkingHours, summedRestingHours).Replace(":", ""))}%";
