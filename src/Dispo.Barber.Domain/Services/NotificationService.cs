@@ -4,6 +4,7 @@ using Dispo.Barber.Domain.Services.Interface;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -11,37 +12,51 @@ namespace Dispo.Barber.Domain.Services
     {
         public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, Dictionary<string, string> data)
         {
-            var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
+            try
             {
-                Token = token,
-                Notification = new Notification()
+                var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
-                    Title = title,
-                    Body = body
-                },
-                Data = data
-            }, cancellationToken);
+                    Token = token,
+                    Notification = new Notification()
+                    {
+                        Title = title,
+                        Body = body
+                    },
+                    Data = data
+                }, cancellationToken);
 
-            logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
+                logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Erro ao notificar usuário {@Error}", e);
+            }
         }
 
         public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, NotificationType notificationType)
         {
-            var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
+            try
             {
-                Token = token,
-                Notification = new Notification()
+                var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
-                    Title = Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
-                    Body = Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
-                },
-                Data = new Dictionary<string, string>()
-                {
-                    ["NotificationType"] = notificationType.ToString("d")
-                },
-            }, cancellationToken);
+                    Token = token,
+                    Notification = new Notification()
+                    {
+                        Title = Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
+                        Body = Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
+                    },
+                    Data = new Dictionary<string, string>()
+                    {
+                        ["NotificationType"] = notificationType.ToString("d")
+                    },
+                }, cancellationToken);
 
-            logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
+                logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Erro ao notificar usuário {@Error}", e);
+            }
         }
 
         public string GenerateCreateAppointmentMessageApp(Appointment appointment)
