@@ -147,7 +147,8 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                               StartDate = s.StartDate,
                                               EndDate = s.EndDate,
                                               DayOfWeek = s.DayOfWeek,
-                                              DayOff = s.DayOff
+                                              Enabled = s.Enabled,
+                                              
                                           }).ToList(),
                                           Services = s.Appointments.SelectMany(s => s.Services).Select(s => s.Service).Select(s => new ServiceDetailDTO
                                           {
