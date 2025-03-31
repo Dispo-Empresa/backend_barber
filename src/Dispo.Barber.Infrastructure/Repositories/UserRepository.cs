@@ -142,12 +142,13 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                           Link = s.EntireSlug(),
                                           CompanyId = s.BusinessUnity.CompanyId,
                                           Role = s.Role,
-                                          Schedules = s.Schedules.Where(w => !w.IsRest).Select(s => new ScheduleDTO
+                                          Schedules = s.Schedules.Where(w => !w.IsRest && !w.DayOff).Select(s => new ScheduleDTO
                                           {
                                               StartDate = s.StartDate,
                                               EndDate = s.EndDate,
                                               DayOfWeek = s.DayOfWeek,
-                                              DayOff = s.DayOff
+                                              Enabled = s.Enabled,
+
                                           }).ToList(),
                                           Services = s.Appointments.SelectMany(s => s.Services).Select(s => s.Service).Select(s => new ServiceDetailDTO
                                           {

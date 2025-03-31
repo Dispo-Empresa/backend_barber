@@ -17,8 +17,8 @@ namespace Dispo.Barber.Domain.Services
 
             dashboard.Itens = new List<DashboardItem>
             {
-                new DashboardItem { Name = "Agendamentos Hoje", DisplayInformation = user.TodayAppointments() },
-                new DashboardItem { Name = "Ganhos Estimados", DisplayInformation = user.EstimatedGains() },
+                new DashboardItem { Name = "Agendamentos", DisplayInformation = user.TodayAppointments() },
+                new DashboardItem { Name = "Receita", DisplayInformation = user.EstimatedGains() },
                 new DashboardItem { Name = "Horas Agendadas", DisplayInformation = user.ScheduledHours() },
                 new DashboardItem { Name = "Aproveitamento", DisplayInformation = user.ChairUsage() }, // % de Aproveitamento de Cadeira
             };

@@ -59,7 +59,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
         public async Task<bool> CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date)
         {
             return await context.Appointments
-                .Where(w => w.AcceptedUserId == userId && w.Date.Date == date.Date)
+                .Where(w => w.AcceptedUserId == userId && w.Date.Date == date.Date && w.Status == AppointmentStatus.Scheduled)
                 .ExecuteUpdateAsync(set => set.SetProperty(a => a.Status, AppointmentStatus.Canceled), cancellationToken) > 0;
         }
 

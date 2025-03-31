@@ -179,9 +179,9 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             try
             {
-                await appointmentAppService.CancelAppointmentAsync(cancellationToken, createAppointmentDTO.Id, false);
+                await appointmentAppService.CancelAppointmentAsync(cancellationToken, createAppointmentDTO.Id, false, true);
                 createAppointmentDTO.Id = 0L;
-                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
+                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, true);
                 return Ok();
             }
             catch (Exception e)
