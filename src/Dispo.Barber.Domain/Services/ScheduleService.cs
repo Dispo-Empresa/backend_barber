@@ -85,6 +85,7 @@ namespace Dispo.Barber.Domain.Services
             if (!schedule.IsDatesValid())
             {
                 await ValidateOverride(cancellationToken, schedule);
+                return;
             }
 
             var (start, end) = schedule.ParseDates();
