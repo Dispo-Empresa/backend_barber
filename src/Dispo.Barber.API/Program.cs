@@ -177,7 +177,20 @@ builder.Services.AddOpenTelemetry()
     {
         tracerProviderBuilder
             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Dispo.Barber"))
-            .AddAspNetCoreInstrumentation()
+            .AddAspNetCoreInstrumentation(options =>
+            {
+                options.EnrichWithHttpRequest = async (activity, httpRequest) =>
+                {
+                    if (httpRequest.Method == HttpMethod.Post.Method)
+                    {
+                        httpRequest.EnableBuffering();
+                        using var reader = new StreamReader(httpRequest.Body, Encoding.UTF8, leaveOpen: true);
+                        string requestBody = await reader.ReadToEndAsync();
+                        httpRequest.Body.Position = 0;
+                        activity.SetTag("http.request.body", requestBody);
+                    }
+                };
+            })
             .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true)
             .AddOtlpExporter(opts =>
             {
