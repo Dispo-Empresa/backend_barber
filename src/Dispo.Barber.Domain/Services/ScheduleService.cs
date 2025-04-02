@@ -114,7 +114,7 @@ namespace Dispo.Barber.Domain.Services
 
         private void HandleDayOffOverride(UserSchedule schedule, UserSchedule existingSchedule)
         {
-            if (schedule.StartDay < existingSchedule.EndDay && schedule.EndDay > existingSchedule.StartDay)
+            if (schedule.StartDay <= existingSchedule.EndDay && schedule.EndDay >= existingSchedule.StartDay)
             {
                 throw new BusinessException("O horário novo sobrepõe um já existente.");
             }
