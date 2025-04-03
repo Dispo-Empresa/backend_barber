@@ -162,7 +162,7 @@ namespace Dispo.Barber.Domain.Services
             if (!string.IsNullOrEmpty(existingSchedule.EndDate))
             {
                 var endDate = TimeSpan.Parse(existingSchedule.EndDate);
-                if (endDate > existingEnd)
+                if (endDate < existingStart)
                 {
                     throw new BusinessException("O horário final não pode ser menor nem igual o horário inicial.");
                 }
