@@ -139,7 +139,7 @@ namespace Dispo.Barber.Domain.Services
 
         private void EnsureValidTimes(UpdateScheduleDTO schedule, UserSchedule existingSchedule)
         {
-            if (!existingSchedule.IsDatesValid() || existingSchedule.IsRest || existingSchedule.DayOff)
+            if (!existingSchedule.IsDatesValid() || existingSchedule.DayOff)
             {
                 return;
             }
