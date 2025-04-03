@@ -54,25 +54,22 @@ namespace Dispo.Barber.Domain.Services
             }
         }
 
-        public async Task SendMessageAsync(string phoneNumberDestiny, string messageBody)
+        public async Task SendMessageAsync(string phone, string messageBody)
         {
             try
             {
-                phoneNumberDestiny = StringUtils.FormatPhoneNumber(phoneNumberDestiny);
-
+                phone = StringUtils.FormatPhoneNumber(phone);
                 TwilioClient.Init(_accountSid, _authToken);
 
-                string numberTwilio = _twilioPhoneNumber;
-
                 await MessageResource.CreateAsync(
-                    to: new PhoneNumber(phoneNumberDestiny),
-                    from: new PhoneNumber(numberTwilio),
+                    to: new PhoneNumber(phone),
+                    from: new PhoneNumber(_twilioPhoneNumber),
                     body: messageBody
                 );
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao enviar {messageBody}. Para o numero {phoneNumberDestiny}. {ex.Message}");
+                throw new Exception($"Erro ao enviar {messageBody}. Para o numero {phone}. {ex.Message}");
             }
         }
 

@@ -31,6 +31,8 @@ namespace Dispo.Barber.Domain.Services
         {
             var schedule = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Horário não encontrado.");
 
+            EnsureValidTimes(updateScheduleDTO, schedule);
+
             if (updateScheduleDTO.DayOfWeek.HasValue && schedule.DayOfWeek != updateScheduleDTO.DayOfWeek.Value)
             {
                 schedule.DayOfWeek = updateScheduleDTO.DayOfWeek.Value;
@@ -132,6 +134,38 @@ namespace Dispo.Barber.Domain.Services
             if (newStart < existingEnd && newEnd > existingStart)
             {
                 throw new BusinessException("O horário novo sobrepõe um já existente.");
+            }
+        }
+
+        private void EnsureValidTimes(UpdateScheduleDTO schedule, UserSchedule existingSchedule)
+        {
+            if (!existingSchedule.IsDatesValid())
+            {
+                return;
+            }
+
+            if (existingSchedule.IsRest || existingSchedule.DayOff)
+            {
+                return;
+            }
+
+            var (existingStart, existingEnd) = existingSchedule.ParseDates();
+            if (!string.IsNullOrEmpty(existingSchedule.StartDate))
+            {
+                var startDate = TimeSpan.Parse(existingSchedule.StartDate);
+                if (startDate > existingEnd)
+                {
+                    throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(existingSchedule.EndDate))
+            {
+                var endDate = TimeSpan.Parse(existingSchedule.EndDate);
+                if (endDate > existingEnd)
+                {
+                    throw new BusinessException("O horário final não pode ser menor nem igual o horário inicial.");
+                }
             }
         }
     }
