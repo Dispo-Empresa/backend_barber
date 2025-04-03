@@ -150,18 +150,18 @@ namespace Dispo.Barber.Domain.Services
             }
 
             var (existingStart, existingEnd) = existingSchedule.ParseDates();
-            if (!string.IsNullOrEmpty(existingSchedule.StartDate))
+            if (!string.IsNullOrEmpty(schedule.StartDate))
             {
-                var startDate = TimeSpan.Parse(existingSchedule.StartDate);
+                var startDate = TimeSpan.Parse(schedule.StartDate);
                 if (startDate > existingEnd)
                 {
                     throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
                 }
             }
 
-            if (!string.IsNullOrEmpty(existingSchedule.EndDate))
+            if (!string.IsNullOrEmpty(schedule.EndDate))
             {
-                var endDate = TimeSpan.Parse(existingSchedule.EndDate);
+                var endDate = TimeSpan.Parse(schedule.EndDate);
                 if (endDate < existingStart)
                 {
                     throw new BusinessException("O horário final não pode ser menor nem igual o horário inicial.");
