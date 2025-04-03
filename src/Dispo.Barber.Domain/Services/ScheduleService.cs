@@ -139,12 +139,7 @@ namespace Dispo.Barber.Domain.Services
 
         private void EnsureValidTimes(UpdateScheduleDTO schedule, UserSchedule existingSchedule)
         {
-            if (!existingSchedule.IsDatesValid())
-            {
-                return;
-            }
-
-            if (existingSchedule.IsRest || existingSchedule.DayOff)
+            if (!existingSchedule.IsDatesValid() || existingSchedule.IsRest || existingSchedule.DayOff)
             {
                 return;
             }
@@ -153,7 +148,7 @@ namespace Dispo.Barber.Domain.Services
             if (!string.IsNullOrEmpty(schedule.StartDate))
             {
                 var startDate = TimeSpan.Parse(schedule.StartDate);
-                if (startDate > existingEnd)
+                if (startDate >= existingEnd)
                 {
                     throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
                 }
@@ -162,7 +157,7 @@ namespace Dispo.Barber.Domain.Services
             if (!string.IsNullOrEmpty(schedule.EndDate))
             {
                 var endDate = TimeSpan.Parse(schedule.EndDate);
-                if (endDate < existingStart)
+                if (endDate <= existingStart)
                 {
                     throw new BusinessException("O horário final não pode ser menor nem igual o horário inicial.");
                 }
