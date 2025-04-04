@@ -42,8 +42,8 @@ namespace Dispo.Barber.Domain.Services
                     Token = token,
                     Notification = new Notification()
                     {
-                        Title = Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
-                        Body = Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
+                        Title = title, //Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
+                        Body = body    //Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
                     },
                     Data = new Dictionary<string, string>()
                     {
@@ -81,7 +81,7 @@ namespace Dispo.Barber.Domain.Services
                 var customerName = appointment.Customer?.Name ?? "Cliente";
                 var appointmentDate = appointment.Date.ToString("dd/MM/yyyy");
 
-                return $"Atenção! {customerName} cancelou o agendamento marcado para o dia {appointmentDate}.";
+                return $"Atencao! {customerName} cancelou o agendamento marcado para o dia {appointmentDate}.";
             }
             catch (Exception ex)
             {
