@@ -4,6 +4,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
+using Google.Api.Gax;
 
 namespace Dispo.Barber.Domain.Services
 {
@@ -12,6 +13,9 @@ namespace Dispo.Barber.Domain.Services
         public async Task CreateAsync(CancellationToken cancellationToken, CreateScheduleDTO createScheduleDTO)
         {
             var schedule = mapper.Map<UserSchedule>(createScheduleDTO);
+
+            await ValidateSchedule(cancellationToken, schedule);
+
             await repository.AddAsync(cancellationToken, schedule);
             await repository.SaveChangesAsync(cancellationToken);
         }
@@ -26,6 +30,8 @@ namespace Dispo.Barber.Domain.Services
         public async Task UpdateAsync(CancellationToken cancellationToken, long id, UpdateScheduleDTO updateScheduleDTO)
         {
             var schedule = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Horário não encontrado.");
+
+            EnsureValidTimes(updateScheduleDTO, schedule);
 
             if (updateScheduleDTO.DayOfWeek.HasValue && schedule.DayOfWeek != updateScheduleDTO.DayOfWeek.Value)
             {
@@ -69,6 +75,93 @@ namespace Dispo.Barber.Domain.Services
 
             repository.Update(schedule);
             await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task ValidateSchedule(CancellationToken cancellationToken, UserSchedule schedule)
+        {
+            if (schedule.DayOff && schedule.StartDay > schedule.EndDay)
+            {
+                throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
+            }
+
+            if (!schedule.IsDatesValid())
+            {
+                await ValidateOverride(cancellationToken, schedule);
+                return;
+            }
+
+            var (start, end) = schedule.ParseDates();
+            if (schedule.IsRest && (start > end || start == end))
+            {
+                throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
+            }
+
+            await ValidateOverride(cancellationToken, schedule);
+        }
+
+        private async Task ValidateOverride(CancellationToken cancellationToken, UserSchedule schedule)
+        {
+            var existingSchedules = await repository.GetAsync(cancellationToken, w => w.Enabled && (w.IsRest || w.DayOff) && w.UserId == schedule.UserId && w.DayOfWeek == schedule.DayOfWeek);
+            foreach (var existingSchedule in existingSchedules)
+            {
+                if (existingSchedule.DayOff)
+                {
+                    HandleDayOffOverride(schedule, existingSchedule);
+                    continue;
+                }
+
+                HandleRestOverride(schedule, existingSchedule);
+            }
+        }
+
+        private void HandleDayOffOverride(UserSchedule schedule, UserSchedule existingSchedule)
+        {
+            if (schedule.StartDay <= existingSchedule.EndDay && schedule.EndDay >= existingSchedule.StartDay)
+            {
+                throw new BusinessException("O horário novo sobrepõe um já existente.");
+            }
+        }
+
+        private void HandleRestOverride(UserSchedule schedule, UserSchedule existingSchedule)
+        {
+            if (!existingSchedule.IsDatesValid() || !schedule.IsDatesValid())
+            {
+                return;
+            }
+
+            var (newStart, newEnd) = schedule.ParseDates();
+            var (existingStart, existingEnd) = existingSchedule.ParseDates();
+            if (newStart < existingEnd && newEnd > existingStart)
+            {
+                throw new BusinessException("O horário novo sobrepõe um já existente.");
+            }
+        }
+
+        private void EnsureValidTimes(UpdateScheduleDTO schedule, UserSchedule existingSchedule)
+        {
+            if (!existingSchedule.IsDatesValid() || existingSchedule.DayOff)
+            {
+                return;
+            }
+
+            var (existingStart, existingEnd) = existingSchedule.ParseDates();
+            if (!string.IsNullOrEmpty(schedule.StartDate))
+            {
+                var startDate = TimeSpan.Parse(schedule.StartDate);
+                if (startDate >= existingEnd)
+                {
+                    throw new BusinessException("O horário inicial não pode ser maior nem igual o horário final.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(schedule.EndDate))
+            {
+                var endDate = TimeSpan.Parse(schedule.EndDate);
+                if (endDate <= existingStart)
+                {
+                    throw new BusinessException("O horário final não pode ser menor nem igual o horário inicial.");
+                }
+            }
         }
     }
 }

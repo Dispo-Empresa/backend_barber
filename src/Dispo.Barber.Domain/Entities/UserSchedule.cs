@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Google.Api.Gax;
 
 namespace Dispo.Barber.Domain.Entities
 {
@@ -29,5 +30,17 @@ namespace Dispo.Barber.Domain.Entities
 
         public long UserId { get; set; }
         public User User { get; set; }
+
+        public bool IsDatesValid()
+        {
+            return !string.IsNullOrWhiteSpace(StartDate) || !string.IsNullOrWhiteSpace(EndDate);
+        }
+
+        public (TimeSpan, TimeSpan) ParseDates()
+        {
+            var newStart = TimeSpan.Parse(StartDate ?? string.Empty);
+            var newEnd = TimeSpan.Parse(EndDate ?? string.Empty);
+            return (newStart, newEnd);
+        }
     }
 }
