@@ -185,11 +185,9 @@ namespace Dispo.Barber.API.Controllers.v1
 
             if (file != null && file.Length != 0)
             {
-                using (var stream = new MemoryStream())
-                {
-                    await file.CopyToAsync(stream, cancellationToken);
-                    byteArrayImage = stream.ToArray();
-                }
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream, cancellationToken);
+                byteArrayImage = stream.ToArray();
             }
 
             await userAppService.UploadImageAsync(cancellationToken, id, byteArrayImage);

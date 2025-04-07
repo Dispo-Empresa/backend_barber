@@ -181,7 +181,7 @@ builder.Services.AddOpenTelemetry()
             {
                 options.EnrichWithHttpRequest = async (activity, httpRequest) =>
                 {
-                    if (httpRequest.Method == HttpMethod.Post.Method || httpRequest.Method == HttpMethod.Put.Method)
+                    if ((httpRequest.Method == HttpMethod.Post.Method || httpRequest.Method == HttpMethod.Put.Method) && !httpRequest.HasFormContentType)
                     {
                         httpRequest.EnableBuffering();
                         using var reader = new StreamReader(httpRequest.Body, Encoding.UTF8, leaveOpen: true);
