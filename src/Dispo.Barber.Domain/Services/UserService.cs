@@ -284,7 +284,7 @@ namespace Dispo.Barber.Domain.Services
         {
             var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
 
-            if (!await ExistsByPhone(cancellationToken, user.Phone))
+            if (await ExistsByPhone(cancellationToken, user.Phone))
             {
                 throw new AlreadyExistsException("Este número já está cadastrado e ativado em uma barbearia.");
             }
