@@ -53,17 +53,18 @@ namespace Dispo.Barber.Application.AppServices
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var appointments = await service.GetUserAppointmentsAsync(cancellationToken, id, getUserAppointmentsDTO);
+
+                    // Estamos completando os agendamentos que já passaram do horário porem estamos fazendo um update em um metodo get, vamos ter que melhorar isso
                     foreach (var appointment in appointments.Where(w => w.Date <= LocalTime.Now && w.Status == AppointmentStatus.Scheduled).ToList())
                     {
                         var duration = appointment.Services.Select(w => w.Service).Sum(w => w.Duration);
                         if (appointment.Date.AddMinutes(duration) >= LocalTime.Now)
-                        {
                             continue;
-                        }
 
                         appointment.Status = AppointmentStatus.Completed;
                     }
                     await unitOfWork.SaveChangesAsync(cancellationToken);
+
                     return appointments;
                 }, true);
             }
@@ -260,11 +261,27 @@ namespace Dispo.Barber.Application.AppServices
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await appointmentService.GetNextAppointmentsAsync(cancellationToken, id));
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    var appointments = await appointmentService.GetNextAppointmentsAsync(cancellationToken, id);
+
+                    // Estamos completando os agendamentos que já passaram do horário porem estamos fazendo um update em um metodo get, vamos ter que melhorar isso
+                    foreach (var appointment in appointments.Where(w => w.Date <= LocalTime.Now && w.Status == AppointmentStatus.Scheduled).ToList())
+                    {
+                        var duration = appointment.Services.Select(w => w.Service).Sum(w => w.Duration);
+                        if (appointment.Date.AddMinutes(duration) >= LocalTime.Now)
+                            continue;
+
+                        appointment.Status = AppointmentStatus.Completed;
+                    }
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    return appointments;
+                }, true);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Error adding service to user.");
+                logger.LogError(e, "Error getting next appointments.");
                 throw;
             }
         }
