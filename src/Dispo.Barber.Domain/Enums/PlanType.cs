@@ -2,6 +2,7 @@
 {
     public enum PlanType
     {
+        none,
         BarberFree,
         BarberPremium,
         BarberPremiumTrial,
