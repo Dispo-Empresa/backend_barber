@@ -1,10 +1,13 @@
 ﻿using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Chat;
+using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
@@ -179,9 +182,9 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             try
             {
-                await appointmentAppService.CancelAppointmentAsync(cancellationToken, createAppointmentDTO.Id, false, true);
+                await appointmentAppService.CancelAppointmentAsync(cancellationToken, createAppointmentDTO.Id, false);
                 createAppointmentDTO.Id = 0L;
-                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, true);
+                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, reschedule: true, notifyUsers: true);
                 return Ok();
             }
             catch (Exception e)

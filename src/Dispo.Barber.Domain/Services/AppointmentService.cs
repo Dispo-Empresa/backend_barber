@@ -49,7 +49,7 @@ namespace Dispo.Barber.Domain.Services
             }
         }
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool reschedule = false)
         {
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
             var user = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
@@ -85,7 +85,14 @@ namespace Dispo.Barber.Domain.Services
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
 
             if (notifyUsers)
-                await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
+            {
+                if (reschedule)
+                {
+                    await SendNotificationByApp(cancellationToken, appointment, "Reagendamento confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.RescheduleAppointment);
+                }
+                else
+                    await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
+            }           
         }
 
         public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
