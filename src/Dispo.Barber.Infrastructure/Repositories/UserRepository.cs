@@ -66,9 +66,15 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                               .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<UserSchedule>> GetEnabledBreaksAsync(CancellationToken cancellationToken, long id, DayOfWeek dayOfWeek)
+        {
+            return await context.UserSchedules.Where(x => x.UserId == id && x.IsRest && !x.DayOff && x.DayOfWeek == dayOfWeek && x.Enabled == true)
+                                              .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<UserSchedule>> GetDaysOffAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.UserSchedules.Where(x => x.UserId == id && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now)
+            return await context.UserSchedules.Where(x => x.UserId == id && x.DayOff && x.StartDay != null && x.EndDay != null && x.StartDay >= LocalTime.Now.Date)
                                               .ToListAsync(cancellationToken);
         }
 

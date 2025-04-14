@@ -14,7 +14,7 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper) : IInformationChatService
+    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository) : IInformationChatService
     {
         public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken, long companyId)
         {
@@ -164,9 +164,11 @@ namespace Dispo.Barber.Domain.Services
             var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
             DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
             var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+            var userBreaks = await userRepository.GetEnabledBreaksAsync(cancellationToken, availableSlotRequestDto.IdUser, dayOfWeek);
+            var userDayOffs = await userRepository.GetDaysOffAsync(cancellationToken, availableSlotRequestDto.IdUser);
             var dayIsEqual = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
-            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
+            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, userBreaks, userDayOffs, availableSlotRequestDto.DateTimeSchedule, dayIsEqual);
             var availableSlots = InitializeAvailableSlots();
 
             var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
@@ -184,9 +186,11 @@ namespace Dispo.Barber.Domain.Services
             var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
             DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
             var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
-            var dayIsEqual = DateTime.Today.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+            var userBreaks = await userRepository.GetEnabledBreaksAsync(cancellationToken, availableSlotRequestDto.IdUser, dayOfWeek);
+            var userDayOffs = await userRepository.GetDaysOffAsync(cancellationToken, availableSlotRequestDto.IdUser);
+            var dayIsEqual = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
-            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, dayIsEqual);
+            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, userBreaks, userDayOffs, availableSlotRequestDto.DateTimeSchedule, dayIsEqual);
             var availableSlots = InitializeAvailableSuggestedSlots();
 
             var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
@@ -527,67 +531,57 @@ namespace Dispo.Barber.Domain.Services
         }
 
 
-        private List<DateTime> GetTimeIntervals(int duration, List<UserSchedule> userSchedules, bool dayIsEqual)
+        private List<DateTime> GetTimeIntervals(int duration,List<UserSchedule> userSchedules, List<UserSchedule> breaks, List<UserSchedule> dayOffs, DateTime selectedDate, bool dayIsEqual)
         {
             var timeIntervals = new List<DateTime>();
-            bool firstTime = true;
+            var today = selectedDate.Date;
+            var currentDay = selectedDate.DayOfWeek;
 
-            for (int i = 0; i < userSchedules.Count; i++)
+            bool isDayOff = dayOffs.Any(d =>
+                d.DayOff &&
+                d.StartDay.HasValue &&
+                d.EndDay.HasValue &&
+                today >= d.StartDay.Value.Date &&
+                today <= d.EndDay.Value.Date);
+
+            if (isDayOff)
             {
-                if (userSchedules[i].IsRest && firstTime)
-                {
-                    (userSchedules[0], userSchedules[1]) = (userSchedules[1], userSchedules[0]);
-                    firstTime = false;
-                    break;
-                }
+                return timeIntervals;
             }
 
             foreach (var userSchedule in userSchedules)
-            {             
-                if (userSchedule.DayOff)
-                {
-                    return timeIntervals;
-                }
+            {
+                if (userSchedule.DayOfWeek != currentDay || userSchedule.DayOff)
+                    continue;
 
                 TimeSpan startTime = TimeSpan.Parse(userSchedule.StartDate);
                 TimeSpan endTime = TimeSpan.Parse(userSchedule.EndDate);
 
                 TimeSpan currentTime = startTime;
-
-                DateTime currentDateTime = LocalTime.Now;
-                TimeSpan currentTimeSpan = currentDateTime.TimeOfDay;
+                TimeSpan nowTime = LocalTime.Now.TimeOfDay;
 
                 while (currentTime < endTime)
                 {
-                    if (!userSchedule.IsRest)
+                    DateTime interval = DateTime.Today.Add(currentTime);
+
+                    if (dayIsEqual && currentTime < nowTime)
                     {
-                        DateTime intervalDateTime = DateTime.Today.Add(currentTime);
-
-                        if (dayIsEqual && !(currentTime >= currentTimeSpan))
-                        {
-                            currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
-                            continue;
-                        }
-                        else
-                        {
-                            timeIntervals.Add(intervalDateTime);
-                        }
-
-
+                        currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                        continue;
                     }
-                    else
+
+                    bool isInBreak = breaks.Any(b =>
                     {
-                        if (!userSchedule.Enabled)
-                        {
-                            break;
-                        }
+                        if (b.DayOfWeek != currentDay) return false;
 
-                        DateTime restStartTime = DateTime.Today.Add(startTime);
-                        DateTime restEndTime = DateTime.Today.Add(endTime);
+                        TimeSpan breakStart = TimeSpan.Parse(b.StartDate);
+                        TimeSpan breakEnd = TimeSpan.Parse(b.EndDate);
+                        return currentTime >= breakStart && currentTime < breakEnd;
+                    });
 
-                        timeIntervals.RemoveAll(slot => slot >= restStartTime && slot < restEndTime);
-                        break;
-
+                    if (!isInBreak)
+                    {
+                        timeIntervals.Add(interval);
                     }
 
                     currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
@@ -596,7 +590,6 @@ namespace Dispo.Barber.Domain.Services
 
             return timeIntervals;
         }
-
 
         private List<DateTime> GetTimeIntervalsTwo(int duration, IList<UserSchedule> userSchedules, bool dayIsEqual)
         {
