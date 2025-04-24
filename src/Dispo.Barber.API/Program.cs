@@ -84,7 +84,12 @@ builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twi
 builder.Services.AddTransient<ISmsService, SmsService>(provider =>
 {
     var twilioSettings = provider.GetRequiredService<IOptions<TwilioSettings>>().Value;
-    return new SmsService(twilioSettings.AccountSid, twilioSettings.AuthToken, twilioSettings.PhoneNumber, twilioSettings.PhoneNumberWhats);
+    string accountSid = Environment.GetEnvironmentVariable("TWILLIO_ACCOUNT_SID") ?? "";
+    string authToken = Environment.GetEnvironmentVariable("TWILLIO_AUTH_TOKEN") ?? "";
+    string phoneNumber = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER") ?? "";
+    string phoneNumberWhats = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER_WHATS") ?? "";
+
+    return new SmsService(accountSid, authToken, phoneNumber, phoneNumberWhats);
 });
 
 builder.Services.AddMemoryCache();
