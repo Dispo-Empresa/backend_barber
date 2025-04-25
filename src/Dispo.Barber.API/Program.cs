@@ -87,7 +87,7 @@ builder.Services.AddTransient<ISmsService, SmsService>(provider =>
     string accountSid = Environment.GetEnvironmentVariable("TWILLIO_ACCOUNT_SID") ?? "";
     string authToken = Environment.GetEnvironmentVariable("TWILLIO_AUTH_TOKEN") ?? "";
     string phoneNumber = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER") ?? "";
-    string phoneNumberWhats = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER_WHATS") ?? "";
+    string phoneNumberWhats = ""; //Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER_WHATS") ?? "";
 
     return new SmsService(accountSid, authToken, phoneNumber, phoneNumberWhats);
 });
