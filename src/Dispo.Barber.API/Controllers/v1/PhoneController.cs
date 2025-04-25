@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Domain.Services.Interface;
+﻿using Dispo.Barber.Domain.DTOs.Phone;
+using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,17 +10,17 @@ namespace Dispo.Barber.API.Controllers.v1
     public class PhoneController(ISmsService smsService, ICacheManager cache) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> GenerateSmsCode([FromBody] string phone)
+        public async Task<IActionResult> GenerateSmsCode([FromBody] GenerateSmsCodePhone request)
         {
             try
             {
-                // var codeRandom = new Random().Next(1000, 9999).ToString();
-                // 
-                // var fullMessageBody = $"Seu código de verificação é: {codeRandom}";
-                // 
-                // await smsService.SendMessageAsync(phone, fullMessageBody);
-                // 
-                // cache.Add(phone, codeRandom);
+                 var codeRandom = new Random().Next(1000, 9999).ToString();
+                 
+                 var fullMessageBody = $"Seu código de verificação é: {codeRandom}";
+                 
+                 await smsService.SendMessageAsync(request.Phone, fullMessageBody);
+                 
+                 cache.Add(request.Phone, codeRandom);
 
                 return Ok(new { message = "Código enviado com sucesso." });
             }
