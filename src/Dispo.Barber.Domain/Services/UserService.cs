@@ -391,6 +391,17 @@ namespace Dispo.Barber.Domain.Services
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task RemoveAsync(CancellationToken cancellationToken, long id)
+        {
+            var user = await repository.GetFirstAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+
+            if (!user.IsPending())
+                throw new BusinessException("Apenas usuários pendentes podem ser deletados.");
+
+            repository.Delete(user);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
         private List<UserSchedule> BuildNormalDays() => [
             new(DayOfWeek.Monday, "08:00", "18:00", false, false, true),
             new(DayOfWeek.Monday, "12:00", "13:30", true, false, true),

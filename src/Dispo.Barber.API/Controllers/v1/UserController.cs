@@ -247,5 +247,13 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             return Ok(await userAppService.GetCompanyIdByIdAsync(cancellationToken, id));
         }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Remove(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await userAppService.RemoveAsync(cancellationToken, id);
+            return Ok();
+        }
     }
 }

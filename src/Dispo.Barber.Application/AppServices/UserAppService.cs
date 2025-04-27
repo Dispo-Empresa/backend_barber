@@ -428,5 +428,18 @@ namespace Dispo.Barber.Application.AppServices
                 throw;
             }
         }
+
+        public async Task RemoveAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.RemoveAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error removing user.");
+                throw;
+            }
+        }
     }
 }

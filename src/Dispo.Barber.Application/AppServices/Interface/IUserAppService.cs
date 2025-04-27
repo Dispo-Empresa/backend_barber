@@ -38,5 +38,6 @@ namespace Dispo.Barber.Application.AppServices.Interface
         Task FinalizeEmployeeUserRegistrationAsync(CancellationToken cancellationToken, long id, FinalizeEmployeeUserDTO createOwnerUserDto);
         Task CreateBarbershopSchemeAsync(CancellationToken cancellationToken, CreateBarbershopSchemeDto createBarbershopSchemeDto);
         Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id);
+        Task RemoveAsync(CancellationToken cancellationToken, long id);
     }
 }
