@@ -14,19 +14,19 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             try
             {
-                 var codeRandom = new Random().Next(1000, 9999).ToString();
-                 
-                 var fullMessageBody = $"Seu código de verificação é: {codeRandom}";
-                 
-                 await smsService.SendMessageAsync(request.Phone, fullMessageBody);
-                 
-                 cache.Add(request.Phone, codeRandom);
+                var codeRandom = new Random().Next(1000, 9999).ToString();
 
-                return Ok(new { message = "Código enviado com sucesso." });
+                var fullMessageBody = $"Seu código de verificação do Aura é {codeRandom}. Use-o para continuar.";
+
+                await smsService.SendMessageAsync(request.Phone, fullMessageBody);
+
+                cache.Add(request.Phone, codeRandom);
+
+                return Ok(new { message = "Enviamos o seu código de verificação. Dá uma olhadinha no seu SMS!" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = $"Erro ao enviar SMS: {ex.Message}" });
+                return BadRequest(new { message = "Não conseguimos enviar o SMS agora. Por favor, tente novamente em instantes." });
             }
         }
 
