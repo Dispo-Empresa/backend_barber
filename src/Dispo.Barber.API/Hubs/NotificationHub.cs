@@ -12,7 +12,6 @@ namespace Dispo.Barber.API.Hubs
             await Clients.All.SendAsync("Notify", notification);
         }
 
-
         public async Task SendNotificationAsync(string deviceToken, string title, string body)
         {
             if (FirebaseApp.DefaultInstance == null)
@@ -23,7 +22,7 @@ namespace Dispo.Barber.API.Hubs
                 });
             }
 
-            var message = new FirebaseAdmin.Messaging.Message()
+            var message = new Message
             {
                 Token = deviceToken,
                 Notification = new Notification()
@@ -32,14 +31,13 @@ namespace Dispo.Barber.API.Hubs
                     Body = body
                 },
                 Data = new Dictionary<string, string>()
-        {
-            { "chave_personalizada", "valor" }
-        }
+                {
+                    { "chave_personalizada", "valor" }
+                }
             };
 
             string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
             Console.WriteLine($"Notificação enviada com sucesso! ID: {response}");
         }
-
     }
 }

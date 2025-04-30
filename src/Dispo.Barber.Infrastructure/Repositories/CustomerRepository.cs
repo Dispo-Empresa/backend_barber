@@ -2,6 +2,7 @@
 using Dispo.Barber.Domain.DTOs.Customer;
 using Dispo.Barber.Domain.DTOs.Service;
 using Dispo.Barber.Domain.Entities;
+using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -116,6 +117,12 @@ namespace Dispo.Barber.Infrastructure.Repositories
                     Frequency = s.Appointments.Count,
                     LastAppointment = s.Appointments != null && s.Appointments.Count != 0 ? s.Appointments.OrderByDescending(o => o.Id).First().Date : null,
                 }).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> HasMultipleAppointmentsAsync(CancellationToken cancellation, long id)
+        {
+            return await context.Customers.Include(i => i.Appointments)
+               .AnyAsync(w => w.Id == id && w.Appointments.Count(w => w.Status == AppointmentStatus.Scheduled) > 3);
         }
     }
 }

@@ -64,6 +64,11 @@ namespace Dispo.Barber.Domain.Services
             {
                 appointment.Customer = null;
                 appointment.CustomerId = existingCustomer.Id;
+
+                if (await customerRepository.HasMultipleAppointmentsAsync(cancellationToken, existingCustomer.Id))
+                {
+                    throw new BusinessException("Este usuário já possui muitos agendamentos confirmados.");
+                }
             }
             else
             {

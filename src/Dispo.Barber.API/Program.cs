@@ -34,14 +34,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        //options.SerializerSettings.Converters.Add(new StringEnumConverter());
     }
 );
 
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSignalR();
@@ -140,8 +138,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Database connection
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
                             .UseNpgsql(Environment.GetEnvironmentVariable("BARBER_CONNECTION_STRING")));
-
-
 
 builder.Services.AddRequestTimeouts();
 
@@ -246,7 +242,6 @@ using (var scope = app.Services.CreateScope())
     migrationManager.Migrate();
 }
 # endif
-
 
 FirebaseApp.Create(new AppOptions()
 {
