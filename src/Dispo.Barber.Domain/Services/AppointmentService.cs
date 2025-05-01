@@ -18,14 +18,9 @@ namespace Dispo.Barber.Domain.Services
     {
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
         {
-            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id);
-
-            if (appointment is null)
-            {
-                throw new NotFoundException("Agendamento não existe.");
-            }
-
+            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
             appointment.Status = AppointmentStatus.Canceled;
+
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
             //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCancelAppointmentMessageSms(appointment), MessageType.Sms);
@@ -38,12 +33,9 @@ namespace Dispo.Barber.Domain.Services
         {
             foreach (var appointmentId in appointmentIds)
             {
-                var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, appointmentId);
-
-                if (appointment is null)
-                    throw new NotFoundException("Agendamento não existe.");
-
+                var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, appointmentId) ?? throw new NotFoundException("Agendamento não existe.");
                 appointment.Status = AppointmentStatus.Canceled;
+
                 repository.Update(appointment);
                 await repository.SaveChangesAsync(cancellationToken);
             }
@@ -107,14 +99,10 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            var appointment = await repository.GetAsync(cancellationToken, id);
-            if (appointment is null)
-            {
-                throw new NotFoundException("Agendamento não existe.");
-            }
-
+            var appointment = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
             appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
             appointment.Status = AppointmentStatus.Canceled;
+
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
         }

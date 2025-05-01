@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Net;
 using System.Text;
+using System.Threading.RateLimiting;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
@@ -201,7 +203,26 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, partition => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromSeconds(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    options.RejectionStatusCode = (int)HttpStatusCode.TooManyRequests;
+});
+
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 app.UseMiddleware<AuthorizationMiddleware>()
    .UseMiddleware<ExceptionHandlingMiddleware>();
