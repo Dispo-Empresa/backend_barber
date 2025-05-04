@@ -19,6 +19,11 @@ namespace Dispo.Barber.Domain.Services
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
         {
             var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+            if (appointment.Status == AppointmentStatus.Canceled)
+            {
+                throw new BusinessException("O agendamento já está cancelado.");
+            }
+
             appointment.Status = AppointmentStatus.Canceled;
 
             repository.Update(appointment);

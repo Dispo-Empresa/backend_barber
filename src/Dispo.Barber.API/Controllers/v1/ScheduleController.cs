@@ -9,7 +9,7 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class ScheduleController(IScheduleAppService scheduleAppService) : ControllerBase
     {
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateScheduleDTO createScheduleDTO)
         {
@@ -25,7 +25,7 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] UpdateScheduleDTO updateScheduleDTO)
         {

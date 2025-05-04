@@ -1,13 +1,9 @@
 ﻿using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Chat;
-using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Services.Interface;
-using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Twilio.TwiML.Messaging;
 
 namespace Dispo.Barber.API.Controllers.v1
 {
@@ -16,8 +12,6 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class ChatController(IInformationChatService informationChatService, 
                                 ICustomerService customerService, 
-                                ISmsService smsService, 
-                                ICacheManager cache, 
                                 IAppointmentAppService appointmentAppService) : ControllerBase
     {
         [HttpGet("companies/information/{id}")]
