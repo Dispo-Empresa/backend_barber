@@ -6,9 +6,6 @@ namespace Dispo.Barber.Domain.Utils
 {
     public static class CryptoHelper
     {
-        private static readonly string Key = "DispoAuraApp-2025-SECURE-KEY@963";
-        private static readonly string IV = "AuraInitVector20";
-
         private static string ToBase64Url(string base64)
         {
             return base64.Replace("+", "-").Replace("/", "_").Replace("=", "");
@@ -28,6 +25,10 @@ namespace Dispo.Barber.Domain.Utils
         public static string Encrypt(string plainText)
         {
             using Aes aesAlg = Aes.Create();
+
+            string Key = Environment.GetEnvironmentVariable("ENCRYPTION_KEY") ?? throw new InvalidOperationException("Missing ENCRYPTION_KEY env variable");
+            string IV = Environment.GetEnvironmentVariable("ENCRYPTION_IV") ?? throw new InvalidOperationException("Missing ENCRYPTION_IV env variable");
+
             aesAlg.Key = Encoding.UTF8.GetBytes(Key);
             aesAlg.IV = Encoding.UTF8.GetBytes(IV);
 
@@ -45,6 +46,10 @@ namespace Dispo.Barber.Domain.Utils
         public static string Decrypt(string cipherText)
         {
             using Aes aesAlg = Aes.Create();
+
+            string Key = Environment.GetEnvironmentVariable("ENCRYPTION_KEY") ?? throw new InvalidOperationException("Missing ENCRYPTION_KEY env variable");
+            string IV = Environment.GetEnvironmentVariable("ENCRYPTION_IV") ?? throw new InvalidOperationException("Missing ENCRYPTION_IV env variable");
+
             aesAlg.Key = Encoding.UTF8.GetBytes(Key);
             aesAlg.IV = Encoding.UTF8.GetBytes(IV);
 
