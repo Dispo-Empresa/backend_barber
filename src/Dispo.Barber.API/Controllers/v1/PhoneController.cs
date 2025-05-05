@@ -10,6 +10,8 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class PhoneController(ISmsService smsService, ICacheManager cache) : ControllerBase
     {
+        private const int MaxRetries = 3;
+
         [HttpPost]
         public async Task<IActionResult> GenerateSmsCode([FromBody] GenerateSmsCodePhone request)
         {
@@ -40,11 +42,10 @@ namespace Dispo.Barber.API.Controllers.v1
                 var smsInCache = cache.Get(phone) ?? throw new NotFoundException("O código expirou.");
                 if (smsInCache != sms)
                 {
+                    CheckRetries(phone);
                     throw new BusinessException("O código é diferente do enviado.");
                 }
 
-                // TODO: Isso pode ser um problema, alguém pode interceptar a requisição
-                //       setando o "data" = "true".
                 return Ok(new { data = smsInCache == sms });
             }
             catch (NotFoundException ex)
@@ -58,6 +59,30 @@ namespace Dispo.Barber.API.Controllers.v1
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        private void CheckRetries(string phone)
+        {
+            var key = $"{phone}-retries";
+            var value = cache.Get(key);
+
+            if (value != null)
+            {
+                var retries = Convert.ToInt32(value);
+                retries++;
+
+                if (retries >= MaxRetries)
+                {
+                    throw new BusinessException("Máximo de tentativas atingidas para o número, aguarde alguns minutos e tente novamente.");
+                }
+
+                cache.Remove(key);
+                cache.Add(key, retries.ToString());
+            }
+            else
+            {
+                cache.Add(key, "1");
             }
         }
     }
