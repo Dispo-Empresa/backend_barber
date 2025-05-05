@@ -12,7 +12,7 @@ using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
 
 
-namespace Dispo.Barber.Domain.Services
+namespace Dispo.Barber.Application.AppServices
 {
     public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository) : IInformationChatService
     {

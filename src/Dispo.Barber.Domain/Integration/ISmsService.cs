@@ -1,7 +1,7 @@
 ﻿using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Utils;
 
-namespace Dispo.Barber.Domain.Services.Interface
+namespace Dispo.Barber.Domain.Integration
 {
     public interface ISmsService
     {

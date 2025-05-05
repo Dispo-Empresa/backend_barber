@@ -1,6 +1,6 @@
 ﻿using Dispo.Barber.Domain.DTOs.Phone;
 using Dispo.Barber.Domain.Exceptions;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Microsoft.AspNetCore.Mvc;
 

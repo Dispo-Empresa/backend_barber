@@ -3,9 +3,9 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Integration;
 
-namespace Dispo.Barber.Domain.Services
+namespace Dispo.Barber.Infrastructure.Integration
 {
     public class SmsService : ISmsService
     {
