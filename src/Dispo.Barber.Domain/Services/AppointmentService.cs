@@ -3,6 +3,7 @@ using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
+using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -14,7 +15,8 @@ namespace Dispo.Barber.Domain.Services
                                     IAppointmentRepository repository,
                                     ICustomerRepository customerRepository,
                                     INotificationService notificationService,
-                                    IUserRepository userRepository) : IAppointmentService
+                                    IUserRepository userRepository,
+                                    ITwillioMessageSender twillioMessageSender) : IAppointmentService
     {
         public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
         {
@@ -79,7 +81,14 @@ namespace Dispo.Barber.Domain.Services
             await repository.AddAsync(cancellationToken, appointment);
             await repository.SaveChangesAsync(cancellationToken);
 
-            //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCreateAppointmentMessageSms(appointment), MessageType.Sms);
+            var barbershopName = appointment.AcceptedUser?.BusinessUnity?.Company?.Name ?? "Teste";
+            var dateOnly = appointment.Date.ToString("dd/MM/yyyy");
+            var timeOnly = appointment.Date.ToString("HH:mm");
+            var professional = appointment.AcceptedUser?.Name;
+            var services = "Teste"; //string.Join(", ", appointment.Services.Select(w => w.Service.Description));
+            var cancellationLink = "https://chat.dispo-api.online/cancelar-agendamento";
+
+            //await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, barbershopName, dateOnly, timeOnly, professional, services, cancellationLink);
 
             appointment.AcceptedUser = user;
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);

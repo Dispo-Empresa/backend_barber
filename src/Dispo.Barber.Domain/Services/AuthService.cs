@@ -17,8 +17,6 @@ namespace Dispo.Barber.Domain.Services
     public class AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IBlacklistService blacklistService, IHubIntegration hubIntegration,
         INotificationService notificationService, IUserService userService) : IAuthService
     {
-        private const string BlacklistedJwtKey = "blacklisted-{0}";
-
         public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
         {
             var user = await userRepository.GetByPhoneWithBusinessUnitiesAsync(cancellationToken, phone) ?? throw new NotFoundException("Usuário não encontrado.");

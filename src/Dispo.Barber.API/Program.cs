@@ -9,6 +9,7 @@ using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Application.Profiles;
 using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services;
 using Dispo.Barber.Domain.Services.Interface;
@@ -16,6 +17,7 @@ using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.interfaces;
 using Dispo.Barber.Infrastructure.Context;
 using Dispo.Barber.Infrastructure.Integration;
+using Dispo.Barber.Infrastructure.Providers;
 using Dispo.Barber.Infrastructure.Repositories;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -79,19 +81,6 @@ builder.Services.AddSwaggerGen(option =>
     );
 });
 
-// Twilio configuration using IOptions<T>
-builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
-builder.Services.AddTransient<ISmsService, SmsService>(provider =>
-{
-    var twilioSettings = provider.GetRequiredService<IOptions<TwilioSettings>>().Value;
-    string accountSid = Environment.GetEnvironmentVariable("TWILLIO_ACCOUNT_SID") ?? "";
-    string authToken = Environment.GetEnvironmentVariable("TWILLIO_AUTH_TOKEN") ?? "";
-    string phoneNumber = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER") ?? "";
-    string phoneNumberWhats = ""; //Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER_WHATS") ?? "";
-
-    return new SmsService(accountSid, authToken, phoneNumber, phoneNumberWhats);
-});
-
 builder.Services.AddMemoryCache();
 
 // Register repositories
@@ -108,6 +97,7 @@ builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentR
 builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
+builder.Services.AddTransient<ITwillioMessageSender, TwillioMessageSender>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
