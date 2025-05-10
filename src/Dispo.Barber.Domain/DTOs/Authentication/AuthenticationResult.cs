@@ -16,7 +16,8 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
             CompanyName = user.BusinessUnity.Company.Name;
             CompanyPhone = user.BusinessUnity.Phone;
             Name = user.Name;
-            Slug = user.EntireSlug();
+            BarberSlug = user.EntireSlug();
+            BarbershopSlug = user.BusinessUnity.EntireSlug();
             Photo = user.Photo;
             DeviceToken = user.DeviceToken;
             LicenceDetails = licenceDetails;
@@ -37,7 +38,8 @@ namespace Dispo.Barber.Domain.DTOs.Authentication
         public string CompanyName { get; set; }
         public string CompanyPhone { get; set; }
         public string Name { get; set; }
-        public string Slug { get; set; }
+        public string BarberSlug { get; set; }
+        public string BarbershopSlug { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
         public long OwnerId { get; set; }

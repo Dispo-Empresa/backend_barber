@@ -16,5 +16,10 @@
         public Company Company { get; set; }
 
         public List<User> Users { get; set; } = new List<User>();
+
+        public string EntireSlug()
+        {
+            return $"https://chat.dispo-api.online/barbearia={Id.ToString()}";
+        }
     }
 }
