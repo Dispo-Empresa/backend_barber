@@ -21,5 +21,7 @@ namespace Dispo.Barber.Domain.Repositories
         Task<List<CustomerDetailDTO>> GetCustomersAsync(CancellationToken cancellationToken);
 
         Task<CustomerDetailDTO?> GetByIdAsync(CancellationToken cancellationToken, long id);
+
+        Task<bool> HasMultipleAppointmentsAsync(CancellationToken cancellation, long id);
     }
 }

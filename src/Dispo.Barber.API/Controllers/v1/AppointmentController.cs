@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Services;
 using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,8 @@ namespace Dispo.Barber.API.Controllers.v1
     [Route("api/v1/appointments")]
     [ApiController]
     public class AppointmentController(IAppointmentAppService appointmentAppService, 
-                                       IInformationChatService informationChatService) : ControllerBase
+                                       IInformationChatService informationChatService,
+                                       Application.AppServices.Interface.InformationSuggestionAppService informationSuggestionAppService ) : ControllerBase
     {
         [Authorize]
         [HttpGet("{id}")]
@@ -75,7 +77,7 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpPost("generate-suggestions")]
         public async Task<IActionResult> GenerateSuggestions()
         {
-            if (await informationChatService.GetSuggestionAppointmentAsync())
+            if (await informationSuggestionAppService.GetSuggestionAppointmentAsync())
                 return Ok("Sugestões geradas com sucesso.");
             else return BadRequest();
         }

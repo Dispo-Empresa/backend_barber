@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Net;
 using System.Text;
+using System.Threading.RateLimiting;
 using AutoMapper;
 using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
@@ -36,14 +38,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        //options.SerializerSettings.Converters.Add(new StringEnumConverter());
     }
 );
 
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSignalR();
@@ -131,8 +131,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<ApplicationContext>(opt => opt
                             .UseNpgsql(Environment.GetEnvironmentVariable("BARBER_CONNECTION_STRING")));
 
-
-
 builder.Services.AddRequestTimeouts();
 
 var config = new MapperConfiguration(cfg =>
@@ -195,7 +193,26 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, partition => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromSeconds(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    options.RejectionStatusCode = (int)HttpStatusCode.TooManyRequests;
+});
+
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 app.UseMiddleware<AuthorizationMiddleware>()
    .UseMiddleware<ExceptionHandlingMiddleware>();
@@ -236,7 +253,6 @@ using (var scope = app.Services.CreateScope())
     migrationManager.Migrate();
 }
 # endif
-
 
 FirebaseApp.Create(new AppOptions()
 {
