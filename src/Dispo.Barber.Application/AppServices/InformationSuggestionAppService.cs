@@ -11,7 +11,7 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class InformationSuggestionAppService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentAppService appointmentAppService, IUserRepository userRepository) : Application.AppServices.Interface.InformationSuggestionAppService
+    public class InformationSuggestionAppService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentAppService appointmentAppService, IUserRepository userRepository) : IInformationSuggestionAppService
     {
 
         public async Task<bool> GetSuggestionAppointmentAsync()

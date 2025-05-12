@@ -114,6 +114,7 @@ builder.Services.AddScoped<IInformationChatService, InformationChatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IBusinessUnityService, BusinessUnityService>();
+builder.Services.AddScoped<IInformationSuggestionAppService, InformationSuggestionAppService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();

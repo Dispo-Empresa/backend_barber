@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dispo.Barber.Application.AppServices.Interface
 {
-    public interface InformationSuggestionAppService
+    public interface IInformationSuggestionAppService
     {
         Task<bool> GetSuggestionAppointmentAsync();
     }

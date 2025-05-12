@@ -12,7 +12,7 @@ namespace Dispo.Barber.API.Controllers.v1
     [ApiController]
     public class AppointmentController(IAppointmentAppService appointmentAppService, 
                                        IInformationChatService informationChatService,
-                                       Application.AppServices.Interface.InformationSuggestionAppService informationSuggestionAppService ) : ControllerBase
+                                       IInformationSuggestionAppService informationSuggestionAppService ) : ControllerBase
     {
         [Authorize]
         [HttpGet("{id}")]
