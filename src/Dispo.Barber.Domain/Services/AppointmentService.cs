@@ -90,7 +90,7 @@ namespace Dispo.Barber.Domain.Services
             var services = "Teste"; //string.Join(", ", appointment.Services.Select(w => w.Service.Description));
             var cancellationLink = "https://chat.dispo-api.online/cancelar-agendamento";
 
-            //await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, barbershopName, dateOnly, timeOnly, professional, services, cancellationLink);
+            await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, barbershopName, dateOnly, timeOnly, professional, services, cancellationLink);
 
             appointment.AcceptedUser = user;
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
