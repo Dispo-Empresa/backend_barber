@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Chat;
-using Dispo.Barber.Domain.DTOs.Customer;
 using Dispo.Barber.Domain.DTOs.Schedule;
 using Dispo.Barber.Domain.DTOs.Service;
 using Dispo.Barber.Domain.DTOs.User;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Exceptions;
+using Dispo.Barber.Domain.Integration;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -14,7 +14,7 @@ using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository) : IInformationChatService
+    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository, IHubIntegration hubIntegration) : IInformationChatService
     {
         public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken, long companyId)
         {
@@ -60,32 +60,29 @@ namespace Dispo.Barber.Domain.Services
             {
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
-                    var userRepository = unitOfWork.GetRepository<IUserRepository>();
-                    var user = await userRepository.GetAsync(cancellationToken, idUser);
-
+                    var user = await userRepository.GetAsync(cancellationToken, idUser) ?? throw new NotFoundException("Usuário não encontrado.");
                     if (!user.BusinessUnityId.HasValue)
                     {
                         throw new Exception($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
                     }
-                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, user.BusinessUnityId.Value);
 
-                    if (businessUnity == null)
+                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, user.BusinessUnityId.Value) 
+                        ?? throw new NotFoundException($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
+
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada.");
+                    if (await hubIntegration.GetPlanType(cancellationToken, company.Id) == PlanType.BarberFree)
                     {
-                        throw new Exception($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
+                        throw new BusinessException("O plano da empresa não contempla esta funcionalidade.");
                     }
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId);
 
                     var services = await unitOfWork.GetRepository<IServiceUserRepository>().GetServicesByUserId(idUser);
-
-                    var informationChat = new InformationChatDTO
+                    return new InformationChatDTO
                     {
                         NameCompany = company.Name,
                         User = user.Status == UserStatus.Active ? new List<UserInformationDTO> { mapper.Map<UserInformationDTO>(user) } : [],
                         Services = mapper.Map<List<ServiceInformationDTO>>(services.Where(s => s.Status == ServiceStatus.Active).ToList()),
                         BusinessUnities = user.BusinessUnityId.Value
                     };
-
-                    return informationChat;
 
                 });
             }
