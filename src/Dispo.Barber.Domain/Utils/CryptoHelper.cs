@@ -26,8 +26,8 @@ namespace Dispo.Barber.Domain.Utils
         {
             using Aes aesAlg = Aes.Create();
 
-            string Key = Environment.GetEnvironmentVariable("PRD_ENCRYPTION_KEY") ?? throw new InvalidOperationException("Missing ENCRYPTION_KEY env variable");
-            string IV = Environment.GetEnvironmentVariable("PRD_ENCRYPTION_IV") ?? throw new InvalidOperationException("Missing ENCRYPTION_IV env variable");
+            string Key = Environment.GetEnvironmentVariable("ENCRYPTION_KEY") ?? throw new InvalidOperationException("Missing ENCRYPTION_KEY env variable");
+            string IV = Environment.GetEnvironmentVariable("ENCRYPTION_IV") ?? throw new InvalidOperationException("Missing ENCRYPTION_IV env variable");
 
             aesAlg.Key = Encoding.UTF8.GetBytes(Key);
             aesAlg.IV = Encoding.UTF8.GetBytes(IV);
