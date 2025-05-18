@@ -1,7 +1,6 @@
 ﻿using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Enums;
-using Dispo.Barber.Domain.Services;
 using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/appointments")]
+    [Authorize]
     [ApiController]
     public class AppointmentController(IAppointmentAppService appointmentAppService, 
                                        IInformationChatService informationChatService,
                                        IInformationSuggestionAppService informationSuggestionAppService ) : ControllerBase
     {
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -22,7 +21,6 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
@@ -30,7 +28,6 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [Authorize]
         [HttpPost("create-by-services")]
         public async Task<IActionResult> CreateByServices(CancellationToken cancellationToken, [FromBody] CreateAppointmentServicosDTO createCreateAppointmentServicosDTO)
         {
@@ -51,7 +48,6 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
 
-        [Authorize]
         [HttpPatch("{id}/inform-problem")]
         public async Task<IActionResult> InformProblem(CancellationToken cancellationToken, [FromRoute] long id, [FromBody] InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
@@ -59,7 +55,6 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok();
         }
 
-        [AllowAnonymous]
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(CancellationToken cancellationToken, [FromRoute] long id)
         {
@@ -99,7 +94,6 @@ namespace Dispo.Barber.API.Controllers.v1
             return Ok(appointments);
         }
 
-        [AllowAnonymous]
         [HttpPatch("{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationByAppointmentId(CancellationToken cancellationToken, [FromRoute] long idAppointment)
         {
@@ -112,23 +106,6 @@ namespace Dispo.Barber.API.Controllers.v1
             {
                 return StatusCode(500, $"Ocorreu um erro ao processar sua solicitação: {ex.Message}");
             }
-        }
-
-        [AllowAnonymous]
-        [HttpPost("reschedule")]
-        public async Task<IActionResult> Reschedule(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
-        {
-            try
-            {
-                await appointmentAppService.CancelAppointmentAsync(cancellationToken, 1, false);
-                createAppointmentDTO.Id = 0L;
-                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = $"Ocorreu um erro ao reagendar: {e.Message}"  });
-            }                 
         }
     }
 }

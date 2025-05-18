@@ -85,7 +85,6 @@ namespace Dispo.Barber.API.Controllers.v1
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("services/information")]
         public async Task<IActionResult> GetServiceInformationById([FromBody] List<long> serviceIds)
         {
@@ -117,31 +116,15 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpPatch("appointments/{idAppointment}/information-appointment")]
         public async Task<IActionResult> GetInformationAppointmentById(CancellationToken cancellationToken, [FromRoute] long idAppointment)
         {
-            try
-            {
-                var result = await informationChatService.GetInformationAppointmentChatByIdAppointment(cancellationToken, idAppointment);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro ao processar sua solicitação: {ex.Message}");
-            }
+            var result = await informationChatService.GetInformationAppointmentChatByIdAppointment(cancellationToken, idAppointment);
+            return Ok(result);
         }
 
         [HttpPost("appointments/reschedule")]
         public async Task<IActionResult> Reschedule(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            try
-            {
-                await appointmentAppService.CancelAppointmentAsync(cancellationToken, createAppointmentDTO.Id, false);
-                createAppointmentDTO.Id = 0L;
-                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, reschedule: true, notifyUsers: true);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = $"Ocorreu um erro ao reagendar: {e.Message}" });
-            }
+            await appointmentAppService.RescheduleAsync(cancellationToken, createAppointmentDTO);
+            return Ok();
         }
     }
 }

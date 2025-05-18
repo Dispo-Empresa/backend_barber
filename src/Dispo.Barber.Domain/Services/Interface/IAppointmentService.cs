@@ -5,7 +5,9 @@ namespace Dispo.Barber.Domain.Services.Interface
 {
     public interface IAppointmentService
     {
-        Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool reschedule = false);
+        Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false);
+
+        Task Reschedule(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO);
 
         Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO);
 
@@ -20,6 +22,7 @@ namespace Dispo.Barber.Domain.Services.Interface
         Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId);
 
         Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId);
+
         Task CancelAllUserScheduledByDateAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate);
 
         Task<List<Appointment>> GetScheduleConflictsAsync(CancellationToken cancellationToken, long userId, DateTime startDate, DateTime endDate);

@@ -137,6 +137,8 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .Include(a => a.AcceptedUser)
                                 .Include("Services.Service.UserServices")
                                 .Include(a => a.Customer)
+                                .Include(a => a.BusinessUnity)
+                                .ThenInclude(a => a.Company)
                                 .Where(w => w.Id == appointmentId)
                                 .FirstOrDefaultAsync(cancellationToken);
         }

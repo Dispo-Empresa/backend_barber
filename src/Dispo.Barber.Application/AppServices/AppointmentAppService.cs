@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppServices
 {
-    public class AppointmentAppService(ILogger<AppointmentAppService> logger, IUnitOfWork unitOfWork, IAppointmentService service) : IAppointmentAppService
+    public class AppointmentAppService(ILogger<AppointmentAppService> logger, 
+                                       IUnitOfWork unitOfWork, 
+                                       IAppointmentService service) : IAppointmentAppService
     {
         public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
         {
@@ -22,15 +24,28 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool reschedule = false)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: notifyUsers, reschedule: true));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: notifyUsers));
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Error creating appointment.");
+                throw;
+            }
+        }
+
+        public async Task RescheduleAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.Reschedule(cancellationToken, createAppointmentDTO));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error rescheduling appointment.");
                 throw;
             }
         }

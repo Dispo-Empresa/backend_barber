@@ -11,6 +11,5 @@ namespace Dispo.Barber.Infrastructure.Repositories
         {
             _context = context;
         }
-
     }
 }

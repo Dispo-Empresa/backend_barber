@@ -5,7 +5,7 @@
         public static string FormatPhoneNumber(string phoneNumber)
         {
             if (string.IsNullOrEmpty(phoneNumber))
-                throw new ArgumentException("Número de telefone inválido.");
+                return phoneNumber;
 
             var cleaned = new string(phoneNumber.Where(char.IsDigit).ToArray());
 

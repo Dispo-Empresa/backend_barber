@@ -97,7 +97,7 @@ builder.Services.AddTransient<IServiceAppointmentRepository, ServiceAppointmentR
 builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
-builder.Services.AddTransient<ITwillioMessageSender, TwillioMessageSender>();
+builder.Services.AddTransient<ITwillioMessageSenderProvider, TwillioMessageSenderProvider>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
@@ -109,7 +109,9 @@ builder.Services.AddScoped<ICustomerAppService, CustomerAppService>();
 builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
 builder.Services.AddScoped<IAuthAppService, AuthAppService>();
+builder.Services.AddScoped<ITokenConfirmationService, TokenConfirmationService>();
 
+// Register appServices
 builder.Services.AddScoped<IInformationChatService, InformationChatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
@@ -123,6 +125,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBlacklistService, BlacklistService>();
+builder.Services.AddScoped<ITokenConfirmationAppService, TokenConfirmationAppService>();
 
 builder.Services.AddScoped<IMigrationManager, MigrationManager>();
 builder.Services.AddHttpContextAccessor();

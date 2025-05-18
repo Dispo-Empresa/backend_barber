@@ -16,42 +16,23 @@ namespace Dispo.Barber.Domain.Services
                                     ICustomerRepository customerRepository,
                                     INotificationService notificationService,
                                     IUserRepository userRepository,
-                                    ITwillioMessageSender twillioMessageSender) : IAppointmentService
+                                    ITwillioMessageSenderProvider twillioMessageSender,
+                                    IServiceRepository serviceRepository) : IAppointmentService
     {
-        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
+        private const string APPOINTMENT_CONFIRMATION_CONTENT_SID = "HX8e8fad455d1978d5979f4a2fecfae59a";
+        private const string APPOINTMENT_CONFIRMATION_TEMPLATE = "appointment_confirmation";
+
+        private const string APPOINTMENT_CANCELLATION_CONTENT_SID = "HX7bc50863b0109b7c303ab71c632a5c63";
+        private const string APPOINTMENT_CANCELLATION_TEMPLATE = "appointment_cancellation";
+
+        private const string APPOINTMENT_RESCHEDULING_CONTENT_SID = "HXa43782e247ca7aef23b8f633bf4dac33";
+        private const string APPOINTMENT_RESCHEDULING_TEMPLATE = "appointment_rescheduling";
+
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
-            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
-            if (appointment.Status == AppointmentStatus.Canceled)
-            {
-                throw new BusinessException("O agendamento já está cancelado.");
-            }
-
-            appointment.Status = AppointmentStatus.Canceled;
-
-            repository.Update(appointment);
-            await repository.SaveChangesAsync(cancellationToken);
-            //await smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateCancelAppointmentMessageSms(appointment), MessageType.Sms);
-
-            if (notifyUsers)
-                await SendNotificationByApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
-        }
-
-        public async Task CancelAppointmentsAsync(CancellationToken cancellationToken, List<long> appointmentIds)
-        {
-            foreach (var appointmentId in appointmentIds)
-            {
-                var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, appointmentId) ?? throw new NotFoundException("Agendamento não existe.");
-                appointment.Status = AppointmentStatus.Canceled;
-
-                repository.Update(appointment);
-                await repository.SaveChangesAsync(cancellationToken);
-            }
-        }
-
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool reschedule = false)
-        {
+            // Dá pra melhorar todo esse método
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
-            var user = await userRepository.GetAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0);
+            var user = await userRepository.GetFirstAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
 
             if (user is not null && user.Status != UserStatus.Active)
             {
@@ -83,47 +64,81 @@ namespace Dispo.Barber.Domain.Services
             await repository.AddAsync(cancellationToken, appointment);
             await repository.SaveChangesAsync(cancellationToken);
 
-            var barbershopName = appointment.AcceptedUser?.BusinessUnity?.Company?.Name ?? "Teste";
-            var dateOnly = appointment.Date.ToString("dd/MM/yyyy");
-            var timeOnly = appointment.Date.ToString("HH:mm");
-            var professional = appointment.AcceptedUser?.Name;
-            var services = "Teste"; //string.Join(", ", appointment.Services.Select(w => w.Service.Description));
-            var cancellationLink = "https://chat.dispo-api.online/cancelar-agendamento";
-
-            await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, barbershopName, dateOnly, timeOnly, professional, services, cancellationLink);
-
             appointment.AcceptedUser = user;
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
 
+            var selectedServices = await serviceRepository.GetListServiceAsync(createAppointmentDTO.Services.ToList());
+            await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, appointment, selectedServices, false);
+
             if (notifyUsers)
-            {
-                if (reschedule)
-                {
-                    await SendNotificationByApp(cancellationToken, appointment, "Reagendamento confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.RescheduleAppointment);
-                }
-                else
-                    await SendNotificationByApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
-            }           
+                await SendNotificationToApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
         }
 
-        public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
+        public async Task Reschedule(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO)
         {
-            return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+            // Dá pra melhorar todo esse método
+
+            var oldAppointment = await repository.GetAppointmentByIdAsync(cancellationToken, createAppointmentDTO.Id) ?? throw new NotFoundException("Agendamento não existe.");
+            oldAppointment.Status = AppointmentStatus.Canceled;
+
+            var newAppointment = mapper.Map<Appointment>(createAppointmentDTO);
+            newAppointment.Id = 0;
+            var user = await userRepository.GetFirstAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
+
+            if (user is not null && user.Status != UserStatus.Active)
+                throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
+
+            newAppointment.Customer = null;
+            newAppointment.CustomerId = createAppointmentDTO.Customer.Id.Value;
+            newAppointment.Status = AppointmentStatus.Scheduled;
+
+            repository.Update(oldAppointment);
+            await repository.AddAsync(cancellationToken, newAppointment);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            newAppointment.AcceptedUser = user;
+            newAppointment.Customer = await customerRepository.GetAsync(cancellationToken, newAppointment.CustomerId);
+
+            var selectedServices = await serviceRepository.GetListServiceAsync(createAppointmentDTO.Services.ToList());
+            await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, newAppointment, selectedServices, true);
+
+            await SendNotificationToApp(cancellationToken, newAppointment, "Reagendamento confirmado", notificationService.GenerateCreateAppointmentMessageApp(newAppointment), NotificationType.RescheduleAppointment);
         }
 
-        public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
+        public async Task CancelAppointmentAsync(CancellationToken cancellationToken, long id, bool notifyUsers = false)
         {
-            var appointment = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
-            appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
+            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+
+            if (appointment.Status == AppointmentStatus.Canceled)
+                throw new BusinessException("O agendamento já está cancelado.");
+
             appointment.Status = AppointmentStatus.Canceled;
 
             repository.Update(appointment);
             await repository.SaveChangesAsync(cancellationToken);
+
+            if (notifyUsers)
+                await SendNotificationToApp(cancellationToken, appointment, "Agendamento Cancelado", notificationService.GenerateCancelAppointmentMessageApp(appointment), NotificationType.CanceledAppointment);
+            else
+                await SendWhatsAppMessageAppointmentCancellationAsync(cancellationToken, appointment);
+        }
+
+        public async Task CancelAppointmentsAsync(CancellationToken cancellationToken, List<long> appointmentIds)
+        {
+            foreach (var appointmentId in appointmentIds)
+            {
+                var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, appointmentId) ?? throw new NotFoundException("Agendamento não existe.");
+                appointment.Status = AppointmentStatus.Canceled;
+
+                repository.Update(appointment);
+                await repository.SaveChangesAsync(cancellationToken);
+
+                await SendWhatsAppMessageAppointmentCancellationAsync(cancellationToken, appointment);
+            }
         }
 
         public async Task CancelAllByDateAsync(CancellationToken cancellationToken, long userId, DateTime date)
         {
-            // TODO: Notificar clientes que tiveram os agendamentos cancelados.
             await repository.CancelAllByDateAsync(cancellationToken, userId, date);
             var appointmentList = await repository.GetAppointmentByUserAndDateIdSync(cancellationToken, userId, date);
             var notifiedCustomers = new HashSet<long>();
@@ -132,27 +147,34 @@ namespace Dispo.Barber.Domain.Services
             {
                 if (!notifiedCustomers.Contains(appointment.CustomerId))
                 {
-                    //await SendNotificationBySMS(appointment);
+                    await SendWhatsAppMessageAppointmentCancellationAsync(cancellationToken, appointment);
                     notifiedCustomers.Add(appointment.CustomerId);
                 }
             }
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
+        {
+            var appointment = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+
+            appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
+            appointment.Status = AppointmentStatus.Canceled;
+
+            repository.Update(appointment);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            await SendWhatsAppMessageAppointmentCancellationAsync(cancellationToken, appointment);
+        }
+
+        public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
+        {
+            return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+        }
+
         public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)
         {
             return await repository.GetNextAppointmentsAsync(cancellationToken, userId);
-        }
-
-
-        //private async Task SendNotificationBySMS(Appointment appointment)
-        //{
-        //    smsService.SendMessageAsync(appointment.Customer.Phone, smsService.GenerateAppointmentMessage(appointment), MessageType.Sms);
-        //}
-
-        private async Task SendNotificationByApp(CancellationToken cancellationToken, Appointment appointment, string tittle, string body, NotificationType notificationType)
-        {
-            await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
         }
 
         public async Task CancelAllScheduledAsync(CancellationToken cancellationToken, long userId)
@@ -176,6 +198,39 @@ namespace Dispo.Barber.Domain.Services
         {
             return isBreak ? await repository.GetScheduleConflictsAsync(cancellationToken, userId, startTime, endTime, dayOfWeek)
                            : await repository.GetScheduleConflictsByWeeklyPlanningAsync(cancellationToken, userId, startTime, endTime, dayOfWeek);
+        }
+
+        private async Task SendNotificationToApp(CancellationToken cancellationToken, Appointment appointment, string tittle, string body, NotificationType notificationType)
+        {
+            await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
+        }
+
+        private async Task SendWhatsAppMessageAppointmentConfirmationAsync(CancellationToken cancellationToken, Appointment appointment, List<Service> selectedServices, bool rescheduling)
+        {
+            var appointmentConfirmationMessage = new AppointmentWhatsAppMessageDTO();
+            appointmentConfirmationMessage.BarbershopName = appointment.AcceptedUser?.BusinessUnity?.Company?.Name;
+            appointmentConfirmationMessage.Date = appointment.Date.ToString("dd/MM/yyyy");
+            appointmentConfirmationMessage.Time = appointment.Date.ToString("HH:mm");
+            appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
+            appointmentConfirmationMessage.ServicesNames = string.Join(", ", selectedServices.Select(w => w.Description));
+            appointmentConfirmationMessage.Link = "https://chat.dispo-api.online/cancelar-agendamento";
+
+            if (rescheduling)
+                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+            else
+                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_CONFIRMATION_TEMPLATE, APPOINTMENT_CONFIRMATION_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+        }
+
+        private async Task SendWhatsAppMessageAppointmentCancellationAsync(CancellationToken cancellationToken, Appointment appointment)
+        {
+            var appointmentConfirmationMessage = new AppointmentWhatsAppMessageDTO();
+            appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
+            appointmentConfirmationMessage.BarbershopName = appointment.AcceptedUser?.BusinessUnity?.Company?.Name;
+            appointmentConfirmationMessage.Date = appointment.Date.ToString("dd/MM/yyyy");
+            appointmentConfirmationMessage.Time = appointment.Date.ToString("HH:mm");
+            appointmentConfirmationMessage.Link = "https://chat.dispo-api.online";
+
+            await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_CANCELLATION_TEMPLATE, APPOINTMENT_CANCELLATION_CONTENT_SID, appointmentConfirmationMessage.ToCancellation());
         }
     }
 }

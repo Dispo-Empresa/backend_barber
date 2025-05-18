@@ -9,15 +9,18 @@ using Twilio.Types;
 
 namespace Dispo.Barber.Infrastructure.Providers
 {
-    public class TwillioMessageSender : ITwillioMessageSender
+    public class TwillioMessageSenderProvider : ITwillioMessageSenderProvider
     {
-        private readonly ILogger<TwillioMessageSender> _logger;
+        private readonly ILogger<TwillioMessageSenderProvider> _logger;
         private readonly string _accountSid;
         private readonly string _authToken;
         private readonly string _twilioPhoneNumber;
         private readonly string _twilioPhoneNumberWhats;
 
-        public TwillioMessageSender(ILogger<TwillioMessageSender> logger)
+        private const string TOKEN_VERIFICATION_CONTENT_SID = "HX6c6d390bceb79e306190675e00f3e25c";
+        private const string TOKEN_VERIFICATION_TEMPLATE = "token_verification";
+
+        public TwillioMessageSenderProvider(ILogger<TwillioMessageSenderProvider> logger)
         {
             _logger = logger;
             _accountSid = Environment.GetEnvironmentVariable("TWILLIO_ACCOUNT_SID") ?? "";
@@ -44,22 +47,42 @@ namespace Dispo.Barber.Infrastructure.Providers
             }
         }
 
-        public async Task SendWhatsAppMessageAsync(string phone, params string[] contentVariables)
+        public async Task SendWhatsAppMessageAsync(string phone, string template, string contentId, params string[] contentVariables)
         {
             try
             {
                 TwilioClient.Init(_accountSid, _authToken);
-                var a = await MessageResource.CreateAsync(
-                    body: "appointment_confirmation",
+                await MessageResource.CreateAsync(
+                    body: template,
                     from: new PhoneNumber($"whatsapp:{_twilioPhoneNumberWhats}"),
                     to: new PhoneNumber($"whatsapp:{phone}"),
                     contentVariables: BuildContentVariables(contentVariables),
-                    contentSid: "HX8cfd612f60e6069fd6ddcd2ada2bb822"
+                    contentSid: contentId
                 );
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error sending whatsapp message to following phone: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task SendTokenVerificationWhatsAppMessage(string phone, string code)
+        {
+            try
+            {
+                TwilioClient.Init(_accountSid, _authToken);
+                await MessageResource.CreateAsync(
+                    body: TOKEN_VERIFICATION_TEMPLATE,
+                    from: new PhoneNumber($"whatsapp:{_twilioPhoneNumberWhats}"),
+                    to: new PhoneNumber($"whatsapp:{phone}"),
+                    contentVariables: BuildContentVariables(code),
+                    contentSid: TOKEN_VERIFICATION_CONTENT_SID
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error sending whatsapp verification code to following phone: {ex.Message}");
                 throw;
             }
         }
