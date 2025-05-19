@@ -32,6 +32,13 @@ namespace Dispo.Barber.Domain.Services
 
                     var businessIdTask = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetIdByCompanyAsync(company.Id);
                     var usersTask = await unitOfWork.GetRepository<IUserRepository>().GetUserByBusinessAsync(businessIdTask);
+
+                    var serviceUser = usersTask
+                        .SelectMany(u => u.ServicesUser)
+                        .Where(su => su.Service != null)
+                        .Select(su => su.Service)
+                        .ToList();
+
                     var companyServicesTask = await companyRepository.GetServicesByCompanyAsync(company.Id);
 
                     var listServices = await unitOfWork.GetRepository<IServiceRepository>().GetListServiceAsync(companyServicesTask);
@@ -40,6 +47,7 @@ namespace Dispo.Barber.Domain.Services
                     {
                         NameCompany = company.Name,
                         User = mapper.Map<List<UserInformationDTO>>(usersTask),
+                        ServicesUser = mapper.Map<List<ServiceInformationDTO>>(serviceUser),
                         Services = mapper.Map<List<ServiceInformationDTO>>(listServices),
                         BusinessUnities = businessIdTask
 
