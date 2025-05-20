@@ -48,7 +48,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<List<User>> GetUserByBusinessAsync(long businessId)
         {
-            return await context.Users.Include(i => i.BusinessUnity)
+            return await context.Users.Include(i => i.BusinessUnity).Include(s => s.ServicesUser).ThenInclude(s => s.Service)
                                 .Where(w => w.BusinessUnityId == businessId && w.Status == UserStatus.Active)
                                 .ToListAsync();
         }
