@@ -121,8 +121,8 @@ namespace Dispo.Barber.Domain.Entities
 
         public string EntireSlug()
         {
-            var cryptId = CryptoHelper.Encrypt(Id.ToString());
-            return $"https://chat.dispo-api.online/barbearia?barber={cryptId}";
+            var barberIdEncripted = CryptoHelper.Encrypt(Id.ToString());
+            return $"https://chat.dispo-api.online/barbearia?barber={barberIdEncripted}";
         }
     }
 }
