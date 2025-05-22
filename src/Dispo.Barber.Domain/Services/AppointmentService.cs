@@ -68,7 +68,7 @@ namespace Dispo.Barber.Domain.Services
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
 
             var selectedServices = await serviceRepository.GetListServiceAsync(createAppointmentDTO.Services.ToList());
-            //await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, appointment, selectedServices, false);
+            await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, appointment, selectedServices, false);
 
             if (notifyUsers)
                 await SendNotificationToApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
