@@ -43,7 +43,7 @@ namespace Dispo.Barber.Infrastructure.Repositories
                 .Select(x => x.UserId)
                 .ToListAsync();
 
-            return await context.Users
+            return await context.Users.Include(us => us.ServicesUser).ThenInclude(s => s.Service)
                 .Where(u => users.Contains(u.Id))
                 .ToListAsync();
         }
