@@ -1,5 +1,6 @@
 ﻿using Dispo.Barber.Application.AppServices;
 using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -83,7 +84,7 @@ namespace Dispo.Barber.Infrastructure.Providers
             catch (Exception ex)
             {
                 _logger.LogError($"Error sending whatsapp verification code to following phone: {ex.Message}");
-                throw;
+                throw new BusinessException(ex.Message);
             }
         }
 
