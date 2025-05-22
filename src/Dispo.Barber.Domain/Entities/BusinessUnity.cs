@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Utils.Constants;
 
 namespace Dispo.Barber.Domain.Entities
 {
@@ -22,7 +23,7 @@ namespace Dispo.Barber.Domain.Entities
         public string EntireSlug()
         {
             var barbershopIdEncripted = CryptoHelper.Encrypt(Id.ToString());
-            return $"https://chat.dispo-api.online/barbearia={barbershopIdEncripted}";
+            return $"{Links.AuraChatBarbershopLink}{barbershopIdEncripted}";
         }
     }
 }
