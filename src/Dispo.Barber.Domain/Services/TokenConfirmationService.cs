@@ -1,7 +1,7 @@
-﻿using Dispo.Barber.Domain.Exceptions;
+﻿using Dispo.Barber.Domain.Cache;
+using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Services.Interface;
-using Dispo.Barber.Domain.Utils.interfaces;
 
 namespace Dispo.Barber.Domain.Services
 {

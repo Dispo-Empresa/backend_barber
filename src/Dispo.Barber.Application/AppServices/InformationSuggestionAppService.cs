@@ -9,7 +9,7 @@ using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Utils;
 
 
-namespace Dispo.Barber.Domain.Services
+namespace Dispo.Barber.Application.AppServices
 {
     public class InformationSuggestionAppService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentAppService appointmentAppService, IUserRepository userRepository) : IInformationSuggestionAppService
     {

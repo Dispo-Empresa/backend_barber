@@ -213,7 +213,7 @@ namespace Dispo.Barber.Domain.Services
             appointmentConfirmationMessage.Time = appointment.Date.ToString("HH:mm");
             appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
             appointmentConfirmationMessage.ServicesNames = string.Join(", ", selectedServices.Select(w => w.Description));
-            appointmentConfirmationMessage.Link = "https://chat.dispo-api.online/cancelar-agendamento";
+            appointmentConfirmationMessage.Link = appointment.CancellationEntireSlug();
 
             if (rescheduling)
                 await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
@@ -228,7 +228,7 @@ namespace Dispo.Barber.Domain.Services
             appointmentConfirmationMessage.BarbershopName = appointment.AcceptedUser?.BusinessUnity?.Company?.Name;
             appointmentConfirmationMessage.Date = appointment.Date.ToString("dd/MM/yyyy");
             appointmentConfirmationMessage.Time = appointment.Date.ToString("HH:mm");
-            appointmentConfirmationMessage.Link = "https://chat.dispo-api.online";
+            appointmentConfirmationMessage.Link = appointment.AcceptedUser?.BusinessUnity?.EntireSlug();
 
             await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_CANCELLATION_TEMPLATE, APPOINTMENT_CANCELLATION_CONTENT_SID, appointmentConfirmationMessage.ToCancellation());
         }
