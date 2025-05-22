@@ -213,7 +213,7 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.UseMiddleware<AuthorizationMiddleware>()
    .UseMiddleware<ExceptionHandlingMiddleware>();
