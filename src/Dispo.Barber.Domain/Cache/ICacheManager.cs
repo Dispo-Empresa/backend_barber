@@ -1,4 +1,4 @@
-﻿namespace Dispo.Barber.Domain.Utils.interfaces
+﻿namespace Dispo.Barber.Domain.Cache
 {
     public interface ICacheManager
     {

@@ -1,4 +1,5 @@
 ﻿using Dispo.Barber.Domain.Enums;
+using Dispo.Barber.Domain.Utils.Constants;
 
 namespace Dispo.Barber.Domain.Entities
 {
@@ -21,5 +22,9 @@ namespace Dispo.Barber.Domain.Entities
 
         public AppointmentStatus Status { get; set; }
 
+        public string CancellationEntireSlug()
+        {
+            return $"{Links.AuraChatCancellationLink}{Id}";
+        }
     }
 }

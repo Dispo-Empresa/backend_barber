@@ -32,6 +32,7 @@ namespace Dispo.Barber.Domain.Services
 
                     var businessIdTask = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetIdByCompanyAsync(company.Id);
                     var usersTask = await unitOfWork.GetRepository<IUserRepository>().GetUserByBusinessAsync(businessIdTask);
+
                     var companyServicesTask = await companyRepository.GetServicesByCompanyAsync(company.Id);
 
                     var listServices = await unitOfWork.GetRepository<IServiceRepository>().GetListServiceAsync(companyServicesTask);

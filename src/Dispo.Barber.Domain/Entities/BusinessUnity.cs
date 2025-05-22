@@ -1,4 +1,7 @@
-﻿namespace Dispo.Barber.Domain.Entities
+﻿using Dispo.Barber.Domain.Utils;
+using Dispo.Barber.Domain.Utils.Constants;
+
+namespace Dispo.Barber.Domain.Entities
 {
     public class BusinessUnity : EntityBase
     {
@@ -19,7 +22,8 @@
 
         public string EntireSlug()
         {
-            return $"https://chat.dispo-api.online/barbearia={Id.ToString()}";
+            var barbershopIdEncripted = CryptoHelper.Encrypt(Id.ToString());
+            return $"{Links.AuraChatBarbershopLink}{barbershopIdEncripted}";
         }
     }
 }

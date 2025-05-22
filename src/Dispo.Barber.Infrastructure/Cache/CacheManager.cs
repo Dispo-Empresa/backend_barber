@@ -1,7 +1,7 @@
-﻿using Dispo.Barber.Domain.Utils.interfaces;
+﻿using Dispo.Barber.Domain.Cache;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Dispo.Barber.Domain.Utils
+namespace Dispo.Barber.Infrastructure.Cache
 {
     public class CacheManager : ICacheManager
     {
