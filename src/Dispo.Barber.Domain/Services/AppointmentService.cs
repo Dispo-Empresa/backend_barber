@@ -213,7 +213,7 @@ namespace Dispo.Barber.Domain.Services
             appointmentConfirmationMessage.Time = appointment.Date.ToString("HH:mm");
             appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
             appointmentConfirmationMessage.ServicesNames = string.Join(", ", selectedServices.Select(w => w.Description));
-            appointmentConfirmationMessage.Link = appointment.AcceptedUser?.EntireSlug();
+            appointmentConfirmationMessage.Link = appointment.CancellationEntireSlug();
 
             if (rescheduling)
                 await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
