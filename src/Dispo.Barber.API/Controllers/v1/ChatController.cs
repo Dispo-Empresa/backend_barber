@@ -34,6 +34,9 @@ namespace Dispo.Barber.API.Controllers.v1
             try
             {
                 var result = await customerService.GetByPhoneAsync(phone);
+                if (result == null)
+                    return StatusCode(500, new { message = "Ocorreu um erro ao buscar o cliente."});
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -62,6 +65,9 @@ namespace Dispo.Barber.API.Controllers.v1
             try
             {
                 var result = await informationChatService.GetUserAppointmentsByUserIdAsync(cancellationToken, idUser);
+                if (result == null)
+                    return StatusCode(500, new { message = "Ocorreu um erro ao buscar os horários de agedamento." });
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -76,6 +82,8 @@ namespace Dispo.Barber.API.Controllers.v1
             try
             {
                 var result = await informationChatService.GetAvailableSlotsAsync(cancellationToken, requestDto);
+                if (result == null)
+                    return StatusCode(500, new { message = "Ocorreu um erro ao buscar os horários disponíveis." });
 
                 return Ok(result);
             }
@@ -91,6 +99,9 @@ namespace Dispo.Barber.API.Controllers.v1
             try
             {
                 var informationChat = await informationChatService.GetInformationChatByIdService(serviceIds);
+                if (informationChat == null)
+                    return StatusCode(500, new { message = "Ocorreu um erro ao buscar as informações de serviço." });
+
                 return Ok(informationChat);
             }
             catch (Exception ex)
@@ -102,8 +113,15 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpPost("appointments")]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true);
-            return Ok();
+            try
+            {
+                await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Ocorreu um erro ao criar o agendamento. {ex.Message}", error = ex.Message });
+            }
         }
 
         [HttpPatch("appointments/{id}/cancel")]
