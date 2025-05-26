@@ -156,7 +156,7 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            var appointment = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
 
             appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
             appointment.Status = AppointmentStatus.Canceled;
