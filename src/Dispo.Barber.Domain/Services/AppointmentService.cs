@@ -156,7 +156,7 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task InformProblemAsync(CancellationToken cancellationToken, long id, InformAppointmentProblemDTO informAppointmentProblemDTO)
         {
-            var appointment = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+            var appointment = await repository.GetAppointmentByIdAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
 
             appointment.AcceptedUserObservation = informAppointmentProblemDTO.Problem;
             appointment.Status = AppointmentStatus.Canceled;
@@ -214,11 +214,12 @@ namespace Dispo.Barber.Domain.Services
             appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
             appointmentConfirmationMessage.ServicesNames = string.Join(", ", selectedServices.Select(w => w.Description));
             appointmentConfirmationMessage.Link = appointment.CancellationEntireSlug();
+            var phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
 
             if (rescheduling)
-                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+                await twillioMessageSender.SendWhatsAppMessageAsync(phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
             else
-                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_CONFIRMATION_TEMPLATE, APPOINTMENT_CONFIRMATION_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+                await twillioMessageSender.SendWhatsAppMessageAsync(phone, APPOINTMENT_CONFIRMATION_TEMPLATE, APPOINTMENT_CONFIRMATION_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
         }
 
         private async Task SendWhatsAppMessageAppointmentCancellationAsync(CancellationToken cancellationToken, Appointment appointment)

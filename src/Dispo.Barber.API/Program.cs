@@ -1,9 +1,6 @@
 using System.Diagnostics;
-using System.Net;
 using System.Text;
-using System.Threading.RateLimiting;
 using AutoMapper;
-using Dispo.Barber.API;
 using Dispo.Barber.API.Hubs;
 using Dispo.Barber.API.Middleware;
 using Dispo.Barber.Application.AppServices;
@@ -26,7 +23,6 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
@@ -198,26 +194,26 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-    {
-        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, partition => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 10,
-            Window = TimeSpan.FromSeconds(1),
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            QueueLimit = 0
-        });
-    });
+//builder.Services.AddRateLimiter(options =>
+//{
+//    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+//    {
+//        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+//        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, partition => new FixedWindowRateLimiterOptions
+//        {
+//            PermitLimit = 10,
+//            Window = TimeSpan.FromSeconds(1),
+//            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+//            QueueLimit = 0
+//        });
+//    });
 
-    options.RejectionStatusCode = (int)HttpStatusCode.TooManyRequests;
-});
+//    options.RejectionStatusCode = (int)HttpStatusCode.TooManyRequests;
+//});
 
 var app = builder.Build();
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.UseMiddleware<AuthorizationMiddleware>()
    .UseMiddleware<ExceptionHandlingMiddleware>();
