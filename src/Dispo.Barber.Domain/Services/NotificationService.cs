@@ -10,29 +10,6 @@ namespace Dispo.Barber.Domain.Services
 {
     public class NotificationService(ILogger<NotificationService> logger) : INotificationService
     {
-        public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, Dictionary<string, string> data)
-        {
-            try
-            {
-                var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
-                {
-                    Token = token,
-                    Notification = new Notification()
-                    {
-                        Title = title,
-                        Body = body
-                    },
-                    Data = data
-                }, cancellationToken);
-
-                logger.LogInformation("Mensagem com o ID {@ID} enviada para {@Token}.", messageId, token);
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Erro ao notificar usuário {@Error}", e);
-            }
-        }
-
         public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, NotificationType notificationType)
         {
             try
@@ -40,13 +17,10 @@ namespace Dispo.Barber.Domain.Services
                 var messageId = await FirebaseMessaging.DefaultInstance.SendAsync(new Message()
                 {
                     Token = token,
-                    Notification = new Notification()
-                    {
-                        Title = title, //Convert.ToBase64String(Encoding.UTF8.GetBytes(title)),
-                        Body = body    //Convert.ToBase64String(Encoding.UTF8.GetBytes(body))
-                    },
                     Data = new Dictionary<string, string>()
                     {
+                        ["Title"] = title,
+                        ["Body"] = body,
                         ["NotificationType"] = notificationType.ToString("d")
                     },
                 }, cancellationToken);
