@@ -1,5 +1,5 @@
 ﻿using Dispo.Barber.Application.AppServices.Interface;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +7,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/auth")]
     [ApiController]
-    public class AuthController(IAuthAppService authAppService, INotificationService notificationService) : ControllerBase
+    public class AuthController(IAuthAppService authAppService, INotificationSenderProvider notificationService) : ControllerBase
     {
         [AllowAnonymous]
         [HttpGet]

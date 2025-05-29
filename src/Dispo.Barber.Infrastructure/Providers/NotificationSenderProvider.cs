@@ -1,14 +1,12 @@
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Providers;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Dispo.Barber.Domain.Services
+namespace Dispo.Barber.Infrastructure.Providers
 {
-    public class NotificationService(ILogger<NotificationService> logger) : INotificationService
+    public class NotificationSenderProvider(ILogger<NotificationSenderProvider> logger) : INotificationSenderProvider
     {
         public async Task NotifyAsync(CancellationToken cancellationToken, string token, string title, string body, NotificationType notificationType)
         {

@@ -14,7 +14,7 @@ namespace Dispo.Barber.Domain.Services
     public class AppointmentService(IMapper mapper,
                                     IAppointmentRepository repository,
                                     ICustomerRepository customerRepository,
-                                    INotificationService notificationService,
+                                    INotificationSenderProvider notificationService,
                                     IUserRepository userRepository,
                                     ITwillioMessageSenderProvider twillioMessageSender,
                                     IServiceRepository serviceRepository) : IAppointmentService
@@ -203,6 +203,11 @@ namespace Dispo.Barber.Domain.Services
         private async Task SendNotificationToApp(CancellationToken cancellationToken, Appointment appointment, string tittle, string body, NotificationType notificationType)
         {
             await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
+
+            var acceptedUser = await userRepository.GetAsync(cancellationToken, appointment.AcceptedUserId.Value);
+            acceptedUser.UnreadNotificationsCount++;
+
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private async Task SendWhatsAppMessageAppointmentConfirmationAsync(CancellationToken cancellationToken, Appointment appointment, List<Service> selectedServices, bool rescheduling)

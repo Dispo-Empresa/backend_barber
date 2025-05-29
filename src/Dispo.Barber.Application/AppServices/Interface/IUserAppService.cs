@@ -39,5 +39,7 @@ namespace Dispo.Barber.Application.AppServices.Interface
         Task CreateBarbershopSchemeAsync(CancellationToken cancellationToken, CreateBarbershopSchemeDto createBarbershopSchemeDto);
         Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id);
         Task RemoveAsync(CancellationToken cancellationToken, long id);
+        Task<int> GetUnreadNotificationsCountAsync(CancellationToken cancellationToken, long id);
+        Task ResetUnreadNotificationsAsync(CancellationToken cancellationToken, long id);
     }
 }

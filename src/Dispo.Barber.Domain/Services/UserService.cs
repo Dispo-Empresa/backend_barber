@@ -402,6 +402,16 @@ namespace Dispo.Barber.Domain.Services
             await repository.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task ResetUnreadNotificationsAsync(CancellationToken cancellationToken, long id)
+        {
+            var user = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Usuário não encontrado.");
+
+            user.UnreadNotificationsCount = 0;
+
+            repository.Update(user);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
         private List<UserSchedule> BuildNormalDays() => [
             new(DayOfWeek.Monday, "08:00", "18:00", false, false, true),
             new(DayOfWeek.Monday, "12:00", "13:30", true, false, true),

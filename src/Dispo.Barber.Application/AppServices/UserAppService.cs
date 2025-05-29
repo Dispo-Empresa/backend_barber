@@ -441,5 +441,31 @@ namespace Dispo.Barber.Application.AppServices
                 throw;
             }
         }
+
+        public async Task<int> GetUnreadNotificationsCountAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await userRepository.GetUnreadNotificationsCountAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting unread notifications count.");
+                throw;
+            }
+        }
+
+        public async Task ResetUnreadNotificationsAsync(CancellationToken cancellationToken, long id)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.ResetUnreadNotificationsAsync(cancellationToken, id));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error getting unread notifications count.");
+                throw;
+            }
+        }
     }
 }

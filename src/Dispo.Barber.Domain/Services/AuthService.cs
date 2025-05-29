@@ -7,6 +7,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -15,7 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace Dispo.Barber.Domain.Services
 {
     public class AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IBlacklistService blacklistService, IHubIntegration hubIntegration,
-        INotificationService notificationService, IUserService userService) : IAuthService
+        INotificationSenderProvider notificationService, IUserService userService) : IAuthService
     {
         public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
         {

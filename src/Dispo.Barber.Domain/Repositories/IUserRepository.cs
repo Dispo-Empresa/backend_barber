@@ -44,5 +44,7 @@ namespace Dispo.Barber.Domain.Repositories
         Task<long> GetCompanyIdByIdAsync(CancellationToken cancellationToken, long id);
 
         Task<long> GetBusinessUnityIdByIdAsync(CancellationToken cancellationToken, long id);
+
+        Task<int> GetUnreadNotificationsCountAsync(CancellationToken cancellationToken, long id);
     }
 }
