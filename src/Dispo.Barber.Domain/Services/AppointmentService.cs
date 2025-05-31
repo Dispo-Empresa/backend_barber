@@ -19,14 +19,14 @@ namespace Dispo.Barber.Domain.Services
                                     ITwillioMessageSenderProvider twillioMessageSender,
                                     IServiceRepository serviceRepository) : IAppointmentService
     {
-        private const string APPOINTMENT_CONFIRMATION_CONTENT_SID = "HX8e8fad455d1978d5979f4a2fecfae59a";
-        private const string APPOINTMENT_CONFIRMATION_TEMPLATE = "appointment_confirmation";
+        private readonly string APPOINTMENT_CONFIRMATION_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_CONFIRMATION_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_CONFIRMATION_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_CONFIRMATION_TEMPLATE") ?? "";
 
-        private const string APPOINTMENT_CANCELLATION_CONTENT_SID = "HX7bc50863b0109b7c303ab71c632a5c63";
-        private const string APPOINTMENT_CANCELLATION_TEMPLATE = "appointment_cancellation";
+        private readonly string APPOINTMENT_CANCELLATION_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_CANCELLATION_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_CANCELLATION_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_CANCELLATION_TEMPLATE") ?? "";
 
-        private const string APPOINTMENT_RESCHEDULING_CONTENT_SID = "HXa43782e247ca7aef23b8f633bf4dac33";
-        private const string APPOINTMENT_RESCHEDULING_TEMPLATE = "appointment_rescheduling";
+        private readonly string APPOINTMENT_RESCHEDULING_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_RESCHEDULING_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_TEMPLATE") ?? "";
 
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
