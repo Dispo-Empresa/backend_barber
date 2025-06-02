@@ -1,6 +1,4 @@
-﻿using Dispo.Barber.Application.AppServices;
-using Dispo.Barber.Domain.Enums;
-using Dispo.Barber.Domain.Exceptions;
+﻿using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -88,7 +86,7 @@ namespace Dispo.Barber.Infrastructure.Providers
             }
         }
 
-        private  string BuildContentVariables(params string[] variables)
+        private string BuildContentVariables(params string[] variables)
         {
             var dict = new Dictionary<string, string>();
             for (int i = 0; i < variables.Length; i++)

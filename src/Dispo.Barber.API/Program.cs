@@ -95,6 +95,7 @@ builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 builder.Services.AddTransient<ITwillioMessageSenderProvider, TwillioMessageSenderProvider>();
+builder.Services.AddTransient<ISubscriptionIntegration, SubscriptionIntegration>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
