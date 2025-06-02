@@ -23,35 +23,32 @@ namespace Dispo.Barber.Domain.Services
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
-                    var company = await companyRepository.GetAsync(cancellationToken, companyId);
+                    var businessUnityRepository = unitOfWork.GetRepository<IBusinessUnityRepository>();
+                    var serviceRepository = unitOfWork.GetRepository<IServiceRepository>();
 
-                    if (company == null)
-                    {
-                        throw new Exception($"Empresa com o ID {companyId} não encontrada.");
-                    }
+                    var company = await companyRepository.GetAsync(cancellationToken, companyId)
+                        ?? throw new NotFoundException("Empresa com o ID não encontrada.");
 
-                    var businessIdTask = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetIdByCompanyAsync(company.Id);
-                    var usersTask = await unitOfWork.GetRepository<IUserRepository>().GetUserByBusinessAsync(businessIdTask);
+                    var businessUnityId = await businessUnityRepository.GetIdByCompanyAsync(company.Id);
+                    if (businessUnityId == 0)
+                        throw new BusinessException($"Empresa '{company.Name}' não possui unidade de negócio vinculada.");
 
-                    var companyServicesTask = await companyRepository.GetServicesByCompanyAsync(company.Id);
+                    var users = await userRepository.GetUserByBusinessAsync(businessUnityId);
+                    var companyServices = await companyRepository.GetServicesByCompanyAsync(company.Id);
+                    var services = await serviceRepository.GetListServiceAsync(companyServices);
 
-                    var listServices = await unitOfWork.GetRepository<IServiceRepository>().GetListServiceAsync(companyServicesTask);
-
-                    var informationChat = new InformationChatDTO
+                    return new InformationChatDTO
                     {
                         NameCompany = company.Name,
-                        User = mapper.Map<List<UserInformationDTO>>(usersTask),
-                        Services = mapper.Map<List<ServiceInformationDTO>>(listServices),
-                        BusinessUnities = businessIdTask
-
+                        User = mapper.Map<List<UserInformationDTO>>(users),
+                        Services = mapper.Map<List<ServiceInformationDTO>>(services),
+                        BusinessUnities = businessUnityId
                     };
-
-                    return informationChat;
                 });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
             {
-                throw new Exception($"Erro ao obter informações do chat para a empresa com ID {companyId}.", ex);
+                throw;
             }
         }
 
@@ -61,116 +58,108 @@ namespace Dispo.Barber.Domain.Services
             {
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
-                    var user = await userRepository.GetAsync(cancellationToken, idUser) ?? throw new NotFoundException("Usuário não encontrado.");
+                    var businessUnityRepository = unitOfWork.GetRepository<IBusinessUnityRepository>();
+                    var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
+                    var serviceUserRepository = unitOfWork.GetRepository<IServiceUserRepository>();
+
+                    var user = await userRepository.GetAsync(cancellationToken, idUser)
+                        ?? throw new NotFoundException("Usuário não encontrado.");
+
                     if (!user.BusinessUnityId.HasValue)
-                    {
-                        throw new Exception($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
-                    }
+                        throw new Exception("Barbeiro não possui unidade de negócio.");
 
-                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, user.BusinessUnityId.Value) 
-                        ?? throw new NotFoundException($"Barbeiro com o ID {idUser} não possui unidade de negócio.");
+                    var businessUnity = await businessUnityRepository.GetAsync(cancellationToken, user.BusinessUnityId.Value)
+                        ?? throw new NotFoundException("Unidade de negócio não encontrada.");
 
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada.");
-                    if (await hubIntegration.GetPlanType(cancellationToken, company.Id) == PlanType.BarberFree)
-                    {
+                    var company = await companyRepository.GetAsync(cancellationToken, businessUnity.CompanyId)
+                        ?? throw new NotFoundException("Empresa não encontrada.");
+
+                    var planType = await hubIntegration.GetPlanType(cancellationToken, company.Id);
+                    if (planType == PlanType.BarberFree)
                         throw new BusinessException("O plano da empresa não contempla esta funcionalidade.");
-                    }
 
-                    var services = await unitOfWork.GetRepository<IServiceUserRepository>().GetServicesByUserId(idUser);
+                    var services = await serviceUserRepository.GetServicesByUserId(idUser);
+                    var activeServices = services
+                        .Where(s => s.Status == ServiceStatus.Active)
+                        .ToList();
+
                     return new InformationChatDTO
                     {
                         NameCompany = company.Name,
-                        User = user.Status == UserStatus.Active ? new List<UserInformationDTO> { mapper.Map<UserInformationDTO>(user) } : [],
-                        Services = mapper.Map<List<ServiceInformationDTO>>(services.Where(s => s.Status == ServiceStatus.Active).ToList()),
+                        User = user.Status == UserStatus.Active
+                            ? new List<UserInformationDTO> { mapper.Map<UserInformationDTO>(user) }
+                            : [],
+                        Services = mapper.Map<List<ServiceInformationDTO>>(activeServices),
                         BusinessUnities = user.BusinessUnityId.Value
                     };
-
                 });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
             {
-                throw new Exception($"Erro ao obter informações do chat para barbeiro com ID {idUser}.", ex);
+                throw;
             }
         }
 
-        public async Task<InformationChatUserDTO> GetInformationChatByIdService(List<long> idServices)
+        public async Task<InformationChatUserDTO> GetInformationChatByIdService(CancellationToken cancellationToken, List<long> idServices)
         {
-            try
+            if (idServices == null || idServices.Count == 0)
+                throw new BusinessException("É necessário informar pelo menos um serviço.");
+
+            var userList = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
             {
-                var cancellationTokenSource = new CancellationTokenSource();
+                var serviceRepository = unitOfWork.GetRepository<IServiceUserRepository>();
+                return await serviceRepository.GetUsersByServiceId(idServices);
+            });
 
-                var userList = await unitOfWork.QueryUnderTransactionAsync(cancellationTokenSource.Token, async () =>
-                {
-                    var serviceRepository = unitOfWork.GetRepository<IServiceUserRepository>();
-                    return await serviceRepository.GetUsersByServiceId(idServices);
-                });
-
-                var informationChat = new InformationChatUserDTO
-                {
-                    User = mapper.Map<List<UserInformationDTO>>(userList)
-                };
-
-                return informationChat;
-
-            }
-            catch (Exception ex)
+            return new InformationChatUserDTO
             {
-                throw new Exception($"Erro ao obter informações do chat para barbeiro com ID {1}.", ex);
-            }
+                User = mapper.Map<List<UserInformationDTO>>(userList)
+            };
         }
 
         public async Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser)
         {
-            try
-            {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
-                {
-                    var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-                    var userSchedules = await userScheduleRepository.GetScheduleByUserId(idUser);
+            var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
 
-                    var scheduleList = userSchedules.Select(schedule => new DayScheduleDto
+            var userSchedules = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            {
+                return await userScheduleRepository.GetScheduleByUserId(idUser);
+            });
+
+            return userSchedules
+                    .Select(schedule => new DayScheduleDto
                     {
                         DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
-                    }).ToList();
-
-                    return scheduleList;
-                });
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao obter os agendamentos do usuário: {ex.Message}", ex);
-            }
+                    })
+                    .ToList();
         }
 
         public async Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
         {
-            try
-            {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
-                {
-                    return await GetAvailableSlotsInternalAsync(cancellationToken, availableSlotRequestDto);
-                });
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Ocorreu um erro ao tentar obter os horários disponíveis.", ex);
-            }
-        }
-
-        private async Task<Dictionary<string, List<string>>> GetAvailableSlotsInternalAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
-        {
             var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-            DayOfWeek dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
+            var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+
+            var dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
             var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
             var userBreaks = await userRepository.GetEnabledBreaksAsync(cancellationToken, availableSlotRequestDto.IdUser, dayOfWeek);
             var userDayOffs = await userRepository.GetDaysOffAsync(cancellationToken, availableSlotRequestDto.IdUser);
-            var dayIsEqual = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
-            var slots = GetTimeIntervals(availableSlotRequestDto.Duration, userSchedules, userBreaks, userDayOffs, availableSlotRequestDto.DateTimeSchedule, dayIsEqual);
+            var isToday = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+
+            var slots = GetTimeIntervals(
+                availableSlotRequestDto.Duration,
+                userSchedules,
+                userBreaks,
+                userDayOffs,
+                availableSlotRequestDto.DateTimeSchedule,
+                isToday);
+
             var availableSlots = InitializeAvailableSlots();
 
-            var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-            var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(cancellationToken, availableSlotRequestDto.IdUser, availableSlotRequestDto.DateTimeSchedule);
+            var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(
+                cancellationToken,
+                availableSlotRequestDto.IdUser,
+                availableSlotRequestDto.DateTimeSchedule);
 
             var occupiedSlots = GetOccupiedSlots(appointments);
 
@@ -212,15 +201,13 @@ namespace Dispo.Barber.Domain.Services
             {
                 var slotTimeInMinutes = slot.TimeOfDay.TotalMinutes;
 
-                bool isSlotOccupied = occupiedSlots.Any(occupied =>
-                    slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
+                bool isSlotOccupied = occupiedSlots.Any(occupied => slotTimeInMinutes >= occupied.Start && slotTimeInMinutes < occupied.End);
 
                 if (!isSlotOccupied)
                 {
                     var slotEndTime = slotTimeInMinutes + availableSlotRequestDto.Duration;
 
-                    bool isSlotAvailable = !occupiedSlots.Any(occupied =>
-                        slotEndTime > occupied.Start && slotEndTime <= occupied.End);
+                    bool isSlotAvailable = !occupiedSlots.Any(occupied => slotEndTime > occupied.Start && slotEndTime <= occupied.End);
 
                     if (isSlotAvailable)
                     {
@@ -249,65 +236,57 @@ namespace Dispo.Barber.Domain.Services
             };
         }
 
-
         private List<DateTime> GetTimeIntervals(int duration,List<UserSchedule> userSchedules, List<UserSchedule> breaks, List<UserSchedule> dayOffs, DateTime selectedDate, bool dayIsEqual)
         {
             var timeIntervals = new List<DateTime>();
             var today = selectedDate.Date;
             var currentDay = selectedDate.DayOfWeek;
+            var nowTime = LocalTime.Now.TimeOfDay;
 
-            bool isDayOff = dayOffs.Any(d =>
-                d.DayOff &&
-                d.StartDay.HasValue &&
-                d.EndDay.HasValue &&
-                today >= d.StartDay.Value.Date &&
-                today <= d.EndDay.Value.Date);
-
-            if (isDayOff)
-            {
+            if (IsDayOff(today, dayOffs))
                 return timeIntervals;
-            }
 
-            foreach (var userSchedule in userSchedules)
+            foreach (var schedule in userSchedules)
             {
-                if (userSchedule.DayOfWeek != currentDay || userSchedule.DayOff)
+                if (schedule.DayOfWeek != currentDay || schedule.DayOff)
                     continue;
 
-                TimeSpan startTime = TimeSpan.Parse(userSchedule.StartDate);
-                TimeSpan endTime = TimeSpan.Parse(userSchedule.EndDate);
+                var startTime = TimeSpan.Parse(schedule.StartDate);
+                var endTime = TimeSpan.Parse(schedule.EndDate);
 
-                TimeSpan currentTime = startTime;
-                TimeSpan nowTime = LocalTime.Now.TimeOfDay;
-
-                while (currentTime < endTime)
+                for (var currentTime = startTime; currentTime < endTime; currentTime = currentTime.Add(TimeSpan.FromMinutes(duration)))
                 {
-                    DateTime interval = DateTime.Today.Add(currentTime);
-
                     if (dayIsEqual && currentTime < nowTime)
-                    {
-                        currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
                         continue;
-                    }
 
-                    bool isInBreak = breaks.Any(b =>
-                    {
-                        if (b.DayOfWeek != currentDay) return false;
+                    if (IsInBreak(currentDay, currentTime, breaks))
+                        continue;
 
-                        TimeSpan breakStart = TimeSpan.Parse(b.StartDate);
-                        TimeSpan breakEnd = TimeSpan.Parse(b.EndDate);
-                        return currentTime >= breakStart && currentTime < breakEnd;
-                    });
-
-                    if (!isInBreak)
-                    {
-                        timeIntervals.Add(interval);
-                    }
-
-                    currentTime = currentTime.Add(TimeSpan.FromMinutes(duration));
+                    var interval = DateTime.Today.Add(currentTime); //Se algum dia der problema por causa disso, user o de baixo
+                    //var interval = selectedDate.Date.Add(currentTime);
+                    timeIntervals.Add(interval);
                 }
             }
 
             return timeIntervals;
+        }
+
+        private bool IsInBreak(DayOfWeek dayOfWeek, TimeSpan time, List<UserSchedule> breaks)
+        {
+            return breaks.Any(b =>
+                b.DayOfWeek == dayOfWeek &&
+                TimeSpan.Parse(b.StartDate) <= time &&
+                time < TimeSpan.Parse(b.EndDate));
+        }
+
+        private bool IsDayOff(DateTime date, List<UserSchedule> dayOffs)
+        {
+            return dayOffs.Any(d =>
+                d.DayOff &&
+                d.StartDay.HasValue &&
+                d.EndDay.HasValue &&
+                date >= d.StartDay.Value.Date &&
+                date <= d.EndDay.Value.Date);
         }
 
         private List<DateTime> GetTimeIntervalsTwo(int duration, IList<UserSchedule> userSchedules, bool dayIsEqual)
@@ -363,33 +342,25 @@ namespace Dispo.Barber.Domain.Services
 
             return timeIntervals;
         }
+
         private int SumDurationService(List<ServiceAppointment> serviceAppointments)
         {
             int duration = 0;
             foreach (var serviceAppointment in serviceAppointments)
-            {
                 duration += serviceAppointment.Service.Duration;
-            }
             return duration;
         }
-
 
         private string CategorizePeriod(DateTime slot)
         {
             var hour = slot.Hour;
 
             if (hour >= 6 && hour < 12)
-            {
                 return "morning";
-            }
             else if (hour >= 12 && hour < 18)
-            {
                 return "afternoon";
-            }
             else
-            {
                 return "evening";
-            }
         }
 
         public async Task<InformationAppointmentChatDTO> GetInformationAppointmentChatByIdAppointment(CancellationToken cancellationToken, long idAppointment)
@@ -399,35 +370,12 @@ namespace Dispo.Barber.Domain.Services
                 return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
                 {
                     var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment);
 
-                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId);
-
-                    if (businessUnity == null)
-                    {
-                        throw new Exception($"Unidade de negocio não encontrada para esse agendamento {idAppointment}.");
-                    }
-
-                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId);
-
-                    if (customer == null)
-                    {
-                        throw new Exception($"Cliente não encontrada para esse agendamento {idAppointment}.");
-                    }
-
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId);
-
-                    if (company == null)
-                    {
-                        throw new Exception($"Empresa não encontrada para esse agendamento {idAppointment}.");
-                    }
-
-                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId);
-
-                    if (user == null)
-                    {
-                        throw new Exception($"Empresa não encontrada para esse agendamento {idAppointment}.");
-                    }
+                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment) ?? throw new NotFoundException("Agendamento não encontrado.");
+                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId) ?? throw new NotFoundException("Unidade de negocio não encontrada para esse agendamento.");
+                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId) ?? throw new NotFoundException("Cliente não encontrado para esse agendamento.");
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada para esse agendamento.");
+                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId) ?? throw new NotFoundException("Usuário não encontrado para esse agendamento.");
 
                     var informationChat = new InformationAppointmentChatDTO
                     {
@@ -443,9 +391,9 @@ namespace Dispo.Barber.Domain.Services
 
                 });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not NotFoundException)
             {
-                throw new Exception($"Erro ao obter informações do chat para o agendamento com ID {idAppointment}.", ex);
+                throw;
             }
         }
     }

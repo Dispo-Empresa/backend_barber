@@ -58,9 +58,9 @@ namespace Dispo.Barber.Domain.Services
 
                 return mapper.Map<CustomerDTO>(customer);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception("Ocorreu um erro ao buscar o cliente pelo telefone.", ex);
+                throw;
             }
         }
 

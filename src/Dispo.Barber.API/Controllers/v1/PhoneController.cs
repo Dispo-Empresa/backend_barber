@@ -12,14 +12,14 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> GenerateSmsCode([FromBody] GenerateSmsCodePhoneRequest request)
         {
             await tokenConfirmationAppService.GenerateCodeConfirmation(request.Phone);
-            return Ok();
+            return Ok();          
         }
 
         [HttpGet]
         public async Task<IActionResult> GetSmsCode([FromQuery] string phone, [FromQuery] string sms)
         {
             var response = await tokenConfirmationAppService.ValidateCodeConfirmation(phone, sms);
-            return Ok(response);
+            return Ok(response);     
         }
     }
 }
