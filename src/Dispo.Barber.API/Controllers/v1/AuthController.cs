@@ -26,8 +26,8 @@ namespace Dispo.Barber.API.Controllers.v1
         }
 
         [Authorize]
-        [HttpPatch("{userId}/purchase-token/teste")]
-        public async Task<IActionResult> UpdatePurchaseToken([FromRoute] int userId, [FromQuery] string purchaseToken, CancellationToken cancellationToken)
+        [HttpPatch("{userId}/purchase-token/{purchaseToken}")]
+        public async Task<IActionResult> UpdatePurchaseToken([FromRoute] int userId, [FromRoute] string purchaseToken, CancellationToken cancellationToken)
         {
             await authAppService.UpdatePurchaseTokenTeste(userId, purchaseToken, cancellationToken);
             return Ok();
