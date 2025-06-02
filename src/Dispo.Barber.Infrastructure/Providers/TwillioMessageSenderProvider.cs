@@ -1,7 +1,6 @@
 ﻿using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -13,7 +12,6 @@ namespace Dispo.Barber.Infrastructure.Providers
         private readonly ILogger<TwillioMessageSenderProvider> _logger;
         private readonly string _accountSid;
         private readonly string _authToken;
-        private readonly string _twilioPhoneNumber;
         private readonly string _twilioPhoneNumberWhats;
 
         private const string TOKEN_VERIFICATION_CONTENT_SID = "HX6c6d390bceb79e306190675e00f3e25c";
@@ -24,26 +22,7 @@ namespace Dispo.Barber.Infrastructure.Providers
             _logger = logger;
             _accountSid = Environment.GetEnvironmentVariable("TWILLIO_ACCOUNT_SID") ?? "";
             _authToken = Environment.GetEnvironmentVariable("TWILLIO_AUTH_TOKEN") ?? "";
-            _twilioPhoneNumber = Environment.GetEnvironmentVariable("TWILLIO_PHONE_NUMBER") ?? "";
-            _twilioPhoneNumberWhats = Environment.GetEnvironmentVariable("TWILLIO_WHATSAPP_PHONE_NUMBER") ?? "";
-        }
-
-        public async Task SendSmsMessageAsync(string phone, string messageBody)
-        {
-            try
-            {
-                TwilioClient.Init(_accountSid, _authToken);
-                await MessageResource.CreateAsync(
-                    body: messageBody,
-                    from: new PhoneNumber(_twilioPhoneNumber),
-                    to: new PhoneNumber(phone)
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error sending sms message to following phone: {ex.Message}");
-                throw;
-            }
+            _twilioPhoneNumberWhats = Environment.GetEnvironmentVariable("TWILLIO_WHATSAPP_NUMBER") ?? "";
         }
 
         public async Task SendWhatsAppMessageAsync(string phone, string template, string contentId, params string[] contentVariables)
