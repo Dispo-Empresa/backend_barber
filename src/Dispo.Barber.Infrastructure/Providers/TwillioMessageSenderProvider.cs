@@ -1,6 +1,7 @@
 ﻿using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;

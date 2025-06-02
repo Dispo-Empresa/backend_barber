@@ -38,7 +38,7 @@ namespace Dispo.Barber.Domain.Services
 
             var licenseDetails = await GetOrCreateLicense(cancellationToken, user);
             var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user); // PurchaseToken não muda, salvar esse cara na tabela de usuario??
-            await subscriptionIntegration.ValidateAndroidSubscriptionAsync("jngogkacdfophhobhemdjomm.AO-J10whzLNj9S5wiC7dVZmkgXz9kRpcg8d_Mtj5084LzbW5Yw9_K3swCzDG0GAzc0nXqGotqd-ECSmToNf2S7nUDz69zihCew", cancellationToken);
+            //await subscriptionIntegration.ValidateAndroidSubscriptionAsync("jngogkacdfophhobhemdjomm.AO-J10whzLNj9S5wiC7dVZmkgXz9kRpcg8d_Mtj5084LzbW5Yw9_K3swCzDG0GAzc0nXqGotqd-ECSmToNf2S7nUDz69zihCew", cancellationToken);
             return BuildAuthenticationResult(user, refreshToken, licenseDetails);
         }
 
