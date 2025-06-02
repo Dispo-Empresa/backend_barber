@@ -95,6 +95,7 @@ builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 builder.Services.AddTransient<ITwillioMessageSenderProvider, TwillioMessageSenderProvider>();
+builder.Services.AddTransient<ISubscriptionIntegration, SubscriptionIntegration>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
@@ -120,7 +121,7 @@ builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationSenderProvider, NotificationSenderProvider>();
 builder.Services.AddScoped<IBlacklistService, BlacklistService>();
 builder.Services.AddScoped<ITokenConfirmationAppService, TokenConfirmationAppService>();
 

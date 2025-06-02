@@ -2,7 +2,6 @@
 using Dispo.Barber.Domain.DTOs.Chat;
 using Dispo.Barber.Domain.DTOs.User;
 using Dispo.Barber.Domain.Enums;
-using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,9 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/users")]
     [ApiController]
-    public class UserController(IUserAppService userAppService, IInformationChatService informationChatService, IDashboardAppService dashboardAppService) : ControllerBase
+    public class UserController(IUserAppService userAppService,
+                                IInformationChatService informationChatService,
+                                IDashboardAppService dashboardAppService) : ControllerBase
     {
         [Authorize]
         [HttpPost]
@@ -253,6 +254,22 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> Remove(CancellationToken cancellationToken, [FromRoute] long id)
         {
             await userAppService.RemoveAsync(cancellationToken, id);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("{id}/unread-notifications")]
+        public async Task<IActionResult> GetUnreadNotificationsCount(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            var response = await userAppService.GetUnreadNotificationsCountAsync(cancellationToken, id);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPatch("{id}/reset-unread-notifications")]
+        public async Task<IActionResult> ResetUnreadNotifications(CancellationToken cancellationToken, [FromRoute] long id)
+        {
+            await userAppService.ResetUnreadNotificationsAsync(cancellationToken, id);
             return Ok();
         }
     }

@@ -14,19 +14,19 @@ namespace Dispo.Barber.Domain.Services
     public class AppointmentService(IMapper mapper,
                                     IAppointmentRepository repository,
                                     ICustomerRepository customerRepository,
-                                    INotificationService notificationService,
+                                    INotificationSenderProvider notificationService,
                                     IUserRepository userRepository,
                                     ITwillioMessageSenderProvider twillioMessageSender,
                                     IServiceRepository serviceRepository) : IAppointmentService
     {
-        private const string APPOINTMENT_CONFIRMATION_CONTENT_SID = "HX8e8fad455d1978d5979f4a2fecfae59a";
-        private const string APPOINTMENT_CONFIRMATION_TEMPLATE = "appointment_confirmation";
+        private readonly string APPOINTMENT_CONFIRMATION_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_CONFIRMATION_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_CONFIRMATION_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_CONFIRMATION_TEMPLATE") ?? "";
 
-        private const string APPOINTMENT_CANCELLATION_CONTENT_SID = "HX7bc50863b0109b7c303ab71c632a5c63";
-        private const string APPOINTMENT_CANCELLATION_TEMPLATE = "appointment_cancellation";
+        private readonly string APPOINTMENT_CANCELLATION_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_CANCELLATION_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_CANCELLATION_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_CANCELLATION_TEMPLATE") ?? "";
 
-        private const string APPOINTMENT_RESCHEDULING_CONTENT_SID = "HXa43782e247ca7aef23b8f633bf4dac33";
-        private const string APPOINTMENT_RESCHEDULING_TEMPLATE = "appointment_rescheduling";
+        private readonly string APPOINTMENT_RESCHEDULING_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_CONTENT_SID") ?? "";
+        private readonly string APPOINTMENT_RESCHEDULING_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_TEMPLATE") ?? "";
 
         public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
         {
@@ -68,7 +68,7 @@ namespace Dispo.Barber.Domain.Services
             appointment.Customer = await customerRepository.GetAsync(cancellationToken, appointment.CustomerId);
 
             var selectedServices = await serviceRepository.GetListServiceAsync(createAppointmentDTO.Services.ToList());
-            await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, appointment, selectedServices, false);
+            //await SendWhatsAppMessageAppointmentConfirmationAsync(cancellationToken, appointment, selectedServices, false);
 
             if (notifyUsers)
                 await SendNotificationToApp(cancellationToken, appointment, "Agendamento Confirmado", notificationService.GenerateCreateAppointmentMessageApp(appointment), NotificationType.NewAppointment);
@@ -203,6 +203,11 @@ namespace Dispo.Barber.Domain.Services
         private async Task SendNotificationToApp(CancellationToken cancellationToken, Appointment appointment, string tittle, string body, NotificationType notificationType)
         {
             await notificationService.NotifyAsync(cancellationToken, appointment.AcceptedUser.DeviceToken, tittle, body, notificationType);
+
+            var acceptedUser = await userRepository.GetAsync(cancellationToken, appointment.AcceptedUserId.Value);
+            acceptedUser.UnreadNotificationsCount++;
+
+            await repository.SaveChangesAsync(cancellationToken);
         }
 
         private async Task SendWhatsAppMessageAppointmentConfirmationAsync(CancellationToken cancellationToken, Appointment appointment, List<Service> selectedServices, bool rescheduling)
@@ -214,12 +219,11 @@ namespace Dispo.Barber.Domain.Services
             appointmentConfirmationMessage.ProfessionalName = appointment.AcceptedUser?.Name;
             appointmentConfirmationMessage.ServicesNames = string.Join(", ", selectedServices.Select(w => w.Description));
             appointmentConfirmationMessage.Link = appointment.CancellationEntireSlug();
-            var phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
 
             if (rescheduling)
-                await twillioMessageSender.SendWhatsAppMessageAsync(phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_RESCHEDULING_TEMPLATE, APPOINTMENT_RESCHEDULING_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
             else
-                await twillioMessageSender.SendWhatsAppMessageAsync(phone, APPOINTMENT_CONFIRMATION_TEMPLATE, APPOINTMENT_CONFIRMATION_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
+                await twillioMessageSender.SendWhatsAppMessageAsync(appointment.Customer.Phone, APPOINTMENT_CONFIRMATION_TEMPLATE, APPOINTMENT_CONFIRMATION_CONTENT_SID, appointmentConfirmationMessage.ToConfirmation());
         }
 
         private async Task SendWhatsAppMessageAppointmentCancellationAsync(CancellationToken cancellationToken, Appointment appointment)

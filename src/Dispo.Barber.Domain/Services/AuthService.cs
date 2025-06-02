@@ -7,6 +7,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -14,8 +15,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IBlacklistService blacklistService, IHubIntegration hubIntegration,
-        INotificationService notificationService, IUserService userService) : IAuthService
+    public class AuthService(IUserRepository userRepository, 
+                             ITokenRepository tokenRepository, 
+                             IBlacklistService blacklistService, 
+                             IHubIntegration hubIntegration,
+                             INotificationSenderProvider notificationService, 
+                             IUserService userService,
+                             ISubscriptionIntegration subscriptionIntegration) : IAuthService
     {
         public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
         {
@@ -31,7 +37,8 @@ namespace Dispo.Barber.Domain.Services
             }
 
             var licenseDetails = await GetOrCreateLicense(cancellationToken, user);
-            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user);
+            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user); // PurchaseToken não muda, salvar esse cara na tabela de usuario?
+            //await subscriptionIntegration.ValidateAndroidSubscriptionAsync("jngogkacdfophhobhemdjomm.AO-J10whzLNj9S5wiC7dVZmkgXz9kRpcg8d_Mtj5084LzbW5Yw9_K3swCzDG0GAzc0nXqGotqd-ECSmToNf2S7nUDz69zihCew", cancellationToken);
             return BuildAuthenticationResult(user, refreshToken, licenseDetails);
         }
 
@@ -81,6 +88,20 @@ namespace Dispo.Barber.Domain.Services
             blacklistService.PutInBlacklist(currentJwt);
             var licenceDetails = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId);
             return BuildAuthenticationResult(user, refreshToken, licenceDetails);
+        }
+
+        public async Task UpdatePurchaseTokenTeste(int userId, string purchaseToken, CancellationToken cancellationToken)
+        {
+            var user = await userRepository.GetAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
+            
+            if (user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("Usuário não está ativo.");
+            }
+
+            user.Email = purchaseToken; // Simulando a atualização do purchaseToken no campo Email
+            userRepository.Update(user);
+            await userRepository.SaveChangesAsync(cancellationToken);
         }
 
         private async Task<LicenseDTO> GetOrCreateLicense(CancellationToken cancellationToken, User user)

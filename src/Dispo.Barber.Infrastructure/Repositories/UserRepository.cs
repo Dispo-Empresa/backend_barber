@@ -257,5 +257,12 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                       .Select(s => s.BusinessUnityId.Value)
                                       .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<int> GetUnreadNotificationsCountAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Users.Where(x => x.Id == id)
+                                      .Select(s => s.UnreadNotificationsCount)
+                                      .FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

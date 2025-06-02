@@ -3,6 +3,7 @@ using Dispo.Barber.Domain.DTOs.Service;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
+using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
 using Dispo.Barber.Domain.Utils;
@@ -16,7 +17,7 @@ namespace Dispo.Barber.Domain.Services
                                 ICompanyRepository companyRepository, 
                                 IBusinessUnityRepository businessUnityRepository, 
                                 IUserRepository userRepository,
-                                INotificationService notificationService,
+                                INotificationSenderProvider notificationService,
                                 IServiceUserRepository serviceUserRepository) : IServiceService
     {
         public async Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO)
