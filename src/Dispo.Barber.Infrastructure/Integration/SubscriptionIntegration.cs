@@ -25,19 +25,19 @@ namespace Dispo.Barber.Infrastructure.Integration
 
         public SubscriptionIntegration()
         {
-            GoogleCredential credential;
-            string googleCloudCredentialsPath = Environment.GetEnvironmentVariable("AURA_GOOGLE_CLOUD_CREDENTIALS") ?? "";
-            using (var stream = new FileStream(googleCloudCredentialsPath, FileMode.Open, FileAccess.Read))
-            {
-                credential = GoogleCredential.FromStream(stream)
-                    .CreateScoped(AndroidPublisherService.Scope.Androidpublisher);
-            }
-
-            _service = new AndroidPublisherService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Aura Subscription Validator"
-            });
+            //GoogleCredential credential;
+            //string googleCloudCredentialsPath = Environment.GetEnvironmentVariable("AURA_GOOGLE_CLOUD_CREDENTIALS") ?? "";
+            //using (var stream = new FileStream(googleCloudCredentialsPath, FileMode.Open, FileAccess.Read))
+            //{
+            //    credential = GoogleCredential.FromStream(stream)
+            //        .CreateScoped(AndroidPublisherService.Scope.Androidpublisher);
+            //}
+            //
+            //_service = new AndroidPublisherService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = "Aura Subscription Validator"
+            //});
         }
 
         public async Task ValidateAndroidSubscriptionAsync(string token, CancellationToken cancellationToken)
