@@ -24,5 +24,13 @@ namespace Dispo.Barber.API.Controllers.v1
             var jwt = await authAppService.RefreshAuthenticationToken(cancellationToken, refreshToken, Request.Headers.Authorization);
             return Ok(jwt);
         }
+
+        [Authorize]
+        [HttpPatch("{userId}/purchase-token/teste")]
+        public async Task<IActionResult> UpdatePurchaseToken([FromRoute] int userId, [FromQuery] string purchaseToken, CancellationToken cancellationToken)
+        {
+            await authAppService.UpdatePurchaseTokenTeste(userId, purchaseToken, cancellationToken);
+            return Ok();
+        }
     }
 }
