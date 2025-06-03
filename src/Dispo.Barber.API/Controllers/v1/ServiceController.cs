@@ -20,17 +20,10 @@ namespace Dispo.Barber.API.Controllers.v1
 
         [AllowAnonymous]
         [HttpPost("information")]
-        public async Task<IActionResult> GetInformationChatByService([FromBody] List<long> serviceIds)
+        public async Task<IActionResult> GetInformationChatByService(CancellationToken cancellationToken, [FromBody] List<long> serviceIds)
         {
-            try
-            {
-                var informationChat = await informationChatService.GetInformationChatByIdService(serviceIds);
+                var informationChat = await informationChatService.GetInformationChatByIdService(cancellationToken, serviceIds);
                 return Ok(informationChat);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Ocorreu um erro ao buscar as informações de serviço.", error = ex.Message });
-            }
         }
 
         //[Authorize] // VALIDAR
