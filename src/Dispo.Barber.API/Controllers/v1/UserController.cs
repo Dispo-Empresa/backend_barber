@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices;
+using Dispo.Barber.Application.AppServices.Interface;
 using Dispo.Barber.Domain.DTOs.Chat;
 using Dispo.Barber.Domain.DTOs.User;
 using Dispo.Barber.Domain.Enums;
@@ -270,6 +271,14 @@ namespace Dispo.Barber.API.Controllers.v1
         public async Task<IActionResult> ResetUnreadNotifications(CancellationToken cancellationToken, [FromRoute] long id)
         {
             await userAppService.ResetUnreadNotificationsAsync(cancellationToken, id);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPatch("{id}/purchase-token/{purchaseToken}")]
+        public async Task<IActionResult> UpdatePurchaseToken([FromRoute] int id, [FromRoute] string purchaseToken, CancellationToken cancellationToken)
+        {
+            await userAppService.UpdatePurchaseToken(id, purchaseToken, cancellationToken);
             return Ok();
         }
     }

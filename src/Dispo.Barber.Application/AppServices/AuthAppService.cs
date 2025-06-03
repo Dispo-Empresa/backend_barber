@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppServices
 {
-    public class AuthAppService(ILogger<AuthAppService> logger, IUnitOfWork unitOfWork, IAuthService service) : IAuthAppService
+    public class AuthAppService(ILogger<AuthAppService> logger, 
+                                IUnitOfWork unitOfWork, 
+                                IAuthService service) : IAuthAppService
     {
         public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
         {
@@ -30,19 +32,6 @@ namespace Dispo.Barber.Application.AppServices
             catch (Exception e)
             {
                 logger.LogError(e, "Error refreshing token.");
-                throw;
-            }
-        }
-
-        public async Task UpdatePurchaseTokenTeste(int userId, string purchaseToken, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UpdatePurchaseTokenTeste(userId, purchaseToken, cancellationToken), true);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Error updating purchase token.");
                 throw;
             }
         }

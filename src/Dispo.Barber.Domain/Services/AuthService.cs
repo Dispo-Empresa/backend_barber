@@ -6,7 +6,8 @@ using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
-using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Integration.HubClient;
+using Dispo.Barber.Domain.Integration.SubscriptionClient;
 using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services.Interface;
@@ -37,12 +38,38 @@ namespace Dispo.Barber.Domain.Services
             }
 
             var licenseDetails = await GetOrCreateLicense(cancellationToken, user);
-            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user); // PurchaseToken não muda, salvar esse cara na tabela de usuario?
-            //await subscriptionIntegration.ValidateAndroidSubscriptionAsync("jngogkacdfophhobhemdjomm.AO-J10whzLNj9S5wiC7dVZmkgXz9kRpcg8d_Mtj5084LzbW5Yw9_K3swCzDG0GAzc0nXqGotqd-ECSmToNf2S7nUDz69zihCew", cancellationToken);
+            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user);
+
+            await ValidateSubscriptionAsync(user, cancellationToken);
+
             return BuildAuthenticationResult(user, refreshToken, licenseDetails);
         }
 
-        public async Task<string> GetOrCreateRefreshToken(CancellationToken cancellationToken, User user)
+        public async Task<AuthenticationResult> RefreshAuthenticationToken(CancellationToken cancellationToken, string refreshToken, string currentJwt)
+        {
+            var token = await tokenRepository.GetFirstAsync(cancellationToken, w => w.RefreshToken == refreshToken.ToString()) ?? throw new NotFoundException("Token não encontrado");
+            if (token.ExpirationDate <= LocalTime.Now)
+            {
+                tokenRepository.Delete(token);
+                await tokenRepository.SaveChangesAsync(cancellationToken);
+                throw new UnauthorizedAccessException("Token expirado.");
+            }
+
+            var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId) ?? throw new NotFoundException("Usuário não encontrado.");
+            if (user.Status != UserStatus.Active)
+            {
+                throw new BusinessException("Usuário não está ativo.");
+            }
+
+            blacklistService.PutInBlacklist(currentJwt);
+            var licenceDetails = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId);
+
+            await ValidateSubscriptionAsync(user, cancellationToken);
+
+            return BuildAuthenticationResult(user, refreshToken, licenceDetails);
+        }
+
+        private async Task<string> GetOrCreateRefreshToken(CancellationToken cancellationToken, User user)
         {
             var existingToken = await tokenRepository.GetFirstAsync(cancellationToken, w => w.UserId == user.Id);
             if (existingToken != null)
@@ -67,41 +94,6 @@ namespace Dispo.Barber.Domain.Services
             await tokenRepository.SaveChangesAsync(cancellationToken);
 
             return refreshToken;
-        }
-
-        public async Task<AuthenticationResult> RefreshAuthenticationToken(CancellationToken cancellationToken, string refreshToken, string currentJwt)
-        {
-            var token = await tokenRepository.GetFirstAsync(cancellationToken, w => w.RefreshToken == refreshToken.ToString()) ?? throw new NotFoundException("Token não encontrado");
-            if (token.ExpirationDate <= LocalTime.Now)
-            {
-                tokenRepository.Delete(token);
-                await tokenRepository.SaveChangesAsync(cancellationToken);
-                throw new UnauthorizedAccessException("Token expirado.");
-            }
-
-            var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId) ?? throw new NotFoundException("Usuário não encontrado.");
-            if (user.Status != UserStatus.Active)
-            {
-                throw new BusinessException("Usuário não está ativo.");
-            }
-
-            blacklistService.PutInBlacklist(currentJwt);
-            var licenceDetails = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId);
-            return BuildAuthenticationResult(user, refreshToken, licenceDetails);
-        }
-
-        public async Task UpdatePurchaseTokenTeste(int userId, string purchaseToken, CancellationToken cancellationToken)
-        {
-            var user = await userRepository.GetAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
-            
-            if (user.Status != UserStatus.Active)
-            {
-                throw new BusinessException("Usuário não está ativo.");
-            }
-
-            user.Email = purchaseToken; // Simulando a atualização do purchaseToken no campo Email
-            userRepository.Update(user);
-            await userRepository.SaveChangesAsync(cancellationToken);
         }
 
         private async Task<LicenseDTO> GetOrCreateLicense(CancellationToken cancellationToken, User user)
@@ -158,6 +150,16 @@ namespace Dispo.Barber.Domain.Services
 
             await notificationService.NotifyAsync(cancellationToken, user.DeviceToken, "Licença expirada",
                 "Sua licença expirou, os usuários da sua barbearia foram inativados.", NotificationType.ExpiredLicense);
+        }
+
+        private async Task ValidateSubscriptionAsync(User user, CancellationToken cancellationToken)
+        {
+            if (user.IsOwner() && !string.IsNullOrEmpty(user.PurchaseToken))
+            {
+                var androidSubscriptionResponse = await subscriptionIntegration.GetAndroidSubscriptionAsync(user.PurchaseToken, cancellationToken);
+
+                // VALIDAR A ASSINATURA DO USUÁRIO | VALIDAR TAMBEM O SITEMA DO USUARIO, IOS OU ANDROID
+            }
         }
 
         private AuthenticationResult BuildAuthenticationResult(User user, string refreshToken, LicenseDTO licenceDetails)

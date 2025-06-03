@@ -6,6 +6,5 @@ namespace Dispo.Barber.Domain.Services.Interface
     {
         Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password);
         Task<AuthenticationResult> RefreshAuthenticationToken(CancellationToken cancellationToken, string refreshToken, string currentJwt);
-        Task UpdatePurchaseTokenTeste(int userId, string purchaseToken, CancellationToken cancellationToken);
     }
 }

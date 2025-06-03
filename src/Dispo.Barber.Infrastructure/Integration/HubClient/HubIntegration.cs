@@ -2,13 +2,13 @@
 using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
-using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Integration.HubClient;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Domain.Utils.Extensions;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace Dispo.Barber.Infrastructure.Integration
+namespace Dispo.Barber.Infrastructure.Integration.HubClient
 {
     public class HubIntegration : IHubIntegration
     {
@@ -140,7 +140,7 @@ namespace Dispo.Barber.Infrastructure.Integration
             }
             catch (Exception ex)
             {
-                throw new BusinessException("Erro ao conectar com a API do HUB");
+                throw new Exception("Erro ao conectar com a API do HUB");
             }
         }
     }

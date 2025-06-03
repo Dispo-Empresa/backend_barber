@@ -1,7 +1,7 @@
 ﻿using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Enums;
 
-namespace Dispo.Barber.Domain.Integration
+namespace Dispo.Barber.Domain.Integration.HubClient
 {
     public interface IHubIntegration
     {
