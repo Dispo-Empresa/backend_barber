@@ -28,7 +28,7 @@ namespace Dispo.Barber.Domain.Services
         private readonly string APPOINTMENT_RESCHEDULING_CONTENT_SID = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_CONTENT_SID") ?? "";
         private readonly string APPOINTMENT_RESCHEDULING_TEMPLATE = Environment.GetEnvironmentVariable("APPOINTMENT_RESCHEDULING_TEMPLATE") ?? "";
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool isChat = false)
         {
             // Dá pra melhorar todo esse método
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
@@ -56,7 +56,7 @@ namespace Dispo.Barber.Domain.Services
                 appointment.Customer.Phone = StringUtils.FormatPhoneNumber(appointment.Customer.Phone);
 
                 var existingIdByPhone = await customerRepository.GetCustomerIdByPhoneAsync(appointment.Customer.Phone, cancellationToken);
-                if (existingIdByPhone.IsValid())
+                if (existingIdByPhone.IsValid() && !isChat)
                     throw new AlreadyExistsException("Este número já está cadastrado para um cliente da barbearia.");
             }
 

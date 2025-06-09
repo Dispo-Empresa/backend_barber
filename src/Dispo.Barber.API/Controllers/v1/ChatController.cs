@@ -69,7 +69,7 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpPost("appointments")]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true);
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true, isChat : true);
             return Ok();
         }
 
