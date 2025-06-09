@@ -1,6 +1,6 @@
 ﻿namespace Dispo.Barber.Domain.Integration.SubscriptionClient.Models
 {
-    public enum SubscriptionStatus
+    public enum AndroidSubscriptionStatus
     {
         /// <summary>
         /// Estado de assinatura não especificado.
@@ -54,17 +54,17 @@
         public DateTime ExpiryDate { get; set; }
         public string Status { get; set; }
 
-        public SubscriptionStatus StatusEnum => Status switch
+        public AndroidSubscriptionStatus StatusEnum => Status switch
         {
-            "SUBSCRIPTION_STATE_PENDING" => SubscriptionStatus.Pending,
-            "SUBSCRIPTION_STATE_ACTIVE" => SubscriptionStatus.Active,
-            "SUBSCRIPTION_STATE_PAUSED" => SubscriptionStatus.Paused,
-            "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" => SubscriptionStatus.InGracePeriod,
-            "SUBSCRIPTION_STATE_ON_HOLD" => SubscriptionStatus.OnHold,
-            "SUBSCRIPTION_STATE_CANCELED" => SubscriptionStatus.Canceled,
-            "SUBSCRIPTION_STATE_EXPIRED" => SubscriptionStatus.Expired,
-            "SUBSCRIPTION_STATE_PENDING_PURCHASE_CANCELED" => SubscriptionStatus.PendingPurchaseCanceled,
-            _ => SubscriptionStatus.Unspecified,
+            "SUBSCRIPTION_STATE_PENDING" => AndroidSubscriptionStatus.Pending,
+            "SUBSCRIPTION_STATE_ACTIVE" => AndroidSubscriptionStatus.Active,
+            "SUBSCRIPTION_STATE_PAUSED" => AndroidSubscriptionStatus.Paused,
+            "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" => AndroidSubscriptionStatus.InGracePeriod,
+            "SUBSCRIPTION_STATE_ON_HOLD" => AndroidSubscriptionStatus.OnHold,
+            "SUBSCRIPTION_STATE_CANCELED" => AndroidSubscriptionStatus.Canceled,
+            "SUBSCRIPTION_STATE_EXPIRED" => AndroidSubscriptionStatus.Expired,
+            "SUBSCRIPTION_STATE_PENDING_PURCHASE_CANCELED" => AndroidSubscriptionStatus.PendingPurchaseCanceled,
+            _ => AndroidSubscriptionStatus.Unspecified,
         };
     }
 }
