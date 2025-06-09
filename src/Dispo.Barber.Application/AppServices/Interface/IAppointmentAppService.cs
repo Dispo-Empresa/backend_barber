@@ -5,7 +5,7 @@ namespace Dispo.Barber.Application.AppServices.Interface
 {
     public interface IAppointmentAppService
     {
-        Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false);
+        Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool isChat = false);
 
         Task RescheduleAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO);
 
