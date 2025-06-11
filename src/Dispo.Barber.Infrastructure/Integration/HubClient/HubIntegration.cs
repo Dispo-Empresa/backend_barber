@@ -33,10 +33,12 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
             {
                 return new LicenseDTO
                 {
-                    ExpirationDate = LocalTime.Now.AddYears(1),
+                    ExpirationDate = DateTime.MaxValue,
                     Plan = new PlanDTO
                     {
-                        Name = PlanType.BarberFree.ToString()
+                        Id = (int)PlanType.BarberFree,
+                        Name = PlanType.BarberFree.ToString(),
+                        UserLimit = 1,
                     }
                 };
             }

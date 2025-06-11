@@ -9,7 +9,7 @@ namespace Dispo.Barber.Domain.DTOs.Hub
 
         public bool IsExpired()
         {
-            return LocalTime.Now >= ExpirationDate;
+            return !Plan.IsFreePlan() && LocalTime.Now >= ExpirationDate;
         }
     }
 }

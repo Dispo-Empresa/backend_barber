@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Domain.Services.Interface;
+﻿using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Dispo.Barber.Domain.Services

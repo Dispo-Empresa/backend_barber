@@ -1,7 +1,7 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.Models;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppServices

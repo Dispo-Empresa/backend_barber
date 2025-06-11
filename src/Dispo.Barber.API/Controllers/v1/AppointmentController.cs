@@ -1,7 +1,7 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Enums;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

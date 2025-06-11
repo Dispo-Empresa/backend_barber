@@ -3,7 +3,7 @@ using Dispo.Barber.Domain.DTOs.Schedule;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Google.Api.Gax;
 
 namespace Dispo.Barber.Domain.Services

@@ -19,6 +19,7 @@ namespace Dispo.Barber.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public int UnreadNotificationsCount { get; set; }
         public string? PurchaseToken { get; set; }
+        public DevicePlatform Platform { get; set; }
 
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }

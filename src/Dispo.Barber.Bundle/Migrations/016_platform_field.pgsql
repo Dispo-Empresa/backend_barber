@@ -1,0 +1,2 @@
+﻿ALTER TABLE public."Users" 
+ADD COLUMN IF NOT EXISTS "Platform" int4 NOT NULL;

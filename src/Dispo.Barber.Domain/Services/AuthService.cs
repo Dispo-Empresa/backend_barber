@@ -1,53 +1,52 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Dispo.Barber.Domain.DTOs.Authentication;
+﻿using Dispo.Barber.Domain.DTOs.Authentication.Request;
+using Dispo.Barber.Domain.DTOs.Authentication.Response;
 using Dispo.Barber.Domain.DTOs.Hub;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration.HubClient;
-using Dispo.Barber.Domain.Integration.SubscriptionClient;
-using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class AuthService(IUserRepository userRepository, 
-                             ITokenRepository tokenRepository, 
-                             IBlacklistService blacklistService, 
+    public class AuthService(IUserRepository userRepository,
+                             ITokenRepository tokenRepository,
+                             IBlacklistService blacklistService,
                              IHubIntegration hubIntegration,
-                             INotificationSenderProvider notificationService, 
-                             IUserService userService,
-                             ISubscriptionIntegration subscriptionIntegration) : IAuthService
+                             IHubLicenceValidationService hubLicenceValidationService,
+                             ISubscriptionValidationService subscriptionValidationService) : IAuthService
     {
-        public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
+        public async Task<AuthenticationResult> AuthenticateAsync(AuthenticationRequest request, CancellationToken cancellationToken)
         {
-            var user = await userRepository.GetByPhoneWithBusinessUnitiesAsync(cancellationToken, phone) ?? throw new NotFoundException("Usuário não encontrado.");
-            if (!PasswordEncryptor.VerifyPassword(password, user.Password))
+            var user = await userRepository.GetByPhoneWithBusinessUnitiesAsync(cancellationToken, request.Phone)
+                ?? throw new NotFoundException("Usuário não encontrado.");
+
+            ValidateUser(user, request.Password);
+
+            var licenseDetails = await hubLicenceValidationService.GetOrCreateLicense(user, cancellationToken);
+
+            var subscriptionData = await ProcessSubscriptionDataAsync(user, licenseDetails, request.Platform, cancellationToken);
+
+            if (licenseDetails.Plan.Id != (int)PlanType.BarberPremium ||
+               (licenseDetails.Plan.Id == (int)PlanType.BarberPremium && subscriptionData!.IsSubscriptionValid))
             {
-                throw new NotFoundException("Usuário não encontrado.");
+                ChangePlataformDeviceToken(user, request.Platform, request.DeviceToken);
             }
 
-            if (user.Status != UserStatus.Active)
-            {
-                throw new BusinessException("Usuário não está ativo.");
-            }
-
-            var licenseDetails = await GetOrCreateLicense(cancellationToken, user);
-            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user);
-
-            await ValidateSubscriptionAsync(user, cancellationToken);
-
-            return BuildAuthenticationResult(user, refreshToken, licenseDetails);
+            return await BuildAuthenticationResult(user, subscriptionData, cancellationToken);
         }
 
         public async Task<AuthenticationResult> RefreshAuthenticationToken(CancellationToken cancellationToken, string refreshToken, string currentJwt)
         {
-            var token = await tokenRepository.GetFirstAsync(cancellationToken, w => w.RefreshToken == refreshToken.ToString()) ?? throw new NotFoundException("Token não encontrado");
+            var token = await tokenRepository.GetFirstAsync(cancellationToken, w => w.RefreshToken == refreshToken.ToString())
+                ?? throw new NotFoundException("Token não encontrado");
+
             if (token.ExpirationDate <= LocalTime.Now)
             {
                 tokenRepository.Delete(token);
@@ -55,18 +54,48 @@ namespace Dispo.Barber.Domain.Services
                 throw new UnauthorizedAccessException("Token expirado.");
             }
 
-            var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId) ?? throw new NotFoundException("Usuário não encontrado.");
+            var user = await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, token.UserId)
+                ?? throw new NotFoundException("Usuário não encontrado.");
+
             if (user.Status != UserStatus.Active)
             {
                 throw new BusinessException("Usuário não está ativo.");
             }
 
             blacklistService.PutInBlacklist(currentJwt);
-            var licenceDetails = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId);
 
-            await ValidateSubscriptionAsync(user, cancellationToken);
+            var licenseDetails = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId)
+                ?? throw new NotFoundException("Licença não encontrada. Por favor, tente mais tarde.");
 
-            return BuildAuthenticationResult(user, refreshToken, licenceDetails);
+            var subscriptionData = await ProcessSubscriptionDataAsync(user, licenseDetails, null, cancellationToken);
+
+            return await BuildAuthenticationResult(user, subscriptionData, cancellationToken);
+        }
+
+        private async Task<SubscriptionData> ProcessSubscriptionDataAsync(User user, LicenseDTO licenseDetails, DevicePlatform? platform, CancellationToken cancellationToken)
+        {
+            if (licenseDetails.Plan.IsPremiumPlan())
+            {
+                var subscriptionData = await subscriptionValidationService.ValidateSubscriptionAsync(user, platform, cancellationToken);
+                subscriptionData.Plan = licenseDetails.Plan;
+
+                return subscriptionData;
+            }
+            else if (licenseDetails.Plan.IsTrial())
+            {
+                return new SubscriptionData
+                {
+                    ExpirationDate = licenseDetails.ExpirationDate,
+                    Plan = licenseDetails.Plan,
+                };
+            }
+            else
+            {
+                return new SubscriptionData
+                {
+                    Plan = licenseDetails.Plan
+                };
+            }
         }
 
         private async Task<string> GetOrCreateRefreshToken(CancellationToken cancellationToken, User user)
@@ -96,90 +125,46 @@ namespace Dispo.Barber.Domain.Services
             return refreshToken;
         }
 
-        private async Task<LicenseDTO> GetOrCreateLicense(CancellationToken cancellationToken, User user)
+        private void ValidateUser(User user, string password)
         {
-            var license = await hubIntegration.GetLicenseDetails(cancellationToken, user.BusinessUnity.CompanyId);
-            if (license is not null)
-            {
-                if (IsUserRestrictedToSingleLicense(license, user))
-                {
-                    await notificationService.NotifyAsync(cancellationToken, user.DeviceToken, "Licença expirada",
-                        "A licença da empresa em que você está vinculado está expirada.", NotificationType.ExpiredLicense);
+            if (!PasswordEncryptor.VerifyPassword(password, user.Password))
+                throw new NotFoundException("Usuário não encontrado.");
 
-                    throw new BusinessException("O plano grátis só permite um usuário por empresa.");
-                }
-
-                if (!license.IsExpired())
-                {
-                    if (license.Plan.Name != PlanType.BarberFree.ToString())
-                    {
-                        await ActivateUsersIfPendingRenewal(cancellationToken, user.BusinessUnity.CompanyId);
-                    }
-
-                    return license;
-                }
-            }
-
-            await HandleExpiredLicense(cancellationToken, user);
-
-            return await hubIntegration.CreateHubLicense(new LicenseRequestDTO
-            {
-                CompanyId = user.BusinessUnity.CompanyId,
-                PlanType = PlanType.BarberFree,
-            }, cancellationToken);
+            if (user.Status != UserStatus.Active)
+                throw new BusinessException("Usuário não está ativo.");
         }
 
-        private bool IsUserRestrictedToSingleLicense(LicenseDTO license, User user)
+        private void ChangePlataformDeviceToken(User user, DevicePlatform currentPlataform, string currentDeviceToken)
         {
-            return license.Plan.Name == PlanType.BarberFree.ToString() && user.BusinessUnity?.Company.OwnerId != user.Id;
-        }
-
-        private async Task ActivateUsersIfPendingRenewal(CancellationToken cancellationToken, long companyId)
-        {
-            if (!await userRepository.ExistsAsync(cancellationToken, w => w.BusinessUnity != null && w.BusinessUnity.CompanyId == companyId && w.Status == UserStatus.PendingRenew))
-            {
+            if (user.DeviceToken == currentDeviceToken && user.Platform == currentPlataform)
                 return;
-            }
 
-            await userService.UpdateAllFromCompany(cancellationToken, companyId, UserStatus.Active);
+            user.Platform = currentPlataform;
+            user.DeviceToken = currentDeviceToken;
+
+            userRepository.Update(user);
         }
 
-        private async Task HandleExpiredLicense(CancellationToken cancellationToken, User user)
-        {
-            await userService.UpdateAllFromCompany(cancellationToken, user.BusinessUnity.CompanyId, UserStatus.PendingRenew);
-
-            await notificationService.NotifyAsync(cancellationToken, user.DeviceToken, "Licença expirada",
-                "Sua licença expirou, os usuários da sua barbearia foram inativados.", NotificationType.ExpiredLicense);
-        }
-
-        private async Task ValidateSubscriptionAsync(User user, CancellationToken cancellationToken)
-        {
-            if (user.IsOwner() && !string.IsNullOrEmpty(user.PurchaseToken))
-            {
-                var androidSubscriptionResponse = await subscriptionIntegration.GetAndroidSubscriptionAsync(user.PurchaseToken, cancellationToken);
-
-                // VALIDAR A ASSINATURA DO USUÁRIO | VALIDAR TAMBEM O SITEMA DO USUARIO, IOS OU ANDROID
-            }
-        }
-
-        private AuthenticationResult BuildAuthenticationResult(User user, string refreshToken, LicenseDTO licenceDetails)
+        private async Task<AuthenticationResult> BuildAuthenticationResult(User user, SubscriptionData subscription, CancellationToken cancellationToken)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var tokenHandler = new JwtSecurityTokenHandler();
-            return new AuthenticationResult(tokenHandler.WriteToken(new JwtSecurityToken(
+
+            var refreshToken = await GetOrCreateRefreshToken(cancellationToken, user);
+            var token = tokenHandler.WriteToken(new JwtSecurityToken(
                 issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
                 audience: Environment.GetEnvironmentVariable("JWT_ISSUER"),
                 claims:
                 [
                     new Claim("id", user.Id.ToString()),
-                    new Claim("phone", user.Phone),
-                    new Claim("link", user.EntireSlug() ?? string.Empty),
-                    new Claim("plan", licenceDetails.Plan.Id.ToString()),
+                    new Claim("role", user.Role.ToString()),
                 ],
                 expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: credentials
-            )), refreshToken, user, licenceDetails);
+            ));
+
+            return new AuthenticationResult(token, refreshToken, user, subscription);
         }
     }
 }

@@ -1,22 +1,22 @@
-using System.Diagnostics;
-using System.Text;
 using AutoMapper;
 using Dispo.Barber.API.Hubs;
 using Dispo.Barber.API.Middleware;
 using Dispo.Barber.Application.AppServices;
-using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Application.Profiles;
 using Dispo.Barber.Bundle.Services;
 using Dispo.Barber.Domain.Cache;
+using Dispo.Barber.Domain.Factories;
 using Dispo.Barber.Domain.Integration.HubClient;
 using Dispo.Barber.Domain.Integration.SubscriptionClient;
 using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
 using Dispo.Barber.Domain.Services;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 using Dispo.Barber.Infrastructure.Cache;
 using Dispo.Barber.Infrastructure.Context;
+using Dispo.Barber.Infrastructure.Factories;
 using Dispo.Barber.Infrastructure.Integration.HubClient;
 using Dispo.Barber.Infrastructure.Integration.SubscriptionClient;
 using Dispo.Barber.Infrastructure.Providers;
@@ -30,6 +30,8 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using System.Diagnostics;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,7 +99,9 @@ builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 builder.Services.AddTransient<ITwillioMessageSenderProvider, TwillioMessageSenderProvider>();
-builder.Services.AddTransient<ISubscriptionIntegration, SubscriptionIntegration>();
+builder.Services.AddTransient<ISubscriptionValidator, GooglePlayStrategyValidator>();
+builder.Services.AddTransient<ISubscriptionValidator, AppStoreStrategyValidator>();
+builder.Services.AddTransient<ISubscriptionValidatorFactory, SubscriptionValidatorFactory>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
