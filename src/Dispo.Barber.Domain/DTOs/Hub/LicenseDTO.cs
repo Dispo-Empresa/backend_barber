@@ -5,7 +5,7 @@ namespace Dispo.Barber.Domain.DTOs.Hub
     public class LicenseDTO
     {
         public DateTime ExpirationDate { get; set; }
-        public PlanDTO Plan { get; set; }
+        public PlanData Plan { get; set; }
 
         public bool IsExpired()
         {

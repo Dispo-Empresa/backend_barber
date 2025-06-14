@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.Enums
+﻿using System.ComponentModel;
+
+namespace Dispo.Barber.Domain.Enums
 {
     public enum DevicePlatform
     {

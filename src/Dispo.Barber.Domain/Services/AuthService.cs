@@ -72,32 +72,6 @@ namespace Dispo.Barber.Domain.Services
             return await BuildAuthenticationResult(user, subscriptionData, cancellationToken);
         }
 
-        private async Task<SubscriptionData> ProcessSubscriptionDataAsync(User user, LicenseDTO licenseDetails, DevicePlatform? platform, CancellationToken cancellationToken)
-        {
-            if (licenseDetails.Plan.IsPremiumPlan())
-            {
-                var subscriptionData = await subscriptionValidationService.ValidateSubscriptionAsync(user, platform, cancellationToken);
-                subscriptionData.Plan = licenseDetails.Plan;
-
-                return subscriptionData;
-            }
-            else if (licenseDetails.Plan.IsTrial())
-            {
-                return new SubscriptionData
-                {
-                    ExpirationDate = licenseDetails.ExpirationDate,
-                    Plan = licenseDetails.Plan,
-                };
-            }
-            else
-            {
-                return new SubscriptionData
-                {
-                    Plan = licenseDetails.Plan
-                };
-            }
-        }
-
         private async Task<string> GetOrCreateRefreshToken(CancellationToken cancellationToken, User user)
         {
             var existingToken = await tokenRepository.GetFirstAsync(cancellationToken, w => w.UserId == user.Id);
@@ -128,10 +102,36 @@ namespace Dispo.Barber.Domain.Services
         private void ValidateUser(User user, string password)
         {
             if (!PasswordEncryptor.VerifyPassword(password, user.Password))
-                throw new NotFoundException("Usuário não encontrado.");
+                throw new NotFoundException("Senha inválida.");
 
             if (user.Status != UserStatus.Active)
                 throw new BusinessException("Usuário não está ativo.");
+        }
+
+        private async Task<SubscriptionData> ProcessSubscriptionDataAsync(User user, LicenseDTO licenseDetails, DevicePlatform? platform, CancellationToken cancellationToken)
+        {
+            if (licenseDetails.Plan.IsPremiumPlan())
+            {
+                var subscriptionData = await subscriptionValidationService.ValidateSubscriptionAsync(user, platform, cancellationToken);
+                subscriptionData.Plan = licenseDetails.Plan;
+
+                return subscriptionData;
+            }
+            else if (licenseDetails.Plan.IsTrial())
+            {
+                return new SubscriptionData
+                {
+                    ExpirationDate = licenseDetails.ExpirationDate,
+                    Plan = licenseDetails.Plan,
+                };
+            }
+            else
+            {
+                return new SubscriptionData
+                {
+                    Plan = licenseDetails.Plan
+                };
+            }
         }
 
         private void ChangePlataformDeviceToken(User user, DevicePlatform currentPlataform, string currentDeviceToken)

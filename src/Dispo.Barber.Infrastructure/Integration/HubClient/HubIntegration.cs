@@ -34,7 +34,7 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
                 return new LicenseDTO
                 {
                     ExpirationDate = DateTime.MaxValue,
-                    Plan = new PlanDTO
+                    Plan = new PlanData
                     {
                         Id = (int)PlanType.BarberFree,
                         Name = PlanType.BarberFree.ToString(),
@@ -64,7 +64,7 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
                     return PlanType.BarberFree;
                 }
 
-                var plan = JsonConvert.DeserializeObject<PlanDTO>(response.Content);
+                var plan = JsonConvert.DeserializeObject<PlanData>(response.Content);
                 if (plan is null)
                 {
                     return PlanType.BarberFree;

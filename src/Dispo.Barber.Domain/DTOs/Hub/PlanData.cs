@@ -2,7 +2,7 @@
 
 namespace Dispo.Barber.Domain.DTOs.Hub
 {
-    public class PlanDTO
+    public class PlanData
     {
         public long Id { get; set; }
         public string Name { get; set; }

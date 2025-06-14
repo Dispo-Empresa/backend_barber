@@ -1,5 +1,4 @@
-﻿using Dispo.Barber.Domain.DTOs.Authentication.Response;
-using Dispo.Barber.Domain.Exceptions;
+﻿using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration.SubscriptionClient;
 using Dispo.Barber.Domain.Integration.SubscriptionClient.Models;
 using Google.Apis.AndroidPublisher.v3;

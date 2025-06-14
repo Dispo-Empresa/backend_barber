@@ -50,10 +50,12 @@ namespace Dispo.Barber.Domain.Services
         {
             if (string.IsNullOrEmpty(purchaseToken))
             {
-                return new SubscriptionData
+                await HandleInvalidSubscription(user, new SubscriptionValidationResponse
                 {
-                    HasTrialExpiredError = true,
-                };
+                    ExpirationDate = DateTime.MinValue,
+                    Status = user.Platform == DevicePlatform.Android ? "SUBSCRIPTION_STATE_UNSPECIFIED" 
+                                                                     : "", // UNSPECIFIED para Ios?
+                }, cancellationToken);
             }
 
             var subscriptionValidator = subscriptionFactory.CreateValidator(user.Platform);
@@ -76,18 +78,10 @@ namespace Dispo.Barber.Domain.Services
 
         private async Task<SubscriptionData> HandleInvalidSubscription(User user, SubscriptionValidationResponse subscriptionValidationResponse, CancellationToken cancellationToken)
         {
-            if (user.IsOwner())
-            {
-                // ALTERAR PLANO PARA GRATUITO
+            // COMENTADO PARA TESTES
+            //await userService.UpdateAllFromCompany(cancellationToken, user.BusinessUnity.CompanyId, UserStatus.PendingRenew);
 
-                return await BuildSubscriptionData(user, subscriptionValidationResponse);
-            }
-            else
-            {
-                await userService.UpdateAllFromCompany(cancellationToken, user.BusinessUnity.CompanyId, UserStatus.PendingRenew);
-
-                return await BuildSubscriptionData(user, subscriptionValidationResponse);
-            }
+            return await BuildSubscriptionData(user, subscriptionValidationResponse);
         }
 
         private async Task<SubscriptionData> BuildSubscriptionData(User user, SubscriptionValidationResponse response)
@@ -96,7 +90,6 @@ namespace Dispo.Barber.Domain.Services
             {
                 ExpirationDate = response.ExpirationDate,
                 Status = response.StatusEnum,
-                HasTrialExpiredError = false,
                 HasChangedPlataformError = false,
                 Platform = user.Platform,
             });

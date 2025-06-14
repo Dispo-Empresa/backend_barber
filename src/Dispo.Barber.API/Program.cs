@@ -99,9 +99,9 @@ builder.Services.AddTransient<ITokenRepository, TokenRepository>();
 builder.Services.AddTransient<ICacheManager, CacheManager>();
 builder.Services.AddTransient<IHubIntegration, HubIntegration>();
 builder.Services.AddTransient<ITwillioMessageSenderProvider, TwillioMessageSenderProvider>();
-builder.Services.AddTransient<ISubscriptionValidator, GooglePlayStrategyValidator>();
-builder.Services.AddTransient<ISubscriptionValidator, AppStoreStrategyValidator>();
 builder.Services.AddTransient<ISubscriptionValidatorFactory, SubscriptionValidatorFactory>();
+builder.Services.AddTransient<GooglePlayStrategyValidator>();
+builder.Services.AddTransient<AppStoreStrategyValidator>();
 
 // Register services
 builder.Services.AddScoped<ICompanyAppService, CompanyAppService>();
@@ -114,6 +114,8 @@ builder.Services.AddScoped<IBusinessUnityAppService, BusinessUnityAppService>();
 builder.Services.AddScoped<IScheduleAppService, ScheduleAppService>();
 builder.Services.AddScoped<IAuthAppService, AuthAppService>();
 builder.Services.AddScoped<ITokenConfirmationService, TokenConfirmationService>();
+builder.Services.AddScoped<ISubscriptionValidationService, SubscriptionValidationService>();
+builder.Services.AddScoped<IHubLicenceValidationService, HubLicenceValidationService>();
 
 // Register appServices
 builder.Services.AddScoped<IInformationChatService, InformationChatService>();

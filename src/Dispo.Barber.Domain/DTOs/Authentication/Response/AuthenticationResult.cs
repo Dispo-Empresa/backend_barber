@@ -62,10 +62,9 @@ namespace Dispo.Barber.Domain.DTOs.Authentication.Response
     {
         public DateTime ExpirationDate { get; set; }
         public SubscriptionStatus Status { get; set; }
-        public bool HasTrialExpiredError { get; set; }
         public bool HasChangedPlataformError { get; set; }
         public DevicePlatform Platform { get; set; }
-        public PlanDTO Plan { get; set; }
+        public PlanData Plan { get; set; }
 
         public bool IsSubscriptionValid => Status is SubscriptionStatus.Active or SubscriptionStatus.InGracePeriod;
     }

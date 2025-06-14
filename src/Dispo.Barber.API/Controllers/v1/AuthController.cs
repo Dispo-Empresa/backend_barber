@@ -11,7 +11,7 @@ namespace Dispo.Barber.API.Controllers.v1
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get(AuthenticationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromQuery] AuthenticationRequest request, CancellationToken cancellationToken)
         {
             var jwt = await authAppService.AuthenticateAsync(request, cancellationToken);
             return Ok(jwt);
