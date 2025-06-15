@@ -140,7 +140,7 @@ namespace Dispo.Barber.Infrastructure.Integration
             }
             catch (Exception ex)
             {
-                throw new BusinessException("Erro ao conectar com a API do HUB");
+                throw new BusinessException("Erro ao conectar com a API do HUB: " + ex.Message);
             }
         }
     }
