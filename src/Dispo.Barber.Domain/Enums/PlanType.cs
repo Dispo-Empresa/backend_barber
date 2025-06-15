@@ -2,9 +2,8 @@
 {
     public enum PlanType
     {
-        none,
-        BarberFree,
-        BarberPremium,
-        BarberPremiumTrial,
+        BarberFree = 1,
+        BarberPremium = 2,
+        BarberPremiumTrial = 3,
     }
 }

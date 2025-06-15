@@ -5,7 +5,7 @@ using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Providers;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 using Microsoft.AspNetCore.Http;
 

@@ -3,7 +3,7 @@ using Dispo.Barber.Domain.DTOs.Company;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 
 namespace Dispo.Barber.Domain.Services
 {

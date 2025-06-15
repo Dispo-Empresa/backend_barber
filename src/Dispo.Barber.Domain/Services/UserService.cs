@@ -9,9 +9,9 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Extension;
-using Dispo.Barber.Domain.Integration;
+using Dispo.Barber.Domain.Integration.HubClient;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
@@ -380,9 +380,7 @@ namespace Dispo.Barber.Domain.Services
             foreach (var user in users)
             {
                 if (user.BusinessUnity?.Company.OwnerId == user.Id)
-                {
                     continue;
-                }
 
                 user.Status = status;
             }
@@ -408,6 +406,18 @@ namespace Dispo.Barber.Domain.Services
 
             user.UnreadNotificationsCount = 0;
 
+            repository.Update(user);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken)
+        {
+            var user = await repository.GetAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
+
+            if (user.Status != UserStatus.Active)
+                throw new BusinessException("Usuário não está ativo.");
+
+            user.PurchaseToken = purchaseToken;
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
         }

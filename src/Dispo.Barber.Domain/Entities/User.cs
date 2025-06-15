@@ -18,6 +18,8 @@ namespace Dispo.Barber.Domain.Entities
         public string DeviceToken { get; set; }
         public DateTime CreatedAt { get; set; }
         public int UnreadNotificationsCount { get; set; }
+        public string? PurchaseToken { get; set; }
+        public DevicePlatform Platform { get; set; }
 
         public long? BusinessUnityId { get; set; }
         public BusinessUnity? BusinessUnity { get; set; }
@@ -82,6 +84,17 @@ namespace Dispo.Barber.Domain.Entities
             return $"{Convert.ToInt32(hourMinute.Replace(":", "")) * 100 / Convert.ToInt32(GetDifference(summedWorkingHours, summedRestingHours).Replace(":", ""))}%";
         }
 
+        public string EntireSlug()
+        {
+            var barberIdEncripted = CryptoHelper.Encrypt(Id.ToString());
+            return $"{Links.AuraChatBarberLink}{barberIdEncripted}";
+        }
+
+        public bool IsOwner()
+        {
+            return BusinessUnity?.Company.OwnerId == Id;
+        }
+
         private static string FormatMinutesToHours(int minutes)
         {
             int hours = minutes / 60;
@@ -119,12 +132,6 @@ namespace Dispo.Barber.Domain.Entities
                 summedHours = SumDates(workingHour, summedHours);
             }
             return summedHours;
-        }
-
-        public string EntireSlug()
-        {
-            var barberIdEncripted = CryptoHelper.Encrypt(Id.ToString());
-            return $"{Links.AuraChatBarberLink}{barberIdEncripted}";
         }
     }
 }

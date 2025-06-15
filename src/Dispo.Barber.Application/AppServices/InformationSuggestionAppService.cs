@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Dispo.Barber.Application.AppServices.Interface;
+using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Chat;
 using Dispo.Barber.Domain.DTOs.Customer;

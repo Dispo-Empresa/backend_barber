@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Customer;
 using Dispo.Barber.Domain.DTOs.Service;
@@ -7,7 +7,7 @@ using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -464,6 +464,19 @@ namespace Dispo.Barber.Application.AppServices
             catch (Exception e)
             {
                 logger.LogError(e, "Error getting unread notifications count.");
+                throw;
+            }
+        }
+
+        public async Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UpdatePurchaseToken(userId, purchaseToken, cancellationToken), true);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error updating purchase token.");
                 throw;
             }
         }
