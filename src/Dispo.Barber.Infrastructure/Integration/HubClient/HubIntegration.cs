@@ -142,7 +142,7 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
             }
             catch (Exception ex)
             {
-                throw new BusinessException("Erro ao conectar com a API do HUB: " + ex.Message);
+                throw new BusinessException("Erro ao conectar com a API do HUB: " + ex.Message + " ULR DO HUB: " + Environment.GetEnvironmentVariable("HUB_INTEGRATION_URL"));
             }
         }
     }
