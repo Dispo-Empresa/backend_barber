@@ -29,6 +29,8 @@ namespace Dispo.Barber.Domain.Services
                 throw new BusinessException("O código é diferente do enviado.");
             }
 
+            InvalidateCode(phone);
+
             return await Task.FromResult(smsInCache == sms);
         }
 
@@ -52,6 +54,12 @@ namespace Dispo.Barber.Domain.Services
             {
                 cache.Add(key, "1");
             }
+        }
+
+        private void InvalidateCode(string phone)
+        {
+            cache.Remove(phone);
+            cache.Remove($"{phone}-retries");
         }
     }
 }
