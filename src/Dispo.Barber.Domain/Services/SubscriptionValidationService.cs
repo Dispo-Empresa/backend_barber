@@ -78,8 +78,7 @@ namespace Dispo.Barber.Domain.Services
 
         private async Task<SubscriptionData> HandleInvalidSubscription(User user, SubscriptionValidationResponse subscriptionValidationResponse, CancellationToken cancellationToken)
         {
-            // COMENTADO PARA TESTES
-            //await userService.UpdateAllFromCompany(cancellationToken, user.BusinessUnity.CompanyId, UserStatus.PendingRenew);
+            await userService.UpdateAllFromCompany(cancellationToken, user.BusinessUnity.CompanyId, UserStatus.PendingRenew);
 
             return await BuildSubscriptionData(user, subscriptionValidationResponse);
         }
