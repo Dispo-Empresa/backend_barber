@@ -257,6 +257,7 @@ namespace Dispo.Barber.Domain.Services
             user.Status = UserStatus.Pending;
             user.Slug = "";
             user.DeviceToken = "";
+            user.Platform = DevicePlatform.Android; // Default
 
             await repository.AddAsync(cancellationToken, user);
             await repository.SaveChangesAsync(cancellationToken);
@@ -300,6 +301,7 @@ namespace Dispo.Barber.Domain.Services
             user.Name = finalizeEmployeeUserDto.Name;
             user.Photo = finalizeEmployeeUserDto.Photo;
             user.DeviceToken = finalizeEmployeeUserDto.DeviceToken;
+            user.Platform = finalizeEmployeeUserDto.Platform;
             user.Status = UserStatus.Active;
             user.Slug = user.Name.ToLowerInvariant().Replace(" ", "-");
 
@@ -345,6 +347,7 @@ namespace Dispo.Barber.Domain.Services
             user.Status = UserStatus.Active;
             user.Role = UserRole.Manager;
             user.BusinessUnityId = createdBusinessUnityId;
+            user.Platform = createBarbershopSchemeDto.OwnerUser.Platform;
 
             if (createBarbershopSchemeDto.Company.Services != null && createBarbershopSchemeDto.Company.Services.Count != 0)
             {

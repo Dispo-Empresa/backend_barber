@@ -1,4 +1,6 @@
-﻿namespace Dispo.Barber.Domain.DTOs.User
+﻿using Dispo.Barber.Domain.Enums;
+
+namespace Dispo.Barber.Domain.DTOs.User
 {
     public class FinalizeEmployeeUserDTO
     {
@@ -6,6 +8,7 @@
         public string Password { get; set; }
         public byte[]? Photo { get; set; }
         public string DeviceToken { get; set; }
+        public DevicePlatform Platform { get; set; }
         public List<long>? EnabledServicesId { get; set; }
     }
 }
