@@ -1,4 +1,5 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
+using Dispo.Barber.Domain.DTOs.Authentication.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,9 @@ namespace Dispo.Barber.API.Controllers.v1
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken, string phone, string password)
+        public async Task<IActionResult> Get([FromQuery] AuthenticationRequest request, CancellationToken cancellationToken)
         {
-            var jwt = await authAppService.AuthenticateAsync(cancellationToken, phone, password);
+            var jwt = await authAppService.AuthenticateAsync(request, cancellationToken);
             return Ok(jwt);
         }
 

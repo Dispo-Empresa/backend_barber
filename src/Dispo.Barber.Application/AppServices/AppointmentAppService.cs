@@ -1,8 +1,8 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.Entities;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppServices
@@ -24,11 +24,11 @@ namespace Dispo.Barber.Application.AppServices
             }
         }
 
-        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false)
+        public async Task CreateAsync(CancellationToken cancellationToken, CreateAppointmentDTO createAppointmentDTO, bool notifyUsers = false, bool isChat = false)
         {
             try
             {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: notifyUsers));
+                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: notifyUsers, isChat : isChat));
             }
             catch (Exception e)
             {

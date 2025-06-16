@@ -33,10 +33,12 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
             {
                 return new LicenseDTO
                 {
-                    ExpirationDate = LocalTime.Now.AddYears(1),
-                    Plan = new PlanDTO
+                    ExpirationDate = DateTime.MaxValue,
+                    Plan = new PlanData
                     {
-                        Name = PlanType.BarberFree.ToString()
+                        Id = (int)PlanType.BarberFree,
+                        Name = PlanType.BarberFree.ToString(),
+                        UserLimit = 1,
                     }
                 };
             }
@@ -62,7 +64,7 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
                     return PlanType.BarberFree;
                 }
 
-                var plan = JsonConvert.DeserializeObject<PlanDTO>(response.Content);
+                var plan = JsonConvert.DeserializeObject<PlanData>(response.Content);
                 if (plan is null)
                 {
                     return PlanType.BarberFree;

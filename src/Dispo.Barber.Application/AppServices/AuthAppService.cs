@@ -1,7 +1,8 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
-using Dispo.Barber.Domain.DTOs.Authentication;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
+using Dispo.Barber.Domain.DTOs.Authentication.Request;
+using Dispo.Barber.Domain.DTOs.Authentication.Response;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Dispo.Barber.Application.AppServices
@@ -10,11 +11,11 @@ namespace Dispo.Barber.Application.AppServices
                                 IUnitOfWork unitOfWork, 
                                 IAuthService service) : IAuthAppService
     {
-        public async Task<AuthenticationResult> AuthenticateAsync(CancellationToken cancellationToken, string phone, string password)
+        public async Task<AuthenticationResult> AuthenticateAsync(AuthenticationRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.AuthenticateAsync(cancellationToken, phone, password), true);
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () => await service.AuthenticateAsync(request, cancellationToken), true);
             }
             catch (Exception e)
             {

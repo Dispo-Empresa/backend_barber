@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 
 namespace Dispo.Barber.API.Middleware
 {

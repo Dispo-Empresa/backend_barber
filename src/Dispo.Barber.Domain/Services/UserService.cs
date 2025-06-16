@@ -11,7 +11,7 @@ using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Extension;
 using Dispo.Barber.Domain.Integration.HubClient;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
 
 namespace Dispo.Barber.Domain.Services
@@ -380,9 +380,7 @@ namespace Dispo.Barber.Domain.Services
             foreach (var user in users)
             {
                 if (user.BusinessUnity?.Company.OwnerId == user.Id)
-                {
                     continue;
-                }
 
                 user.Status = status;
             }

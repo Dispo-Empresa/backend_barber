@@ -1,8 +1,8 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Appointment;
 using Dispo.Barber.Domain.DTOs.Chat;
 using Dispo.Barber.Domain.Entities;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,7 +69,7 @@ namespace Dispo.Barber.API.Controllers.v1
         [HttpPost("appointments")]
         public async Task<IActionResult> Create(CancellationToken cancellationToken, [FromBody] CreateAppointmentDTO createAppointmentDTO)
         {
-            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true);
+            await appointmentAppService.CreateAsync(cancellationToken, createAppointmentDTO, notifyUsers: true, isChat : true);
             return Ok();
         }
 

@@ -1,4 +1,4 @@
-﻿using Dispo.Barber.Application.AppServices.Interface;
+﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Phone.Requests;
 using Microsoft.AspNetCore.Mvc;
 

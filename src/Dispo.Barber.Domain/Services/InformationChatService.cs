@@ -8,13 +8,14 @@ using Dispo.Barber.Domain.Enums;
 using Dispo.Barber.Domain.Exceptions;
 using Dispo.Barber.Domain.Integration.HubClient;
 using Dispo.Barber.Domain.Repositories;
-using Dispo.Barber.Domain.Services.Interface;
+using Dispo.Barber.Domain.Services.Interfaces;
 using Dispo.Barber.Domain.Utils;
+using Microsoft.Extensions.Logging;
 
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class InformationChatService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository, IHubIntegration hubIntegration) : IInformationChatService
+    public class InformationChatService(ILogger<InformationChatService> logger,IUnitOfWork unitOfWork, IMapper mapper, IUserRepository userRepository, IHubIntegration hubIntegration) : IInformationChatService
     {
         public async Task<InformationChatDTO> GetInformationChatByIdCompanyAsync(CancellationToken cancellationToken, long companyId)
         {
@@ -48,6 +49,7 @@ namespace Dispo.Barber.Domain.Services
             }
             catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
             {
+                logger.LogError(ex, "Error GetInformationChatByIdCompanyAsync.");
                 throw;
             }
         }
@@ -96,76 +98,137 @@ namespace Dispo.Barber.Domain.Services
             }
             catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
             {
+                logger.LogError(ex, "Error GetInformationChatByIdUser.");
                 throw;
             }
         }
 
         public async Task<InformationChatUserDTO> GetInformationChatByIdService(CancellationToken cancellationToken, List<long> idServices)
         {
-            if (idServices == null || idServices.Count == 0)
-                throw new BusinessException("É necessário informar pelo menos um serviço.");
-
-            var userList = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            try
             {
-                var serviceRepository = unitOfWork.GetRepository<IServiceUserRepository>();
-                return await serviceRepository.GetUsersByServiceId(idServices);
-            });
+                if (idServices == null || idServices.Count == 0)
+                    throw new BusinessException("É necessário informar pelo menos um serviço.");
 
-            return new InformationChatUserDTO
+                var userList = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    var serviceRepository = unitOfWork.GetRepository<IServiceUserRepository>();
+                    return await serviceRepository.GetUsersByServiceId(idServices);
+                });
+
+                return new InformationChatUserDTO
+                {
+                    User = mapper.Map<List<UserInformationDTO>>(userList)
+                };
+            }
+            catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
             {
-                User = mapper.Map<List<UserInformationDTO>>(userList)
-            };
+                logger.LogError(ex, "Error GetInformationChatByIdService.");
+                throw;
+            }
         }
 
         public async Task<List<DayScheduleDto>> GetUserAppointmentsByUserIdAsync(CancellationToken cancellationToken, long idUser)
         {
-            var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-
-            var userSchedules = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+            try
             {
-                return await userScheduleRepository.GetScheduleByUserId(idUser);
-            });
+                var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
 
-            return userSchedules
-                    .Select(schedule => new DayScheduleDto
-                    {
-                        DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
-                    })
-                    .ToList();
+                var userSchedules = await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    return await userScheduleRepository.GetScheduleByUserId(idUser);
+                });
+
+                return userSchedules
+                        .Select(schedule => new DayScheduleDto
+                        {
+                            DayOfWeek = GetDayOfWeekString((int)schedule.DayOfWeek)
+                        })
+                        .ToList();
+            }
+            catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
+            {
+                logger.LogError(ex, "Error GetUserAppointmentsByUserIdAsync.");
+                throw;
+            }
         }
 
         public async Task<Dictionary<string, List<string>>> GetAvailableSlotsAsync(CancellationToken cancellationToken, AvailableSlotRequestDto availableSlotRequestDto)
         {
-            var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
-            var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+            try
+            {
+                var userScheduleRepository = unitOfWork.GetRepository<IScheduleRepository>();
+                var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
 
-            var dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
-            var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
-            var userBreaks = await userRepository.GetEnabledBreaksAsync(cancellationToken, availableSlotRequestDto.IdUser, dayOfWeek);
-            var userDayOffs = await userRepository.GetDaysOffAsync(cancellationToken, availableSlotRequestDto.IdUser);
+                var dayOfWeek = availableSlotRequestDto.DateTimeSchedule.DayOfWeek;
+                var userSchedules = await userScheduleRepository.GetScheduleByUserDayOfWeek(availableSlotRequestDto.IdUser, dayOfWeek);
+                var userBreaks = await userRepository.GetEnabledBreaksAsync(cancellationToken, availableSlotRequestDto.IdUser, dayOfWeek);
+                var userDayOffs = await userRepository.GetDaysOffAsync(cancellationToken, availableSlotRequestDto.IdUser);
 
-            var isToday = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
+                var isToday = LocalTime.Now.Date == availableSlotRequestDto.DateTimeSchedule.Date;
 
-            var slots = GetTimeIntervals(
-                availableSlotRequestDto.Duration,
-                userSchedules,
-                userBreaks,
-                userDayOffs,
-                availableSlotRequestDto.DateTimeSchedule,
-                isToday);
+                var slots = GetTimeIntervals(
+                    availableSlotRequestDto.Duration,
+                    userSchedules,
+                    userBreaks,
+                    userDayOffs,
+                    availableSlotRequestDto.DateTimeSchedule,
+                    isToday);
 
-            var availableSlots = InitializeAvailableSlots();
+                var availableSlots = InitializeAvailableSlots();
 
-            var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(
-                cancellationToken,
-                availableSlotRequestDto.IdUser,
-                availableSlotRequestDto.DateTimeSchedule);
+                var appointments = await appointmentRepository.GetAppointmentByUserAndDateIdSync(
+                    cancellationToken,
+                    availableSlotRequestDto.IdUser,
+                    availableSlotRequestDto.DateTimeSchedule);
 
-            var occupiedSlots = GetOccupiedSlots(appointments);
+                var occupiedSlots = GetOccupiedSlots(appointments);
 
-            PopulateAvailableSlots(slots, occupiedSlots, availableSlotRequestDto, availableSlots);
+                PopulateAvailableSlots(slots, occupiedSlots, availableSlotRequestDto, availableSlots);
 
-            return availableSlots;
+                return availableSlots;
+            }
+            catch (Exception ex) when (ex is not BusinessException and not NotFoundException)
+            {
+                logger.LogError(ex, "Error GetAvailableSlotsAsync.");
+                throw;
+            }
+           
+        }
+
+        public async Task<InformationAppointmentChatDTO> GetInformationAppointmentChatByIdAppointment(CancellationToken cancellationToken, long idAppointment)
+        {
+            try
+            {
+                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
+                {
+                    var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
+
+                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment) ?? throw new NotFoundException("Agendamento não encontrado.");
+                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId) ?? throw new NotFoundException("Unidade de negocio não encontrada para esse agendamento.");
+                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId) ?? throw new NotFoundException("Cliente não encontrado para esse agendamento.");
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada para esse agendamento.");
+                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId) ?? throw new NotFoundException("Usuário não encontrado para esse agendamento.");
+
+                    var informationChat = new InformationAppointmentChatDTO
+                    {
+                        NameCompany = company.Name,
+                        IdUser = user.Status == UserStatus.Active ? user.Id : null,
+                        NameUser = user.Name,
+                        NameCustomer = customer.Name,
+                        Phone = customer.Phone,
+                        DateAppointment = appointment.Date
+                    };
+
+                    return informationChat;
+
+                });
+            }
+            catch (Exception ex) when (ex is not NotFoundException)
+            {
+                logger.LogError(ex, "Error GetInformationAppointmentChatByIdAppointment.");
+                throw;
+            }
         }
 
         private Dictionary<string, List<string>> InitializeAvailableSlots()
@@ -361,40 +424,6 @@ namespace Dispo.Barber.Domain.Services
                 return "afternoon";
             else
                 return "evening";
-        }
-
-        public async Task<InformationAppointmentChatDTO> GetInformationAppointmentChatByIdAppointment(CancellationToken cancellationToken, long idAppointment)
-        {
-            try
-            {
-                return await unitOfWork.QueryUnderTransactionAsync(cancellationToken, async () =>
-                {
-                    var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
-
-                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment) ?? throw new NotFoundException("Agendamento não encontrado.");
-                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId) ?? throw new NotFoundException("Unidade de negocio não encontrada para esse agendamento.");
-                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId) ?? throw new NotFoundException("Cliente não encontrado para esse agendamento.");
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada para esse agendamento.");
-                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId) ?? throw new NotFoundException("Usuário não encontrado para esse agendamento.");
-
-                    var informationChat = new InformationAppointmentChatDTO
-                    {
-                        NameCompany = company.Name,
-                        IdUser = user.Status == UserStatus.Active ? user.Id : null,
-                        NameUser = user.Name,
-                        NameCustomer = customer.Name,
-                        Phone = customer.Phone,
-                        DateAppointment = appointment.Date
-                    };
-
-                    return informationChat;
-
-                });
-            }
-            catch (Exception ex) when (ex is not NotFoundException)
-            {
-                throw;
-            }
         }
     }
 }
