@@ -70,7 +70,7 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
                     return LicensePlan.BarberFree;
                 }
 
-                return plan.Name.ToEnum<LicensePlan>();
+                return (LicensePlan)plan.Id;
             }
             catch (Exception)
             {
