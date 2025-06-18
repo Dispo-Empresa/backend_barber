@@ -273,13 +273,5 @@ namespace Dispo.Barber.API.Controllers.v1
             await userAppService.ResetUnreadNotificationsAsync(cancellationToken, id);
             return Ok();
         }
-
-        [Authorize]
-        [HttpPatch("{id}/purchase-token/{purchaseToken}")]
-        public async Task<IActionResult> UpdatePurchaseToken([FromRoute] int id, [FromRoute] string purchaseToken, CancellationToken cancellationToken)
-        {
-            await userAppService.UpdatePurchaseToken(id, purchaseToken, cancellationToken);
-            return Ok();
-        }
     }
 }

@@ -4,7 +4,7 @@ using Dispo.Barber.Domain.Enums;
 
 namespace Dispo.Barber.Domain.Services.Interfaces
 {
-    public interface ISubscriptionValidationService
+    public interface IStoreSubscriptionService
     {
         Task<SubscriptionData> ValidateSubscriptionAsync(User user, DevicePlatform? currentPlataform, CancellationToken cancellationToken);
     }

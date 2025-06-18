@@ -20,7 +20,7 @@ namespace Dispo.Barber.Domain.Services
                              IBlacklistService blacklistService,
                              IHubIntegration hubIntegration,
                              IHubLicenceValidationService hubLicenceValidationService,
-                             ISubscriptionValidationService subscriptionValidationService) : IAuthService
+                             IStoreSubscriptionService subscriptionValidationService) : IAuthService
     {
         public async Task<AuthenticationResult> AuthenticateAsync(AuthenticationRequest request, CancellationToken cancellationToken)
         {
@@ -33,8 +33,8 @@ namespace Dispo.Barber.Domain.Services
 
             var subscriptionData = await ProcessSubscriptionDataAsync(user, licenseDetails, request.Platform, cancellationToken);
 
-            if (licenseDetails.Plan.Id != (int)PlanType.BarberPremium ||
-               (licenseDetails.Plan.Id == (int)PlanType.BarberPremium && subscriptionData!.IsSubscriptionValid))
+            if (licenseDetails.Plan.Id != (int)LicensePlan.BarberPremium ||
+               (licenseDetails.Plan.Id == (int)LicensePlan.BarberPremium && subscriptionData!.IsSubscriptionValid))
             {
                 ChangePlataformDeviceToken(user, request.Platform, request.DeviceToken);
             }

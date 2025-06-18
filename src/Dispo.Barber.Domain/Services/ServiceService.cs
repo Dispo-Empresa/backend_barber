@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 namespace Dispo.Barber.Domain.Services
 {
     public class ServiceService(IMapper mapper,
-                                IHttpContextAccessor _httpContextAccessor,
+                                IHttpContextAccessor httpContextAccessor,
                                 IServiceRepository repository, 
                                 ICompanyRepository companyRepository, 
                                 IBusinessUnityRepository businessUnityRepository, 
@@ -23,7 +23,7 @@ namespace Dispo.Barber.Domain.Services
         public async Task CreateAsync(CancellationToken cancellationToken, CreateServiceDTO createServiceDTO)
         {
             var service = mapper.Map<Service>(createServiceDTO);
-            var loggedUserId = long.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
+            var loggedUserId = long.Parse(httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
             await repository.AddAsync(cancellationToken, service);
             await repository.SaveChangesAsync(cancellationToken);
 
@@ -69,7 +69,7 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task<IList<ServiceInformationDTO>> GetAllServicesList(CancellationToken cancellationToken)
         {
-            var services = await repository.GetAllAsync(cancellationToken);
+            var services = await repository.GetAllAsNoTrackingAsync(cancellationToken);
             return mapper.Map<IList<ServiceInformationDTO>>(services);
         }
 
@@ -99,7 +99,7 @@ namespace Dispo.Barber.Domain.Services
         public async Task ChangeStatusAsync(CancellationToken cancellationToken, long id, ServiceStatus status)
         {
             var service = await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Serviço não encontrado.");
-            var loggedUserId = long.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
+            var loggedUserId = long.Parse(httpContextAccessor.HttpContext?.User.FindFirst("id").Value);
             var businessUnityId = await userRepository.GetBusinessUnityIdByIdAsync(cancellationToken, loggedUserId);
             var users = await businessUnityRepository.GetUsersAsync(cancellationToken, businessUnityId);
 

@@ -32,14 +32,14 @@ namespace Dispo.Barber.Domain.Services
         {
             // Dá pra melhorar todo esse método
             var appointment = mapper.Map<Appointment>(createAppointmentDTO);
-            var user = await userRepository.GetFirstAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
+            var user = await userRepository.GetFirstAsNoTrackingAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
 
             if (user is not null && user.Status != UserStatus.Active)
             {
                 throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
             }
 
-            var existingCustomer = await customerRepository.GetFirstAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
+            var existingCustomer = await customerRepository.GetFirstAsNoTrackingAsync(cancellationToken, w => w.Id == createAppointmentDTO.Customer.Id.Value && w.Appointments.Any(w => w.BusinessUnityId == createAppointmentDTO.BusinessUnityId));
             if (existingCustomer != null)
             {
                 appointment.Customer = null;
@@ -83,7 +83,7 @@ namespace Dispo.Barber.Domain.Services
 
             var newAppointment = mapper.Map<Appointment>(createAppointmentDTO);
             newAppointment.Id = 0;
-            var user = await userRepository.GetFirstAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
+            var user = await userRepository.GetFirstAsNoTrackingAsync(cancellationToken, createAppointmentDTO.AcceptedUserId ?? 0, "BusinessUnity.Company");
 
             if (user is not null && user.Status != UserStatus.Active)
                 throw new BusinessException("O usuário precisa estar ativo para aceitar um agendamento");
@@ -169,7 +169,7 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task<Appointment> GetAsync(CancellationToken cancellationToken, long id)
         {
-            return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
+            return await repository.GetAsNoTrackingAsync(cancellationToken, id) ?? throw new NotFoundException("Agendamento não existe.");
         }
 
         public async Task<List<Appointment>> GetNextAppointmentsAsync(CancellationToken cancellationToken, long userId)

@@ -41,6 +41,5 @@ namespace Dispo.Barber.Application.AppServices.Interfaces
         Task RemoveAsync(CancellationToken cancellationToken, long id);
         Task<int> GetUnreadNotificationsCountAsync(CancellationToken cancellationToken, long id);
         Task ResetUnreadNotificationsAsync(CancellationToken cancellationToken, long id);
-        Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken);
     }
 }

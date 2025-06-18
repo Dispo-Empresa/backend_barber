@@ -5,7 +5,7 @@ namespace Dispo.Barber.Domain.Integration.HubClient
 {
     public interface IHubIntegration
     {
-        Task<PlanType> GetPlanType(CancellationToken cancellationToken, long companyId);
+        Task<LicensePlan> GetPlanType(CancellationToken cancellationToken, long companyId);
         Task<LicenseDTO?> GetLicenseDetails(CancellationToken cancellationToken, long companyId);
         Task<LicenseDTO> CreateHubLicense(LicenseRequestDTO licenceRequestDTO, CancellationToken cancellationToken);
     }

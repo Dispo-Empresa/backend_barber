@@ -27,7 +27,7 @@ namespace Dispo.Barber.Domain.Services
                     var businessUnityRepository = unitOfWork.GetRepository<IBusinessUnityRepository>();
                     var serviceRepository = unitOfWork.GetRepository<IServiceRepository>();
 
-                    var company = await companyRepository.GetAsync(cancellationToken, companyId)
+                    var company = await companyRepository.GetAsNoTrackingAsync(cancellationToken, companyId)
                         ?? throw new NotFoundException("Empresa com o ID não encontrada.");
 
                     var businessUnityId = await businessUnityRepository.GetIdByCompanyAsync(company.Id);
@@ -64,20 +64,20 @@ namespace Dispo.Barber.Domain.Services
                     var companyRepository = unitOfWork.GetRepository<ICompanyRepository>();
                     var serviceUserRepository = unitOfWork.GetRepository<IServiceUserRepository>();
 
-                    var user = await userRepository.GetAsync(cancellationToken, idUser)
+                    var user = await userRepository.GetAsNoTrackingAsync(cancellationToken, idUser)
                         ?? throw new NotFoundException("Usuário não encontrado.");
 
                     if (!user.BusinessUnityId.HasValue)
                         throw new Exception("Barbeiro não possui unidade de negócio.");
 
-                    var businessUnity = await businessUnityRepository.GetAsync(cancellationToken, user.BusinessUnityId.Value)
+                    var businessUnity = await businessUnityRepository.GetAsNoTrackingAsync(cancellationToken, user.BusinessUnityId.Value)
                         ?? throw new NotFoundException("Unidade de negócio não encontrada.");
 
-                    var company = await companyRepository.GetAsync(cancellationToken, businessUnity.CompanyId)
+                    var company = await companyRepository.GetAsNoTrackingAsync(cancellationToken, businessUnity.CompanyId)
                         ?? throw new NotFoundException("Empresa não encontrada.");
 
                     var planType = await hubIntegration.GetPlanType(cancellationToken, company.Id);
-                    if (planType == PlanType.BarberFree)
+                    if (planType == LicensePlan.BarberFree)
                         throw new BusinessException("O plano da empresa não contempla esta funcionalidade.");
 
                     var services = await serviceUserRepository.GetServicesByUserId(idUser);
@@ -204,11 +204,11 @@ namespace Dispo.Barber.Domain.Services
                 {
                     var appointmentRepository = unitOfWork.GetRepository<IAppointmentRepository>();
 
-                    var appointment = await appointmentRepository.GetAsync(cancellationToken, idAppointment) ?? throw new NotFoundException("Agendamento não encontrado.");
-                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsync(cancellationToken, appointment.BusinessUnityId) ?? throw new NotFoundException("Unidade de negocio não encontrada para esse agendamento.");
-                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsync(cancellationToken, appointment.CustomerId) ?? throw new NotFoundException("Cliente não encontrado para esse agendamento.");
-                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada para esse agendamento.");
-                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsync(cancellationToken, (long)appointment.AcceptedUserId) ?? throw new NotFoundException("Usuário não encontrado para esse agendamento.");
+                    var appointment = await appointmentRepository.GetAsNoTrackingAsync(cancellationToken, idAppointment) ?? throw new NotFoundException("Agendamento não encontrado.");
+                    var businessUnity = await unitOfWork.GetRepository<IBusinessUnityRepository>().GetAsNoTrackingAsync(cancellationToken, appointment.BusinessUnityId) ?? throw new NotFoundException("Unidade de negocio não encontrada para esse agendamento.");
+                    var customer = await unitOfWork.GetRepository<ICustomerRepository>().GetAsNoTrackingAsync(cancellationToken, appointment.CustomerId) ?? throw new NotFoundException("Cliente não encontrado para esse agendamento.");
+                    var company = await unitOfWork.GetRepository<ICompanyRepository>().GetAsNoTrackingAsync(cancellationToken, businessUnity.CompanyId) ?? throw new NotFoundException("Empresa não encontrada para esse agendamento.");
+                    var user = await unitOfWork.GetRepository<IUserRepository>().GetAsNoTrackingAsync(cancellationToken, (long)appointment.AcceptedUserId) ?? throw new NotFoundException("Usuário não encontrado para esse agendamento.");
 
                     var informationChat = new InformationAppointmentChatDTO
                     {

@@ -36,7 +36,7 @@ namespace Dispo.Barber.Domain.Services
             return await hubIntegration.CreateHubLicense(new LicenseRequestDTO
             {
                 CompanyId = user.BusinessUnity.CompanyId,
-                PlanType = PlanType.BarberFree,
+                PlanType = LicensePlan.BarberFree,
             }, cancellationToken);
         }
 

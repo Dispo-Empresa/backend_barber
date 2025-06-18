@@ -101,7 +101,7 @@ namespace Dispo.Barber.Domain.Services
 
         private async Task ValidateOverride(CancellationToken cancellationToken, UserSchedule schedule)
         {
-            var existingSchedules = await repository.GetAsync(cancellationToken, w => w.Enabled && (w.IsRest || w.DayOff) && w.UserId == schedule.UserId && w.DayOfWeek == schedule.DayOfWeek);
+            var existingSchedules = await repository.GetAsNoTrackingAsync(cancellationToken, w => w.Enabled && (w.IsRest || w.DayOff) && w.UserId == schedule.UserId && w.DayOfWeek == schedule.DayOfWeek);
             foreach (var existingSchedule in existingSchedules)
             {
                 if (existingSchedule.DayOff)

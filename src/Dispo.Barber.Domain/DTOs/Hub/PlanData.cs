@@ -9,8 +9,8 @@ namespace Dispo.Barber.Domain.DTOs.Hub
         public decimal Price { get; set; }
         public double UserLimit { get; set; }
 
-        public bool IsFreePlan() => Id == (int)PlanType.BarberFree;
-        public bool IsPremiumPlan() => Id == (int)PlanType.BarberPremium;
-        public bool IsTrial() => Id == (int)PlanType.BarberPremiumTrial;
+        public bool IsFreePlan() => Id == (int)LicensePlan.BarberFree;
+        public bool IsPremiumPlan() => Id == (int)LicensePlan.BarberPremium;
+        public bool IsTrial() => Id == (int)LicensePlan.BarberPremiumTrial;
     }
 }

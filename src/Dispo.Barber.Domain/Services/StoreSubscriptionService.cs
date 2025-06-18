@@ -9,9 +9,9 @@ using Dispo.Barber.Domain.Services.Interfaces;
 
 namespace Dispo.Barber.Domain.Services
 {
-    public class SubscriptionValidationService(IUserRepository userRepository,
+    public class StoreSubscriptionService(IUserRepository userRepository,
                                                ISubscriptionValidatorFactory subscriptionFactory,
-                                               IUserService userService) : ISubscriptionValidationService
+                                               IUserService userService) : IStoreSubscriptionService
     {
         public async Task<SubscriptionData> ValidateSubscriptionAsync(User user, DevicePlatform? currentPlataform, CancellationToken cancellationToken)
         {
@@ -41,7 +41,7 @@ namespace Dispo.Barber.Domain.Services
         private async Task<SubscriptionData> ValidateDependentSubscriptionAsync(User dependent, CancellationToken cancellationToken)
         {
             var ownerId = dependent.BusinessUnity?.Company.OwnerId;
-            var owner = await userRepository.GetAsync(cancellationToken, ownerId.GetValueOrDefault()) ?? throw new NotFoundException("Proprietário não encontrado.");
+            var owner = await userRepository.GetAsNoTrackingAsync(cancellationToken, ownerId.GetValueOrDefault()) ?? throw new NotFoundException("Proprietário não encontrado.");
 
             return await ExecuteSubscriptionValidationAsync(dependent, owner.PurchaseToken, cancellationToken);
         }

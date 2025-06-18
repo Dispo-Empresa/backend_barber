@@ -368,7 +368,7 @@ namespace Dispo.Barber.Domain.Services
             {
                 CompanyId = createdCompanyId,
                 PlanType = createBarbershopSchemeDto.PlanType,
-                Expiration = createBarbershopSchemeDto.PlanType == PlanType.BarberPremiumTrial ? LocalTime.Now.AddDays(7) : null
+                Expiration = createBarbershopSchemeDto.PlanType == LicensePlan.BarberPremiumTrial ? LocalTime.Now.AddDays(7) : null
             }, cancellationToken);
         }
 
@@ -409,18 +409,6 @@ namespace Dispo.Barber.Domain.Services
 
             user.UnreadNotificationsCount = 0;
 
-            repository.Update(user);
-            await repository.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken)
-        {
-            var user = await repository.GetAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
-
-            if (user.Status != UserStatus.Active)
-                throw new BusinessException("Usuário não está ativo.");
-
-            user.PurchaseToken = purchaseToken;
             repository.Update(user);
             await repository.SaveChangesAsync(cancellationToken);
         }

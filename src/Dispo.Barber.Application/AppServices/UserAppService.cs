@@ -467,18 +467,5 @@ namespace Dispo.Barber.Application.AppServices
                 throw;
             }
         }
-
-        public async Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await unitOfWork.ExecuteUnderTransactionAsync(cancellationToken, async () => await service.UpdatePurchaseToken(userId, purchaseToken, cancellationToken), true);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Error updating purchase token.");
-                throw;
-            }
-        }
     }
 }

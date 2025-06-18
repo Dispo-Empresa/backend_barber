@@ -29,7 +29,7 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task<List<Company>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await repository.GetAllAsync(cancellationToken);
+            return await repository.GetAllAsNoTrackingAsync(cancellationToken);
         }
 
         public async Task<List<BusinessUnity>> GetBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
@@ -66,12 +66,12 @@ namespace Dispo.Barber.Domain.Services
 
         public async Task<Company> GetAsync(CancellationToken cancellationToken, long id)
         {
-            return await repository.GetAsync(cancellationToken, id) ?? throw new NotFoundException("Empresa não existe.");
+            return await repository.GetAsNoTrackingAsync(cancellationToken, id) ?? throw new NotFoundException("Empresa não existe.");
         }
 
         public async Task UpdateOwner(CancellationToken cancellationToken, long id, long ownerId)
         {
-            var company = await GetAsync(cancellationToken, id);
+            var company = await repository.GetAsync(cancellationToken, id);
             company.OwnerId = ownerId;
 
             repository.Update(company);

@@ -1,6 +1,5 @@
 ﻿using Dispo.Barber.Application.AppServices.Interfaces;
 using Dispo.Barber.Domain.DTOs.Company;
-using Dispo.Barber.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +7,7 @@ namespace Dispo.Barber.API.Controllers.v1
 {
     [Route("api/v1/companies")]
     [ApiController]
-    public class CompanyController(ICompanyAppService companyAppService, IInformationChatService informationChatService) : ControllerBase
+    public class CompanyController(ICompanyAppService companyAppService) : ControllerBase
     {
         [AllowAnonymous]
         [HttpPost]
@@ -48,21 +47,6 @@ namespace Dispo.Barber.API.Controllers.v1
         {
             var result = await companyAppService.GetAsync(cancellationToken, id);
             return Ok(result);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("information/{id}")]
-        public async Task<IActionResult> GetInformationChatById(CancellationToken cancellationToken, long id)
-        {
-            try
-            {
-                var informationChat = await informationChatService.GetInformationChatByIdCompanyAsync(cancellationToken, id);
-                return Ok(informationChat);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Ocorreu um erro ao buscar empressa.", error = ex.Message });
-            }
         }
 
         [Authorize]

@@ -34,6 +34,5 @@ namespace Dispo.Barber.Domain.Services.Interfaces
         Task UpdateAllFromCompany(CancellationToken cancellationToken, long companyId, UserStatus status);
         Task RemoveAsync(CancellationToken cancellationToken, long id);
         Task ResetUnreadNotificationsAsync(CancellationToken cancellationToken, long id);
-        Task UpdatePurchaseToken(int userId, string purchaseToken, CancellationToken cancellationToken);
     }
 }

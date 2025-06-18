@@ -36,21 +36,21 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
                     ExpirationDate = DateTime.MaxValue,
                     Plan = new PlanData
                     {
-                        Id = (int)PlanType.BarberFree,
-                        Name = PlanType.BarberFree.ToString(),
+                        Id = (int)LicensePlan.BarberFree,
+                        Name = LicensePlan.BarberFree.ToString(),
                         UserLimit = 1,
                     }
                 };
             }
         }
 
-        public async Task<PlanType> GetPlanType(CancellationToken cancellationToken, long companyId)
+        public async Task<LicensePlan> GetPlanType(CancellationToken cancellationToken, long companyId)
         {
             try
             {
                 if (!HubIntegrationEnabled)
                 {
-                    return PlanType.BarberFree;
+                    return LicensePlan.BarberFree;
                 }
 
                 var url = Environment.GetEnvironmentVariable("HUB_INTEGRATION_URL");
@@ -61,20 +61,20 @@ namespace Dispo.Barber.Infrastructure.Integration.HubClient
 
                 if (response == null || response.StatusCode != HttpStatusCode.OK)
                 {
-                    return PlanType.BarberFree;
+                    return LicensePlan.BarberFree;
                 }
 
                 var plan = JsonConvert.DeserializeObject<PlanData>(response.Content);
                 if (plan is null)
                 {
-                    return PlanType.BarberFree;
+                    return LicensePlan.BarberFree;
                 }
 
-                return plan.Name.ToEnum<PlanType>();
+                return plan.Name.ToEnum<LicensePlan>();
             }
             catch (Exception)
             {
-                return PlanType.BarberFree;
+                return LicensePlan.BarberFree;
             }
         }
 

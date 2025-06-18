@@ -7,6 +7,6 @@ namespace Dispo.Barber.Domain.DTOs.User
     {
         public CreateOwnerUserDTO OwnerUser { get; set; }
         public CreateCompanyDTO Company { get; set; }
-        public PlanType PlanType { get; set; }
+        public LicensePlan PlanType { get; set; }
     }
 }

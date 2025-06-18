@@ -1,6 +1,6 @@
 ﻿namespace Dispo.Barber.Domain.Enums
 {
-    public enum PlanType
+    public enum LicensePlan
     {
         BarberFree = 1,
         BarberPremium = 2,

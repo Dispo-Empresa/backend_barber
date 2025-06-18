@@ -52,6 +52,13 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
+        public async Task<T?> GetAsNoTrackingAsync(CancellationToken cancellationToken, long id)
+        {
+            return await context.Set<T>()
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
         public async Task<List<T>> GetAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression, string include = "")
         {
             if (!string.IsNullOrEmpty(include))
@@ -67,9 +74,27 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<T>> GetAsNoTrackingAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression, string include = "")
+        {
+            if (!string.IsNullOrEmpty(include))
+            {
+                return await context.Set<T>()
+                                .Include(include)
+                                .AsNoTracking()
+                                .Where(expression)
+                                .ToListAsync(cancellationToken);
+            }
+
+            return await context.Set<T>()
+                                .AsNoTracking()
+                                .Where(expression)
+                                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<T>> GetAllAsNoTrackingAsync(CancellationToken cancellationToken)
         {
             return await context.Set<T>()
+                                .AsNoTracking()
                                 .ToListAsync(cancellationToken);
         }
 
@@ -79,20 +104,46 @@ namespace Dispo.Barber.Infrastructure.Repositories
                                 .FirstOrDefaultAsync(expression, cancellationToken);
         }
 
+        public async Task<T> GetFirstAsNoTrackingAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression)
+        {
+            return await context.Set<T>()
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(expression, cancellationToken);
+        }
+
         public async Task<T> GetFirstAsync(CancellationToken cancellationToken, long id, string include = "")
         {
             if (!string.IsNullOrEmpty(include))
             {
-                return await context.Set<T>().Include(include).FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+                return await context.Set<T>()
+                                    .Include(include)
+                                    .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
             }
 
-            return await context.Set<T>().FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+            return await context.Set<T>()
+                                .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+        }
+
+        public async Task<T> GetFirstAsNoTrackingAsync(CancellationToken cancellationToken, long id, string include = "")
+        {
+            if (!string.IsNullOrEmpty(include))
+            {
+                return await context.Set<T>()
+                                    .Include(include)
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+            }
+
+            return await context.Set<T>()
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
         }
 
         public async Task<bool> ExistsAsync(CancellationToken cancellationToken, Expression<Func<T, bool>> expression)
         {
             return await context.Set<T>()
-                .AnyAsync(expression, cancellationToken);
+                                .AsNoTracking()
+                                .AnyAsync(expression, cancellationToken);
         }
     }
 }
