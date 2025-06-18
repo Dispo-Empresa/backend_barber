@@ -33,7 +33,7 @@ namespace Dispo.Barber.Domain.Services
 
         private async Task<User> GetUserAsync(long userId, CancellationToken cancellationToken)
         {
-            return await userRepository.GetAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
+            return await userRepository.GetByIdWithBusinessUnitiesAsync(cancellationToken, userId) ?? throw new NotFoundException("Usuário não encontrado.");
         }
 
         private void ValidateUserPermissions(Company company, User user)

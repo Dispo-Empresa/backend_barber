@@ -107,8 +107,11 @@ namespace Dispo.Barber.Infrastructure.Repositories
 
         public async Task<User> GetByIdWithBusinessUnitiesAsync(CancellationToken cancellationToken, long id)
         {
-            return await context.Users.Include(i => i.BusinessUnity).ThenInclude(i => i.Company).Include(i => i.RefreshToken)
-                                      .FirstOrDefaultAsync(w => w.Id == id);
+            return await context.Users
+                                .Include(i => i.BusinessUnity)
+                                .ThenInclude(i => i.Company)
+                                .Include(i => i.RefreshToken)
+                                .FirstOrDefaultAsync(w => w.Id == id);
         }
 
         public async Task<User?> GetByCompanyAndUserSlugAsync(CancellationToken cancellationToken, string companySlug, string userSlug)
